@@ -1,0 +1,132 @@
+<html>
+<head>
+<meta charset="utf-8">
+
+<script>
+function onLoad()
+{
+  var cols = document.querySelectorAll('#choises .column');
+  [].forEach.call(cols, function(col)
+  {
+    col.addEventListener('dragstart', onDragStart, false);
+    col.addEventListener('dragenter', onDragEnter, false);
+    col.addEventListener('dragover', onDragOver, false);
+    col.addEventListener('dragleave', onDragLeave, false);
+    col.addEventListener('drop', onDrop, false);
+    col.addEventListener('dragend', onDragEnd, false);
+  });
+  img_holder.addEventListener('dragstart', onDragStart, false);
+  img_holder.addEventListener('dragenter', onDragEnter, false);
+  img_holder.addEventListener('dragover', onDragOver, false);
+  img_holder.addEventListener('dragleave', onDragLeave, false);
+  img_holder.addEventListener('drop', onDrop, false);
+  img_holder.addEventListener('dragend', onDragEnd, false);
+}
+
+function onDragStart(e)
+{
+  this.style.opacity = '0.4';
+  return false;
+}
+
+function onDragEnter(e)
+{
+  
+  this.classList.add('over');
+  return false;
+}
+
+function onDragOver(e)
+{
+  return false;
+}
+
+function onDragLeave(e)
+{
+  this.classList.remove('over');
+  return false;
+}
+
+function onDrop(e)
+{
+  alert("drop");
+  return false;
+}
+
+function onDragEnd(e)
+{
+  this.style.opacity = '1.0';
+  return false;
+}
+
+</script>
+
+
+<style>
+.column {
+  height: 50px;
+  width: 150px;
+  float: bottom;
+  border: 2px solid #666666;
+  background-color: #ccc;
+  margin-right: 5px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: move;
+}
+.column header {
+  color: #fff;
+  text-shadow: #0ff 0 1px;
+  box-shadow: 5px;
+  padding: 5px;
+  background: -moz-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
+  background: -webkit-gradient(linear, left top, right top,
+                               color-stop(0, rgb(0,0,0)),
+                               color-stop(0.50, rgb(79,79,79)),
+                               color-stop(1, rgb(21,21,21)));
+  background: -webkit-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
+  background: -ms-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
+  border-bottom: 1px solid #ddd;
+  -webkit-border-top-left-radius: 10px;
+  -moz-border-radius-topleft: 10px;
+  -ms-border-radius-topleft: 10px;
+  border-top-left-radius: 10px;
+  -webkit-border-top-right-radius: 10px;
+  -ms-border-top-right-radius: 10px;
+  -moz-border-radius-topright: 10px;
+  border-top-right-radius: 10px;
+}
+
+.img_holder_class {
+  float: bottom;
+  border: 2px solid #0000ff;
+  background-color: #ccc;
+  margin-right: 5px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: move;
+}
+
+.img_holder_class.over {
+  border: 2px dashed #ff0000;
+}
+
+
+</style>
+<head>
+<body onload='onLoad();'>
+<table><tr>
+  <td>
+    <img class="img_holder_class" src=img/dog.jpg id="img_holder" ></img>
+  </td>
+
+  <td>
+    <div id="choises">
+    <div class="column" draggable="true"><header>Տուն</header></div>
+    <div class="column" draggable="true"><header>Շուն</header></div>
+    <div class="column" draggable="true"><header>Սար</header></div>
+    </div>
+  </td>
+</tr></table>
+</body>
+</html>
