@@ -1,132 +1,71 @@
 <html>
 <head>
 <meta charset="utf-8">
-
 <script>
-function onLoad()
+var imgArr = {};
+var currIdx = 0;
+function loadImages()
 {
-  var cols = document.querySelectorAll('#choises .column');
-  [].forEach.call(cols, function(col)
+  var srcArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
+    "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
+    "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
+  for(var idx in srcArr)
   {
-    col.addEventListener('dragstart', onDragStart, false);
-    col.addEventListener('dragenter', onDragEnter, false);
-    col.addEventListener('dragover', onDragOver, false);
-    col.addEventListener('dragleave', onDragLeave, false);
-    col.addEventListener('drop', onDrop, false);
-    col.addEventListener('dragend', onDragEnd, false);
-  });
-  img_holder.addEventListener('dragstart', onDragStart, false);
-  img_holder.addEventListener('dragenter', onDragEnter, false);
-  img_holder.addEventListener('dragover', onDragOver, false);
-  img_holder.addEventListener('dragleave', onDragLeave, false);
-  img_holder.addEventListener('drop', onDrop, false);
-  img_holder.addEventListener('dragend', onDragEnd, false);
+    imgArr[idx] = new Image();
+    imgArr[idx].src = "img/"+srcArr[idx]; 
+  }
+  imgArr.count = srcArr.length;
 }
 
-function onDragStart(e)
+function selectRandomPic()
 {
-  this.style.opacity = '0.4';
-  return false;
+  fileArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
+    "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
+    "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
+//  idx=Math.floor(Math.random() * fileArr.length);
+//  imgHolder.src="img/"+fileArr[idx];
 }
 
-function onDragEnter(e)
+function draw()
 {
-  
-  this.classList.add('over');
-  return false;
+  var ctx=cs.getContext("2d");
+
+  // Create gradient
+  var grd=ctx.createLinearGradient(0,0,cs.width,cs.height);
+  grd.addColorStop(0,"red");
+  grd.addColorStop(1,"yellow");
+
+  // Fill with gradient
+  ctx.fillStyle=grd;
+  ctx.fillRect(0,0,cs.width,cs.height);
+  var img = imgArr[imgArr.currIdx];
+  var x = cs.width / 2 - img.width / 2;
+  var y = cs.height / 2 - img.height / 2;
+  ctx.drawImage(img, x, y);
 }
 
-function onDragOver(e)
+window.onload = function()
 {
-  return false;
+  cs.width = window.innerWidth;
+  cs.height = window.innerHeight;
+  loadImages();
+  imgArr.currIdx = Math.floor(Math.random() * 1000) % imgArr.count;
+  draw();
 }
 
-function onDragLeave(e)
+window.onresize = function()
 {
-  this.classList.remove('over');
-  return false;
-}
-
-function onDrop(e)
-{
-  alert("drop");
-  return false;
-}
-
-function onDragEnd(e)
-{
-  this.style.opacity = '1.0';
-  return false;
+  cs.width = window.innerWidth;
+  cs.height = window.innerHeight;
+  draw();
 }
 
 </script>
-
-
-<style>
-.column {
-  height: 50px;
-  width: 150px;
-  float: bottom;
-  border: 2px solid #666666;
-  background-color: #ccc;
-  margin-right: 5px;
-  border-radius: 10px;
-  text-align: center;
-  cursor: move;
-}
-.column header {
-  color: #fff;
-  text-shadow: #0ff 0 1px;
-  box-shadow: 5px;
-  padding: 5px;
-  background: -moz-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
-  background: -webkit-gradient(linear, left top, right top,
-                               color-stop(0, rgb(0,0,0)),
-                               color-stop(0.50, rgb(79,79,79)),
-                               color-stop(1, rgb(21,21,21)));
-  background: -webkit-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
-  background: -ms-linear-gradient(left center, rgb(0,0,0), rgb(79,79,79), rgb(21,21,21));
-  border-bottom: 1px solid #ddd;
-  -webkit-border-top-left-radius: 10px;
-  -moz-border-radius-topleft: 10px;
-  -ms-border-radius-topleft: 10px;
-  border-top-left-radius: 10px;
-  -webkit-border-top-right-radius: 10px;
-  -ms-border-top-right-radius: 10px;
-  -moz-border-radius-topright: 10px;
-  border-top-right-radius: 10px;
-}
-
-.img_holder_class {
-  float: bottom;
-  border: 2px solid #0000ff;
-  background-color: #ccc;
-  margin-right: 5px;
-  border-radius: 10px;
-  text-align: center;
-  cursor: move;
-}
-
-.img_holder_class.over {
-  border: 2px dashed #ff0000;
-}
-
-
-</style>
 <head>
-<body onload='onLoad();'>
-<table><tr>
-  <td>
-    <img class="img_holder_class" src=img/dog.jpg id="img_holder" ></img>
-  </td>
 
-  <td>
-    <div id="choises">
-    <div class="column" draggable="true"><header>Տուն</header></div>
-    <div class="column" draggable="true"><header>Շուն</header></div>
-    <div class="column" draggable="true"><header>Սար</header></div>
-    </div>
-  </td>
-</tr></table>
+<body>
+<canvas id="cs" style="border:1px solid #000000">
+Ձեր ծրագիրը շատ հին է, օգտագործեք Google Crome կամ Mozila Firefox
+</canvas>
 </body>
 </html>
