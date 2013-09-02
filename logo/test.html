@@ -72,6 +72,10 @@ function draw()
   x += img.width;
   y += img.height / 2 - lineHeight * imgArr.currTxtArr.length / 2;
   ctx.fillStyle = 'blue';
+  ctx.shadowColor = 'grey';
+  ctx.shadowOffsetX = 10;
+  ctx.shadowOffsetY = 10;
+  ctx.shadowBlur = 10;
   for(i in imgArr.currTxtArr)
   {
     var txt = imgArr.currTxtArr[i];
