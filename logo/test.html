@@ -3,27 +3,49 @@
 <meta charset="utf-8">
 <script>
 var imgArr = {};
-var currIdx = 0;
 function loadImages()
 {
   var srcArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
     "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
     "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
+  var txtArr = ["Մեղու", "Կով", "Մասուր", "Ձի", "Մուկ", "Պարան",
+    "Պատ", "Կատու", "Շուն", "Ձուկ", "Լուսին", "Մատիտ", "Կոշիկ",
+    "Պանիր", "Ձու", "Ծաղիկ", "Սար", "Նկար", "Սեղան"
+  ];
   for(var idx in srcArr)
   {
     imgArr[idx] = new Image();
-    imgArr[idx].src = "img/"+srcArr[idx]; 
+    imgArr[idx].src = "img/"+srcArr[idx];
+    imgArr[idx].txt = txtArr[idx];
   }
   imgArr.count = srcArr.length;
 }
 
 function selectRandomPic()
 {
-  fileArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
-    "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
-    "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
-//  idx=Math.floor(Math.random() * fileArr.length);
-//  imgHolder.src="img/"+fileArr[idx];
+  imgArr.currImg = imgArr[Math.floor(Math.random() * 1000) % imgArr.count];
+  var tmp = {}
+  var arr = [];
+  var cnt = 1;
+  tmp[imgArr.currImg.txt] = "";
+  arr[0] = imgArr.currImg.txt;
+  while(cnt < 3)
+  {
+    var txt = imgArr[Math.floor(Math.random() * 1000) % imgArr.count].txt;
+    if(tmp[txt] != null) continue;
+    tmp[txt] = "";
+    arr[cnt] = txt;
+    cnt ++;
+  }
+  for(var i = 0; i < 32; i ++)
+  {
+    var i1 = Math.floor(Math.random() * 1000) % arr.length;
+    var i2 = Math.floor(Math.random() * 1000) % arr.length;
+    var tmp = arr[i1];
+    arr[i1] = arr[i2];
+    arr[i2] = tmp;
+  }
+  imgArr.currTxtArr = arr;
 }
 
 function draw()
@@ -38,25 +60,40 @@ function draw()
   // Fill with gradient
   ctx.fillStyle=grd;
   ctx.fillRect(0,0,cs.width,cs.height);
-  var img = imgArr[imgArr.currIdx];
-  var x = cs.width / 2 - img.width / 2;
+  var img = imgArr.currImg;
+  var txtWidth = 0;
+  var lineHeight = 22;
+  ctx.font = lineHeight + 'pt Calibri';
+
+  for(i in imgArr.currTxtArr) txtWidth += ctx.measureText(imgArr.currTxtArr[i]).width;
+  var x = cs.width / 2 - (img.width + txtWidth) / 2;
   var y = cs.height / 2 - img.height / 2;
   ctx.drawImage(img, x, y);
+  x += img.width;
+  y += img.height / 2 - lineHeight * imgArr.currTxtArr.length / 2;
+  ctx.fillStyle = 'blue';
+  for(i in imgArr.currTxtArr)
+  {
+    var txt = imgArr.currTxtArr[i];
+    ctx.fillText(txt, x, y);
+    x += ctx.measureText(txt).width;
+    y += (lineHeight + 10);
+  }
 }
 
 window.onload = function()
 {
-  cs.width = window.innerWidth;
-  cs.height = window.innerHeight;
+  cs.width = cs.parentNode.clientWidth;
+  cs.height = cs.parentNode.clientHeight;
   loadImages();
-  imgArr.currIdx = Math.floor(Math.random() * 1000) % imgArr.count;
+  selectRandomPic();
   draw();
 }
 
 window.onresize = function()
 {
-  cs.width = window.innerWidth;
-  cs.height = window.innerHeight;
+  cs.width = cs.parentNode.clientWidth;
+  cs.height = cs.parentNode.clientHeight;
   draw();
 }
 
