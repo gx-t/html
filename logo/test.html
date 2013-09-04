@@ -66,13 +66,20 @@ function draw()
   ctx.font = lineHeight + 'pt Calibri';
 
   for(i in imgArr.currTxtArr) txtWidth += ctx.measureText(imgArr.currTxtArr[i]).width;
+  if(txtWidth > cs.width - img.width)
+  {
+    lineHeight *= (cs.width - img.width);
+    lineHeight /= txtWidth;
+    ctx.font = lineHeight + 'pt Calibri';
+    txtWidth = 0;
+    for(i in imgArr.currTxtArr) txtWidth += ctx.measureText(imgArr.currTxtArr[i]).width;
+  }
   var x = cs.width / 2 - (img.width + txtWidth) / 2;
   var y = cs.height / 2 - img.height / 2;
   imgArr.imgLeft = x;
   imgArr.imgTop = y;
   ctx.drawImage(img, x, y);
   x += img.width;
-//  y += img.height / 2 - lineHeight * imgArr.currTxtArr.length / 2;
   y += lineHeight;
   ctx.save();
   ctx.fillStyle = 'blue';
@@ -121,26 +128,12 @@ onClick = function()
     draw();
     return;
   }
-  if(event.offsetX < imgArr.txtGrid[1].x)
-  {
-    //text 0
-    alert(imgArr.currTxtArr[0]);
-    return;
-  }
-  if(event.offsetX < imgArr.txtGrid[2].x)
-  {
-    //text 1
-    alert(imgArr.currTxtArr[1]);
-    return;
-  }
-  //text 2
-  alert(imgArr.currTxtArr[2]);
-  
-  /*
-  if((event.offsetX < imgArr.imgLeft + imgArr.currImg.width) && (event.offsetY < imgArr.imgTop + imgArr.currImg.height))
-  {
-    alert("image "+event.offsetX+" "+event.offsetY + " " + imgArr.txtGrid[0].x);
-  }*/
+  //in text
+  var selTxt = "";
+  if(event.offsetX < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
+  else if(event.offsetX < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
+  else selTxt = imgArr.currTxtArr[2];
+  alert(selTxt == imgArr.currImg.txt ? "Ճիշտ է" : "Սխալ է");
 }
 
 </script>
