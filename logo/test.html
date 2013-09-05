@@ -2,28 +2,11 @@
 <head>
 <meta charset="utf-8">
 <script>
-var imgArr = {};
-function loadImages()
-{
-  var srcArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
-    "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
-    "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
-  var txtArr = ["Մեղու", "Կով", "Մասուր", "Ձի", "Մուկ", "Պարան",
-    "Պատ", "Կատու", "Շուն", "Ձուկ", "Լուսին", "Մատիտ", "Կոշիկ",
-    "Պանիր", "Ձու", "Ծաղիկ", "Սար", "Նկար", "Սեղան"
-  ];
-  for(var idx in srcArr)
-  {
-    imgArr[idx] = new Image();
-    imgArr[idx].src = "img/"+srcArr[idx];
-    imgArr[idx].txt = txtArr[idx];
-  }
-  imgArr.count = srcArr.length;
-}
+var imgArr = new Array();
 
 function selectRandomPic()
 {
-  imgArr.currImg = imgArr[Math.floor(Math.random() * 1000) % imgArr.count];
+  imgArr.currImg = imgArr[Math.floor(Math.random() * 1000) % imgArr.length];
   var tmp = {}
   var arr = [];
   var cnt = 1;
@@ -31,7 +14,7 @@ function selectRandomPic()
   arr[0] = imgArr.currImg.txt;
   while(cnt < 3)
   {
-    var txt = imgArr[Math.floor(Math.random() * 1000) % imgArr.count].txt;
+    var txt = imgArr[Math.floor(Math.random() * 1000) % imgArr.length].txt;
     if(tmp[txt] != null) continue;
     tmp[txt] = "";
     arr[cnt] = txt;
@@ -104,9 +87,28 @@ window.onload = function()
 {
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
-  loadImages();
-  selectRandomPic();
-  draw();
+  var srcArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
+    "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
+    "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
+  var txtArr = ["Մեղու", "Կով", "Մասուր", "Ձի", "Մուկ", "Պարան",
+    "Պատ", "Կատու", "Շուն", "Ձուկ", "Լուսին", "Մատիտ", "Կոշիկ",
+    "Պանիր", "Ձու", "Ծաղիկ", "Սար", "Նկար", "Սեղան"
+  ];
+  for(var idx in srcArr)
+  {
+    var img = new Image();
+    img.txt = txtArr[idx];
+    img.src = "img/"+srcArr[idx];
+    img.onload = function(e)
+    {
+      imgArr.push(e.target);
+      if(imgArr.length == txtArr.length)
+      {
+        selectRandomPic();
+        draw();
+      }
+    }
+  }
 }
 
 window.onresize = function()
@@ -123,7 +125,6 @@ onClick = function()
   if(event.offsetY > imgArr.imgTop + imgArr.currImg.height) return;
   if(event.offsetX < imgArr.txtGrid[0].x)
   {
-    //in image
     selectRandomPic();
     draw();
     return;
@@ -145,3 +146,4 @@ onClick = function()
 </canvas>
 </body>
 </html>
+
