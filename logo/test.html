@@ -109,39 +109,38 @@ window.onload = function()
       }
     }
   }
+  cs.addEventListener("click", function(e)
+  {
+    if(e.clientX < imgArr.imgLeft) return;
+    if(e.clientY < imgArr.imgTop) return;
+    if(e.clientY > imgArr.imgTop + imgArr.currImg.height) return;
+    if(e.clientX < imgArr.txtGrid[0].x)
+    {
+      selectRandomPic();
+      draw();
+      return;
+    }
+    //in text
+    var selTxt = "";
+    if(e.clientX < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
+    else if(e.clientX < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
+    else selTxt = imgArr.currTxtArr[2];
+    alert(selTxt == imgArr.currImg.txt ? "Ճիշտ է" : "Սխալ է");
+  })
 }
 
 window.onresize = function()
 {
-  cs.width = cs.parentNode.clientWidth - 30;
-  cs.height = cs.parentNode.clientHeight - 30;
+  cs.width = cs.parentNode.clientWidth;
+  cs.height = cs.parentNode.clientHeight;
   draw();
-}
-
-onClick = function()
-{
-  if(event.offsetX < imgArr.imgLeft) return;
-  if(event.offsetY < imgArr.imgTop) return;
-  if(event.offsetY > imgArr.imgTop + imgArr.currImg.height) return;
-  if(event.offsetX < imgArr.txtGrid[0].x)
-  {
-    selectRandomPic();
-    draw();
-    return;
-  }
-  //in text
-  var selTxt = "";
-  if(event.offsetX < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
-  else if(event.offsetX < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
-  else selTxt = imgArr.currTxtArr[2];
-  alert(selTxt == imgArr.currImg.txt ? "Ճիշտ է" : "Սխալ է");
 }
 
 </script>
 <head>
 
 <body>
-<canvas id="cs" style="border:1px solid #000000" onclick="onClick();">
+<canvas id="cs" style="border:1px solid #000000"">
 Ձեր ծրագիրը շատ հին է, օգտագործեք Google Crome կամ Mozila Firefox
 </canvas>
 </body>
