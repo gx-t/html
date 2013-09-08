@@ -2,91 +2,173 @@
 <head>
 <meta charset="utf-8">
 <script>
-var imgArr = new Array();
+var imgArr = [];
 
-function selectRandomPic()
+function randPic(update)
 {
-  imgArr.currImg = imgArr[Math.floor(Math.random() * 1000) % imgArr.length];
-  var tmp = {}
-  var arr = [];
-  var cnt = 1;
-  tmp[imgArr.currImg.txt] = "";
-  arr[0] = imgArr.currImg.txt;
-  while(cnt < 3)
+  if(update)
   {
-    var txt = imgArr[Math.floor(Math.random() * 1000) % imgArr.length].txt;
-    if(tmp[txt] != null) continue;
-    tmp[txt] = "";
-    arr[cnt] = txt;
-    cnt ++;
+    imgArr.currImg = imgArr[Math.floor(Math.random() * 1000) % imgArr.length];
+    var tmp = [];
+    var arr = [];
+    var cnt = 1;
+    tmp[imgArr.currImg.txt] = "";
+    arr.push(imgArr.currImg.txt);
+    while(cnt < 3)
+    {
+      var txt = imgArr[Math.floor(Math.random() * 1000) % imgArr.length].txt;
+      if(tmp[txt] != null) continue;
+      tmp[txt] = "";
+      arr.push(txt);
+      cnt ++;
+    }
+    for(var i = 0; i < 32; i ++)
+    {
+      var i1 = Math.floor(Math.random() * 1000) % arr.length;
+      var i2 = Math.floor(Math.random() * 1000) % arr.length;
+      var tmp = arr[i1];
+      arr[i1] = arr[i2];
+      arr[i2] = tmp;
+    }
+    imgArr.currTxtArr = arr;
   }
-  for(var i = 0; i < 32; i ++)
+  imgArr.draw = function()
   {
-    var i1 = Math.floor(Math.random() * 1000) % arr.length;
-    var i2 = Math.floor(Math.random() * 1000) % arr.length;
-    var tmp = arr[i1];
-    arr[i1] = arr[i2];
-    arr[i2] = tmp;
+    imgArr.ctx.save();
+
+    // Create gradient
+    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0,"red");
+    grd.addColorStop(1,"yellow");
+
+    // Fill with gradient
+    imgArr.ctx.fillStyle=grd;
+    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    var img = imgArr.currImg;
+    var txtWidth = 0;
+    var lineHeight = img.height / 3 - 10;
+    imgArr.ctx.font = lineHeight + 'pt Calibri';
+
+    for(i in imgArr.currTxtArr) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+    if(txtWidth > cs.width - img.width)
+    {
+      lineHeight *= (cs.width - img.width);
+      lineHeight /= txtWidth;
+      imgArr.ctx.font = lineHeight + 'pt Calibri';
+      txtWidth = 0;
+      for(i in imgArr.currTxtArr) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+    }
+    var x = cs.width / 2 - (img.width + txtWidth) / 2;
+    var y = cs.height / 2 - img.height / 2;
+    imgArr.imgLeft = x;
+    imgArr.imgTop = y;
+    imgArr.ctx.drawImage(img, x, y);
+    x += img.width;
+    y += lineHeight;
+    imgArr.ctx.fillStyle = 'darkblue';
+//    imgArr.ctx.shadowColor = 'grey';
+//    imgArr.ctx.shadowOffsetX = 10;
+//    imgArr.ctx.shadowOffsetY = 10;
+//    imgArr.ctx.shadowBlur = 10;
+    imgArr.txtGrid = [];
+    for(i in imgArr.currTxtArr)
+    {
+      var txt = imgArr.currTxtArr[i];
+      imgArr.ctx.fillText(txt, x, y);
+      w = imgArr.ctx.measureText(txt).width;
+      imgArr.txtGrid[i] = {"x":x,"y":y,"w":w};
+      x += w;
+      y += (lineHeight + 10);
+    }
+    imgArr.ctx.restore();
   }
-  imgArr.currTxtArr = arr;
+  imgArr.onClick = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var x = e.clientX - rc.left;
+    var y = e.clientY - rc.top;
+    if(x < imgArr.imgLeft) return;
+    if(y < imgArr.imgTop) return;
+    if(y > imgArr.imgTop + imgArr.currImg.height) return;
+    if(x < imgArr.txtGrid[0].x)
+    {
+      randPic(true);
+      imgArr.draw();
+      return;
+    }
+    //in text
+    var selTxt = "";
+    if(x < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
+    else if(x < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
+    else selTxt = imgArr.currTxtArr[2];
+    selTxt == imgArr.currImg.txt ? yesPic() : noPic();
+  }
+  imgArr.draw();
 }
 
-function draw()
+function yesPic()
 {
-  var ctx=cs.getContext("2d");
-
-  // Create gradient
-  var grd=ctx.createLinearGradient(0,0,cs.width,cs.height);
-  grd.addColorStop(0,"red");
-  grd.addColorStop(1,"yellow");
-
-  // Fill with gradient
-  ctx.fillStyle=grd;
-  ctx.fillRect(0,0,cs.width,cs.height);
-  var img = imgArr.currImg;
-  var txtWidth = 0;
-  var lineHeight = img.height / 3 - 10;
-  ctx.font = lineHeight + 'pt Calibri';
-
-  for(i in imgArr.currTxtArr) txtWidth += ctx.measureText(imgArr.currTxtArr[i]).width;
-  if(txtWidth > cs.width - img.width)
+  imgArr.draw = function()
   {
-    lineHeight *= (cs.width - img.width);
+    imgArr.ctx.save();
+    // Create gradient
+    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0,"red");
+    grd.addColorStop(1,"yellow");
+
+    // Fill with gradient
+    imgArr.ctx.fillStyle=grd;
+    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    var img = imgArr.currImg;
+    var lineHeight = 20;
+    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    var txtWidth = imgArr.ctx.measureText(img.txt).width;
+    lineHeight *= img.width;
     lineHeight /= txtWidth;
-    ctx.font = lineHeight + 'pt Calibri';
-    txtWidth = 0;
-    for(i in imgArr.currTxtArr) txtWidth += ctx.measureText(imgArr.currTxtArr[i]).width;
+    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    var x = cs.width / 2 - img.width / 2;
+    var y = cs.height / 2 - img.height / 2;
+    imgArr.ctx.drawImage(img, x, y);
+    imgArr.ctx.fillStyle = 'darkblue';
+    imgArr.ctx.fillText(img.txt, x, y + img.height + lineHeight + 10);
+    imgArr.ctx.restore();
   }
-  var x = cs.width / 2 - (img.width + txtWidth) / 2;
-  var y = cs.height / 2 - img.height / 2;
-  imgArr.imgLeft = x;
-  imgArr.imgTop = y;
-  ctx.drawImage(img, x, y);
-  x += img.width;
-  y += lineHeight;
-  ctx.save();
-  ctx.fillStyle = 'blue';
-  ctx.shadowColor = 'grey';
-  ctx.shadowOffsetX = 10;
-  ctx.shadowOffsetY = 10;
-  ctx.shadowBlur = 10;
-  imgArr.txtGrid = [];
-  for(i in imgArr.currTxtArr)
+  imgArr.onClick = function(e) {randPic(true);}
+  imgArr.draw();
+}
+
+function noPic()
+{
+  imgArr.draw = function()
   {
-    var txt = imgArr.currTxtArr[i];
-    ctx.fillText(txt, x, y);
-    w = ctx.measureText(txt).width;
-    imgArr.txtGrid[i] = {"x":x,"y":y,"w":w};
-    x += w;
-    y += (lineHeight + 10);
+    imgArr.ctx.save();
+    // Create gradient
+    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0,"red");
+    grd.addColorStop(1,"yellow");
+
+    // Fill with gradient
+    imgArr.ctx.fillStyle=grd;
+    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    var img = imgArr.currImg;
+    var x = cs.width / 2 - img.width / 2;
+    var y = cs.height / 2 - img.height / 2;
+    imgArr.ctx.drawImage(img, x, y);
+    var img = imgArr.no;
+    var x = cs.width / 2 - img.width / 2;
+    var y = cs.height / 2 - img.height / 2;
+    imgArr.ctx.drawImage(img, x, y);
+    imgArr.ctx.restore();
   }
-  ctx.restore();
+  imgArr.onClick = function(e) {randPic(false);}
+  imgArr.draw();
 }
 
 window.onload = function()
 {
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
+  imgArr.ctx = cs.getContext("2d");
   var srcArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
     "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
     "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
@@ -94,6 +176,8 @@ window.onload = function()
     "Պատ", "Կատու", "Շուն", "Ձուկ", "Լուսին", "Մատիտ", "Կոշիկ",
     "Պանիր", "Ձու", "Ծաղիկ", "Սար", "Նկար", "Սեղան"
   ];
+  imgArr.no = new Image();
+  imgArr.no.src = "img/no.png";
   for(var idx in srcArr)
   {
     var img = new Image();
@@ -102,38 +186,17 @@ window.onload = function()
     img.onload = function(e)
     {
       imgArr.push(e.target);
-      if(imgArr.length == txtArr.length)
-      {
-        selectRandomPic();
-        draw();
-      }
+      if(imgArr.length == txtArr.length) {randPic(true);}
     }
   }
-  cs.addEventListener("click", function(e)
-  {
-    if(e.clientX < imgArr.imgLeft) return;
-    if(e.clientY < imgArr.imgTop) return;
-    if(e.clientY > imgArr.imgTop + imgArr.currImg.height) return;
-    if(e.clientX < imgArr.txtGrid[0].x)
-    {
-      selectRandomPic();
-      draw();
-      return;
-    }
-    //in text
-    var selTxt = "";
-    if(e.clientX < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
-    else if(e.clientX < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
-    else selTxt = imgArr.currTxtArr[2];
-    alert(selTxt == imgArr.currImg.txt ? "Ճիշտ է" : "Սխալ է");
-  })
+  cs.addEventListener("click", function(e) {imgArr.onClick(e);})
 }
 
 window.onresize = function()
 {
-  cs.width = cs.parentNode.clientWidth;
-  cs.height = cs.parentNode.clientHeight;
-  draw();
+  cs.width = cs.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.clientHeight - 30;
+  imgArr.draw();
 }
 
 </script>
