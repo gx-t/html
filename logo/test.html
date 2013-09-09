@@ -8,7 +8,7 @@ function randPic(update)
 {
   if(update)
   {
-    imgArr.currImg = imgArr[Math.floor(Math.random() * 1000) % imgArr.length];
+    imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
     var tmp = [];
     var arr = [];
     var cnt = 1;
@@ -16,7 +16,7 @@ function randPic(update)
     arr.push(imgArr.currImg.txt);
     while(cnt < 3)
     {
-      var txt = imgArr[Math.floor(Math.random() * 1000) % imgArr.length].txt;
+      var txt = imgArr[Math.floor(Math.random() * 10000) % imgArr.length].txt;
       if(tmp[txt] != null) continue;
       tmp[txt] = "";
       arr.push(txt);
@@ -24,8 +24,8 @@ function randPic(update)
     }
     for(var i = 0; i < 32; i ++)
     {
-      var i1 = Math.floor(Math.random() * 1000) % arr.length;
-      var i2 = Math.floor(Math.random() * 1000) % arr.length;
+      var i1 = Math.floor(Math.random() * 10000) % arr.length;
+      var i2 = Math.floor(Math.random() * 10000) % arr.length;
       var tmp = arr[i1];
       arr[i1] = arr[i2];
       arr[i2] = tmp;
@@ -164,17 +164,39 @@ function noPic()
   imgArr.draw();
 }
 
+function loadingImages()
+{
+  imgArr.draw = function()
+  {
+    imgArr.ctx.save();
+    // Create gradient
+    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0,"green");
+    grd.addColorStop(1,"yellow");
+
+    // Fill with gradient
+    imgArr.ctx.fillStyle=grd;
+    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    imgArr.ctx.font = 20 + 'pt Calibri';
+    var txt = "Նկարները բեռնվում են․․․";
+    var txtWidth = imgArr.ctx.measureText(txt).width;
+    var x = cs.width / 2 - txtWidth / 2;
+    var y = cs.height / 2;
+    imgArr.ctx.fillStyle = 'darkblue';
+    imgArr.ctx.fillText(txt, x, y);
+    imgArr.ctx.restore();
+  }
+  imgArr.draw();
+}
+
 window.onload = function()
 {
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
   imgArr.ctx = cs.getContext("2d");
-  var srcArr = ["bee.jpg","cow.jpg","eglantine.jpg","horse.jpg","mouse.jpg","rope.jpg",
-    "wall.jpg","cat.jpg","dog.jpg","Fish.jpg","moon.jpg","pencil.jpg","shoes.jpg",
-    "cheese.jpg","egg.jpg","flower.jpg","mount.jpg","pictire.jpg","table.jpg"];
-  var txtArr = ["Մեղու", "Կով", "Մասուր", "Ձի", "Մուկ", "Պարան",
-    "Պատ", "Կատու", "Շուն", "Ձուկ", "Լուսին", "Մատիտ", "Կոշիկ",
-    "Պանիր", "Ձու", "Ծաղիկ", "Սար", "Նկար", "Սեղան"];
+  loadingImages();
+  var srcArr = ["apple.jpg","apricot.jpg","banana.jpg","bee.jpg","book.jpg","cake.jpg",     "cap.jpg", "car.jpg","cat.jpg","chear.jpg","cheese.jpg","cloud.jpg","cow.jpg","dog.jpg","duck.jpg","egg.jpg","eglantine.jpg","elephant.jpg","Fish.jpg","flower.jpg","fox.jpg","fruits.jpg","goat.jpg","God's kow.jpg","guitar.jpg","hammer.jpg","horse.jpg","ice-cream.jpg","lamp.jpg","lemo.jpg","medicine.jpg","moon.jpg","mount.jpg","mouse.jpg","peach.jpg","pear.jpg","pencil.jpg","pictire.jpg","pig.jpg","rope.jpg","sheep.jpg","ship.jpg","shoes.jpg","strawberries.jpg","table.jpg","tea.jpg","tree.jpg","t-shirt.jpg","violin.jpg","wall.jpg","wolf.jpg"];
+  var txtArr = ["Խնձոր",  "Ծիրան",    "Բանան",  "Մեղու", "Գիրք",   "Կարկանդակ","Գլխարկ","Ավտո", "Կատու","Աթոռ",   "Պանիր",   "Ամպ",     "Կով",   "Շուն",  "Բադ",   "Ձու",    "Մասուր",     "Փիղ",        "Ձուկ",   "Ծաղիկ",   "Աղվես", "Միրգ",    "Այծ",     "Զատիկ",     "Կիթար",   "Մուրճ",    "Ձի",      "Պաղպաղակ", "Լամպ",  "Կիտրոն","Դեղ",        "Լուսին", "Սար",    "Մուկ",    "Դեզձ",    "Տանձ",   "Մատիտ",  "Նկար",    "Խոզ",   "Պարան","Ոչխար",  "Նավ",   "Կոշիկ",   "Ելակ",           "Սեղան",  "Թեյ",    "Ծառ",   "․․․",         "Ջութակ",  "Պատ",   "Գայլ"];
   imgArr.no = new Image();
   imgArr.no.src = "img/no-small.png";
   for(var idx in srcArr)
