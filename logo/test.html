@@ -309,8 +309,6 @@ function test1() {randPic1(true);}
 
 window.onload = function()
 {
-  var entryPoint = document.URL.split("#")[1];
-  if(entryPoint == undefined) entryPoint = "randPic0(true);";
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
   imgArr.ctx = cs.getContext("2d");
@@ -329,10 +327,17 @@ window.onload = function()
     img.onload = function(e)
     {
       imgArr.push(e.target);
-      if(imgArr.length == txtArr.length) {try{eval(entryPoint);}catch(e){test0();}}
+      if(imgArr.length == txtArr.length) {window.onhashchange();}
     }
   }
   cs.addEventListener("click", function(e) {imgArr.onClick(e);})
+}
+
+window.onhashchange = function()
+{
+  var entryPoint = document.URL.split("#")[1];
+  if(entryPoint == undefined) entryPoint = "randPic0(true);";
+  try{eval(entryPoint);}catch(e){test0();}
 }
 
 window.onresize = function()
