@@ -4,7 +4,115 @@
 <script>
 var imgArr = [];
 
-function randPic(update)
+function randPic1(update)
+{
+  if(update)
+  {
+    imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
+    var tmp = [];
+    var arr = [];
+    var cnt = 1;
+    tmp[imgArr.currImg.txt] = "";
+    arr.push(imgArr.currImg.txt);
+    while(cnt < 3)
+    {
+      var txt = imgArr[Math.floor(Math.random() * 10000) % imgArr.length].txt;
+      if(tmp[txt] != null) continue;
+      tmp[txt] = "";
+      arr.push(txt);
+      cnt ++;
+    }
+    for(var i = 0; i < 32; i ++)
+    {
+      var i1 = Math.floor(Math.random() * 10000) % arr.length;
+      var i2 = Math.floor(Math.random() * 10000) % arr.length;
+      var tmp = arr[i1];
+      arr[i1] = arr[i2];
+      arr[i2] = tmp;
+    }
+    imgArr.currTxtArr = arr;
+  }
+  imgArr.draw = function()
+  {
+    imgArr.ctx.save();
+
+    // Create gradient
+    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0,"red");
+    grd.addColorStop(1,"yellow");
+
+    // Fill with gradient
+    imgArr.ctx.fillStyle=grd;
+    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    var img = imgArr.currImg;
+    var txtWidth = 0;
+    var lineHeight = img.height / 3 - 10;
+    imgArr.ctx.font = lineHeight + 'pt Calibri';
+
+    for(i in imgArr.currTxtArr) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+    if(txtWidth > cs.width - img.width)
+    {
+      lineHeight *= (cs.width - img.width);
+      lineHeight /= txtWidth;
+      imgArr.ctx.font = lineHeight + 'pt Calibri';
+      txtWidth = 0;
+      for(i in imgArr.currTxtArr) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+    }
+    var x = cs.width / 2 - img.width / 2;
+    var y = 50;
+    imgArr.imgLeft = x;
+    imgArr.imgTop = y;
+    imgArr.ctx.drawImage(img, x, y);
+    imgArr.ctx.beginPath();
+    imgArr.ctx.moveTo(x - 50, y + img.height + 50);
+    imgArr.ctx.lineTo(x + img.width + 50, y + img.height + 50);
+    imgArr.ctx.moveTo(0, cs.height - 50);
+    imgArr.ctx.lineTo(cs.width, cs.height - 50);
+    imgArr.ctx.stroke();
+    x += img.width;
+    y += lineHeight;
+    imgArr.ctx.fillStyle = 'darkblue';
+//    imgArr.ctx.shadowColor = 'grey';
+//    imgArr.ctx.shadowOffsetX = 10;
+//    imgArr.ctx.shadowOffsetY = 10;
+//    imgArr.ctx.shadowBlur = 10;
+    imgArr.txtGrid = [];
+    for(i in imgArr.currTxtArr)
+    {
+      var txt = imgArr.currTxtArr[i];
+//      imgArr.ctx.fillText(txt, x, y);
+      w = imgArr.ctx.measureText(txt).width;
+      imgArr.txtGrid[i] = {"x":x,"y":y,"w":w};
+      x += w;
+      y += (lineHeight + 10);
+    }
+    imgArr.ctx.restore();
+  }
+  imgArr.onClick = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var x = e.clientX - rc.left;
+    var y = e.clientY - rc.top;
+    if(x < imgArr.imgLeft) return;
+    if(y < imgArr.imgTop) return;
+    if(y > imgArr.imgTop + imgArr.currImg.height) return;
+    if(x < imgArr.txtGrid[0].x)
+    {
+      randPic0(true);
+      imgArr.draw();
+      return;
+    }
+    //in text
+    var selTxt = "";
+    if(x < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
+    else if(x < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
+    else selTxt = imgArr.currTxtArr[2];
+    selTxt == imgArr.currImg.txt ? yesPic(randPic0) : noPic(randPic0);
+  }
+  imgArr.draw();
+}
+
+function randPic0(update)
 {
   if(update)
   {
@@ -92,7 +200,7 @@ function randPic(update)
     if(y > imgArr.imgTop + imgArr.currImg.height) return;
     if(x < imgArr.txtGrid[0].x)
     {
-      randPic(true);
+      randPic0(true);
       imgArr.draw();
       return;
     }
@@ -101,12 +209,12 @@ function randPic(update)
     if(x < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
     else if(x < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
     else selTxt = imgArr.currTxtArr[2];
-    selTxt == imgArr.currImg.txt ? yesPic() : noPic();
+    selTxt == imgArr.currImg.txt ? yesPic(randPic0) : noPic(randPic0);
   }
   imgArr.draw();
 }
 
-function yesPic()
+function yesPic(retFunc)
 {
   imgArr.draw = function()
   {
@@ -133,11 +241,11 @@ function yesPic()
     imgArr.ctx.fillText(img.txt, x, y + img.height + lineHeight + 10);
     imgArr.ctx.restore();
   }
-  imgArr.onClick = function(e) {randPic(true);}
+  imgArr.onClick = function(e) {retFunc(true);}
   imgArr.draw();
 }
 
-function noPic()
+function noPic(retFunc)
 {
   imgArr.draw = function()
   {
@@ -160,7 +268,7 @@ function noPic()
     imgArr.ctx.drawImage(img, x, y);
     imgArr.ctx.restore();
   }
-  imgArr.onClick = function(e) {randPic(false);}
+  imgArr.onClick = function(e) {retFunc(true);}
   imgArr.draw();
 }
 
@@ -189,8 +297,13 @@ function loadingImages()
   imgArr.draw();
 }
 
+function test0() {randPic0(true);}
+function test1() {randPic1(true);}
+
 window.onload = function()
 {
+  var entryPoint = document.URL.split("#")[1];
+  if(entryPoint == undefined) entryPoint = "randPic0(true);";
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
   imgArr.ctx = cs.getContext("2d");
@@ -209,7 +322,7 @@ window.onload = function()
     img.onload = function(e)
     {
       imgArr.push(e.target);
-      if(imgArr.length == txtArr.length) {randPic(true);}
+      if(imgArr.length == txtArr.length) {try{eval(entryPoint);}catch(e){test0();}}
     }
   }
   cs.addEventListener("click", function(e) {imgArr.onClick(e);})
