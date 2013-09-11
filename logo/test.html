@@ -275,7 +275,7 @@ function noPic(retFunc)
     imgArr.ctx.drawImage(img, x, y);
     imgArr.ctx.restore();
   }
-  imgArr.onClick = function(e) {retFunc(true);}
+  imgArr.onClick = function(e) {retFunc(false);}
   imgArr.draw();
 }
 
