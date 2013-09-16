@@ -4,94 +4,98 @@
 <script>
 var imgArr = [];
 
+function libShuffle(arr, count)
+{
+  for(var i = 0; i < count; i ++)
+  {
+    var i1 = Math.floor(Math.random() * 10000) % arr.length;
+    var i2 = Math.floor(Math.random() * 10000) % arr.length;
+    var tmp = arr[i1];
+    arr[i1] = arr[i2];
+    arr[i2] = tmp;
+  }
+}
+
+function libBackGround(clr0, clr1)
+{
+  // Create gradient
+  var grd = imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
+  grd.addColorStop(0, clr0);
+  grd.addColorStop(1, clr1);
+
+  // Fill with gradient
+  imgArr.ctx.fillStyle = grd;
+  imgArr.ctx.fillRect(0, 0, cs.width, cs.height);
+}
+
 function randPic1(update)
 {
   if(update)
   {
     imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
+    imgArr.txt = "";
     var tmp = [];
     var arr = [];
-    var cnt = 1;
-    tmp[imgArr.currImg.txt] = "";
-    arr.push(imgArr.currImg.txt);
-    while(cnt < 3)
+    var txt = imgArr.currImg.txt;
+    for(var i = 0; i < txt.length; i ++)
     {
-      var txt = imgArr[Math.floor(Math.random() * 10000) % imgArr.length].txt;
-      if(tmp[txt] != null) continue;
-      tmp[txt] = "";
-      arr.push(txt);
-      cnt ++;
+      var ch = txt.charAt(i);
+      if(ch == "ո" && txt.charAt(i + 1) == "ւ") {ch = "ու"; i ++;}
+      else if(ch == "Ո" && txt.charAt(i + 1) == "Ւ") {ch = "ՈՒ"; i ++;}
+      if(ch === ch.toUpperCase())
+      {
+        if(tmp[ch.toLowerCase()] == null)
+        {
+          tmp[ch.toLowerCase()] = "";
+          arr.push(ch.toLowerCase());
+        }
+      }
+      if(tmp[ch] != null) continue;
+      tmp[ch] = "";
+      arr.push(ch);
     }
-    for(var i = 0; i < 32; i ++)
+    var count = arr.length * 2;
+    if(count < 7) count = 7;
+    var abc = ["ա","բ","գ","դ","ե","զ","է","ը","թ","ժ","ի","լ","խ","ծ","կ","հ","ձ","ղ","ճ","մ","յ","ն","շ","ո","չ","պ","ջ","ռ","ս","վ","տ","ր","ց","ու","փ","ք","և","օ","ֆ"];
+    var i = arr.length;
+    while(i < count)
     {
-      var i1 = Math.floor(Math.random() * 10000) % arr.length;
-      var i2 = Math.floor(Math.random() * 10000) % arr.length;
-      var tmp = arr[i1];
-      arr[i1] = arr[i2];
-      arr[i2] = tmp;
+      var ch = abc[Math.floor(Math.random() * 10000) % abc.length];
+      if(tmp[ch] != null) continue;
+      tmp[ch] = "";
+      arr.push(ch);
+      i ++;
     }
+    libShuffle(arr, arr.length * 32);
     imgArr.currTxtArr = arr;
   }
   imgArr.draw = function()
   {
     imgArr.ctx.save();
-
-    // Create gradient
-    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
-    grd.addColorStop(0,"red");
-    grd.addColorStop(1,"yellow");
-
-    // Fill with gradient
-    imgArr.ctx.fillStyle=grd;
-    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    libBackGround("red", "yellow");
     var img = imgArr.currImg;
     var txtWidth = 0;
-    var lineHeight = img.height / 3 - 10;
+    var lineHeight = img.height / 5;
     imgArr.ctx.font = lineHeight + 'pt Calibri';
-
-    for(i in imgArr.currTxtArr) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
-    if(txtWidth > cs.width - img.width)
-    {
-      lineHeight *= (cs.width - img.width);
-      lineHeight /= txtWidth;
-      imgArr.ctx.font = lineHeight + 'pt Calibri';
-      txtWidth = 0;
-      for(i in imgArr.currTxtArr) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
-    }
     var x = cs.width / 2 - img.width / 2;
-    var y = 50;
+    var y = lineHeight;
     imgArr.imgLeft = x;
     imgArr.imgTop = y;
     imgArr.ctx.drawImage(img, x, y);
     y += img.height;
-    var yStep = (cs.height - y) / 3;
-    var lineHeight = yStep / 2;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
-    y += yStep;
-    imgArr.ctx.beginPath();
-    imgArr.ctx.moveTo(x - lineHeight, y);
-    imgArr.ctx.lineTo(x + img.width + lineHeight, y);
-    y += yStep;
-    imgArr.ctx.moveTo(0, y);
-    imgArr.ctx.lineTo(cs.width, y);
-    imgArr.ctx.strokeStyle = 'green';
-    imgArr.ctx.stroke();
-    x += img.width;
+    y += lineHeight;
     y += lineHeight;
     imgArr.ctx.fillStyle = 'darkblue';
-//    imgArr.ctx.shadowColor = 'grey';
-//    imgArr.ctx.shadowOffsetX = 10;
-//    imgArr.ctx.shadowOffsetY = 10;
-//    imgArr.ctx.shadowBlur = 10;
-    imgArr.txtGrid = [];
-    for(i in imgArr.currTxtArr)
+    x = cs.width / 2 - imgArr.ctx.measureText(imgArr.txt).width / 2;
+    imgArr.ctx.fillText(imgArr.txt, x, y);
+    lineHeight = cs.width / imgArr.currTxtArr.length / 2;
+    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    y = cs.height - 50;
+    x = 0;
+    for(var i = 0; i < imgArr.currTxtArr.length; i ++)
     {
-      var txt = imgArr.currTxtArr[i];
-//      imgArr.ctx.fillText(txt, x, y);
-      w = imgArr.ctx.measureText(txt).width;
-      imgArr.txtGrid[i] = {"x":x,"y":y,"w":w};
-      x += w;
-      y += (lineHeight + 10);
+      imgArr.ctx.fillText(imgArr.currTxtArr[i], x + lineHeight - imgArr.ctx.measureText(imgArr.currTxtArr[i]).width / 2, y);
+      x += 2 * lineHeight;
     }
     imgArr.ctx.restore();
   }
@@ -100,21 +104,14 @@ function randPic1(update)
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(x < imgArr.imgLeft) return;
-    if(y < imgArr.imgTop) return;
-    if(y > imgArr.imgTop + imgArr.currImg.height) return;
-    if(x < imgArr.txtGrid[0].x)
-    {
-      randPic0(true);
-      imgArr.draw();
-      return;
-    }
-    //in text
-    var selTxt = "";
-    if(x < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
-    else if(x < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
-    else selTxt = imgArr.currTxtArr[2];
-    selTxt == imgArr.currImg.txt ? yesPic(randPic0) : noPic(randPic0);
+    if(y < imgArr.imgTop + imgArr.currImg.height) {return randPic1(true);}
+    var lineHeight = cs.width / imgArr.currTxtArr.length / 2;
+    if(y < cs.height - 100 - lineHeight) return;
+    var ch = imgArr.currTxtArr[Math.floor(x / (2 * lineHeight))];
+    imgArr.txt += ch;
+    if(imgArr.txt === imgArr.currImg.txt) return yesPic(randPic1);
+    if(imgArr.currImg.txt.indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noPic(randPic1);}
+    imgArr.draw();
   }
   imgArr.draw();
 }
@@ -137,28 +134,13 @@ function randPic0(update)
       arr.push(txt);
       cnt ++;
     }
-    for(var i = 0; i < 32; i ++)
-    {
-      var i1 = Math.floor(Math.random() * 10000) % arr.length;
-      var i2 = Math.floor(Math.random() * 10000) % arr.length;
-      var tmp = arr[i1];
-      arr[i1] = arr[i2];
-      arr[i2] = tmp;
-    }
+    libShuffle(arr, 32);
     imgArr.currTxtArr = arr;
   }
   imgArr.draw = function()
   {
     imgArr.ctx.save();
-
-    // Create gradient
-    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
-    grd.addColorStop(0,"red");
-    grd.addColorStop(1,"yellow");
-
-    // Fill with gradient
-    imgArr.ctx.fillStyle=grd;
-    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    libBackGround("red", "yellow");
     var img = imgArr.currImg;
     var txtWidth = 0;
     var lineHeight = img.height / 3 - 10;
@@ -226,14 +208,7 @@ function yesPic(retFunc)
   imgArr.draw = function()
   {
     imgArr.ctx.save();
-    // Create gradient
-    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
-    grd.addColorStop(0,"red");
-    grd.addColorStop(1,"yellow");
-
-    // Fill with gradient
-    imgArr.ctx.fillStyle=grd;
-    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    libBackGround("red", "yellow");
     var img = imgArr.currImg;
     var lineHeight = 20;
     imgArr.ctx.font = lineHeight + 'pt Calibri';
@@ -257,14 +232,7 @@ function noPic(retFunc)
   imgArr.draw = function()
   {
     imgArr.ctx.save();
-    // Create gradient
-    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
-    grd.addColorStop(0,"red");
-    grd.addColorStop(1,"yellow");
-
-    // Fill with gradient
-    imgArr.ctx.fillStyle=grd;
-    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    libBackGround("red", "yellow");
     var img = imgArr.currImg;
     var x = cs.width / 2 - img.width / 2;
     var y = cs.height / 2 - img.height / 2;
@@ -284,14 +252,7 @@ function loadingImages()
   imgArr.draw = function()
   {
     imgArr.ctx.save();
-    // Create gradient
-    var grd=imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
-    grd.addColorStop(0,"green");
-    grd.addColorStop(1,"yellow");
-
-    // Fill with gradient
-    imgArr.ctx.fillStyle=grd;
-    imgArr.ctx.fillRect(0,0,cs.width,cs.height);
+    libBackGround("green", "yellow");
     imgArr.ctx.font = 20 + 'pt Calibri';
     var txt = "Նկարները բեռնվում են․․․";
     var txtWidth = imgArr.ctx.measureText(txt).width;
