@@ -1,11 +1,16 @@
 <html>
 <head>
 <meta charset="utf-8">
+<script src="data/vocabulary.js"></script>
+<script src="data/abc.js"></script>
 <script>
 var imgArr = [];
 
-function libShuffle(arr, count)
+String.prototype.replaceAll = function(s, r) {return this.split(s).join(r);}
+
+function libShuffle(arr)
 {
+  var count = arr.length * 32;
   for(var i = 0; i < count; i ++)
   {
     var i1 = Math.floor(Math.random() * 10000) % arr.length;
@@ -56,17 +61,16 @@ function randPic1(update)
     }
     var count = arr.length * 2;
     if(count < 7) count = 7;
-    var abc = ["ա","բ","գ","դ","ե","զ","է","ը","թ","ժ","ի","լ","խ","ծ","կ","հ","ձ","ղ","ճ","մ","յ","ն","շ","ո","չ","պ","ջ","ռ","ս","վ","տ","ր","ց","ու","փ","ք","և","օ","ֆ"];
     var i = arr.length;
     while(i < count)
     {
-      var ch = abc[Math.floor(Math.random() * 10000) % abc.length];
+      var ch = g_abc[Math.floor(Math.random() * 10000) % g_abc.length];
       if(tmp[ch] != null) continue;
       tmp[ch] = "";
       arr.push(ch);
       i ++;
     }
-    libShuffle(arr, arr.length * 32);
+    libShuffle(arr);
     imgArr.currTxtArr = arr;
   }
   imgArr.draw = function()
@@ -134,7 +138,7 @@ function randPic0(update)
       arr.push(txt);
       cnt ++;
     }
-    libShuffle(arr, 32);
+    libShuffle(arr);
     imgArr.currTxtArr = arr;
   }
   imgArr.draw = function()
@@ -217,7 +221,7 @@ function yesPic(retFunc)
     lineHeight /= txtWidth;
     imgArr.ctx.font = lineHeight + 'pt Calibri';
     var x = cs.width / 2 - img.width / 2;
-    var y = cs.height / 2 - img.height / 2;
+    var y = cs.height / 2 - img.height / 2 - (lineHeight + 10) / 2;
     imgArr.ctx.drawImage(img, x, y);
     imgArr.ctx.fillStyle = 'darkblue';
     imgArr.ctx.fillText(img.txt, x, y + img.height + lineHeight + 10);
@@ -274,21 +278,17 @@ window.onload = function()
   cs.height = cs.parentNode.clientHeight - 30;
   imgArr.ctx = cs.getContext("2d");
   loadingImages();
-  var srcArr = ["apple.jpg","apricot.jpg","banana.jpg","bee.jpg","book.jpg","cake.jpg","cap.jpg", "car.jpg","cat.jpg",  "chear.jpg","cheese.jpg","cloud.jpg","cow.jpg","dog.jpg","duck.jpg","egg.jpg","eglantine.jpg","elephant.jpg","Fish.jpg","flower.jpg","fox.jpg","fruits.jpg","goat.jpg","God's kow.jpg","guitar.jpg","hammer.jpg","horse.jpg","ice-cream.jpg","lamp.jpg","lemo.jpg","medicine.jpg","moon.jpg","mount.jpg","mouse.jpg","peach.jpg","pear.jpg","pencil.jpg","pictire.jpg","pig.jpg","rope.jpg","sheep.jpg","ship.jpg","shoes.jpg","strawberries.jpg","table.jpg","tea.jpg","tree.jpg","t-shirt.jpg","violin.jpg","wall.jpg","wolf.jpg"];
-  var txtArr = ["Խնձոր",  "Ծիրան",    "Բանան",  "Մեղու", "Գիրք",   "Տորթ",   "Գլխարկ","Մեքենա","Կատու","Աթոռ",    "Պանիր",   "Ամպ",    "Կով",   "Շուն",  "Բադ",    "Ձու",    "Մասուր",     "Փիղ",        "Ձուկ",   "Ծաղիկ",   "Աղվես","Միրգ",     "Այծ",     "Զատիկ",     "Կիթառ",   "Մուրճ",    "Ձի",      "Պաղպաղակ","Լամպ",  "Կիտրոն","Դեղ",        "Լուսին", "Սար",     "Մուկ",    "Դեղձ",    "Տանձ",  "Մատիտ",  "Նկար",     "Խոզ",   "Պարան","Ոչխար",  "Նավ",   "Կոշիկ",   "Ելակ",           "Սեղան",  "Թեյ",   "Ծառ",    "Շապիկ",   "Ջութակ",  "Պատ",   "Գայլ"];
-  if(srcArr.length != txtArr.length)
-    alert("ՍԽԱԼ՝ նկարների և անունների քանակները տարբեր են․ " + srcArr.length + " " + txtArr.length);
   imgArr.no = new Image();
   imgArr.no.src = "img/no-small.png";
-  for(var idx in srcArr)
+  for(var i in g_vocab)
   {
     var img = new Image();
-    img.txt = txtArr[idx];
-    img.src = "img/"+srcArr[idx];
+    img.txt = g_vocab[i].t.replaceAll("-", "");
+    img.src = "img/"+g_vocab[i].p;
     img.onload = function(e)
     {
       imgArr.push(e.target);
-      if(imgArr.length == txtArr.length) {window.onhashchange();}
+      if(imgArr.length == g_vocab.length) {window.onhashchange();}
     }
   }
   cs.addEventListener("click", function(e) {imgArr.onClick(e);})
