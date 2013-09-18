@@ -33,7 +33,7 @@ function libBackGround(clr0, clr1)
   imgArr.ctx.fillRect(0, 0, cs.width, cs.height);
 }
 
-function randPic1(update)
+function letterScreen(update)
 {
   if(update)
   {
@@ -108,19 +108,19 @@ function randPic1(update)
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < imgArr.imgTop + imgArr.currImg.height) {return randPic1(true);}
+    if(y < imgArr.imgTop + imgArr.currImg.height) {return letterScreen(true);}
     var lineHeight = cs.width / imgArr.currTxtArr.length / 2;
     if(y < cs.height - 100 - lineHeight) return;
     var ch = imgArr.currTxtArr[Math.floor(x / (2 * lineHeight))];
     imgArr.txt += ch;
-    if(imgArr.txt === imgArr.currImg.txt) return yesPic(randPic1);
-    if(imgArr.currImg.txt.indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noPic(randPic1);}
+    if(imgArr.txt === imgArr.currImg.txt) return yesScreen(letterScreen);
+    if(imgArr.currImg.txt.indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noScreen(letterScreen);}
     imgArr.draw();
   }
   imgArr.draw();
 }
 
-function randPic0(update)
+function wordScreen(update)
 {
   if(update)
   {
@@ -193,7 +193,7 @@ function randPic0(update)
     if(y > imgArr.imgTop + imgArr.currImg.height) return;
     if(x < imgArr.txtGrid[0].x)
     {
-      randPic0(true);
+      wordScreen(true);
       imgArr.draw();
       return;
     }
@@ -202,12 +202,12 @@ function randPic0(update)
     if(x < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
     else if(x < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
     else selTxt = imgArr.currTxtArr[2];
-    selTxt == imgArr.currImg.txt ? yesPic(randPic0) : noPic(randPic0);
+    selTxt == imgArr.currImg.txt ? yesScreen(wordScreen) : noScreen(wordScreen);
   }
   imgArr.draw();
 }
 
-function yesPic(retFunc)
+function yesScreen(retFunc)
 {
   imgArr.draw = function()
   {
@@ -231,7 +231,7 @@ function yesPic(retFunc)
   imgArr.draw();
 }
 
-function noPic(retFunc)
+function noScreen(retFunc)
 {
   imgArr.draw = function()
   {
@@ -251,7 +251,7 @@ function noPic(retFunc)
   imgArr.draw();
 }
 
-function loadingImages()
+function loadingScreen()
 {
   imgArr.draw = function()
   {
@@ -269,15 +269,15 @@ function loadingImages()
   imgArr.draw();
 }
 
-function test0() {randPic0(true);}
-function test1() {randPic1(true);}
+function test0() {wordScreen(true);}
+function test1() {letterScreen(true);}
 
 window.onload = function()
 {
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
   imgArr.ctx = cs.getContext("2d");
-  loadingImages();
+  loadingScreen();
   imgArr.no = new Image();
   imgArr.no.src = "img/no-small.png";
   for(var i in g_vocab)
@@ -297,7 +297,7 @@ window.onload = function()
 window.onhashchange = function()
 {
   var entryPoint = document.URL.split("#")[1];
-  if(entryPoint == undefined) entryPoint = "randPic0(true);";
+  if(entryPoint == undefined) entryPoint = "wordScreen(true);";
   try{eval(entryPoint);}catch(e){test0();}
 }
 
