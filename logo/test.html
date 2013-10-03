@@ -52,6 +52,23 @@ function libBackGround(clr0, clr1)
   imgArr.ctx.fillRect(0, 0, cs.width, cs.height);
 }
 
+function libDrawImgWithText(img, txt)
+{
+    var lineHeight = img.height / 5;
+    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    var x = cs.width / 2 - img.width / 2;
+    var y = cs.height / 20;
+    imgArr.imgLeft = x;
+    imgArr.imgTop = y;
+    imgArr.ctx.drawImage(img, x, y);
+    y += img.height;
+    y += cs.height / 40;
+    y += lineHeight;
+    imgArr.ctx.fillStyle = 'darkblue';
+    x = cs.width / 2 - imgArr.ctx.measureText(txt).width / 2;
+    imgArr.ctx.fillText(txt, x, y);
+}
+
 function syllableScreen(update)
 {
   if(update)
@@ -78,33 +95,19 @@ function syllableScreen(update)
   {
     imgArr.ctx.save();
     libBackGround("red", "yellow");
-    var img = imgArr.currImg;
-    var txtWidth = 0;
-    var lineHeight = img.height / 5;
+    libDrawImgWithText(imgArr.currImg, imgArr.txt);
+    var lineHeight = cs.width / imgArr.currTxtArr.join("").length / 2;
     imgArr.ctx.font = lineHeight + 'pt Calibri';
-    var x = cs.width / 2 - img.width / 2;
-    var y = lineHeight;
-    imgArr.imgLeft = x;
-    imgArr.imgTop = y;
-    imgArr.ctx.drawImage(img, x, y);
-    y += img.height;
-    y += lineHeight;
-    y += lineHeight;
-    imgArr.ctx.fillStyle = 'darkblue';
-    x = cs.width / 2 - imgArr.ctx.measureText(imgArr.txt).width / 2;
-    imgArr.ctx.fillText(imgArr.txt, x, y);
-    lineHeight = cs.width / imgArr.currTxtArr.join("").length / 2;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
-    y = cs.height - 50;
+    var y = cs.height - cs.height / 20;
     var step = cs.width - imgArr.ctx.measureText(imgArr.currTxtArr.join()).width;
     step /= (2 * imgArr.currTxtArr.length);
-    x = 0;
+    var x = 0;
     imgArr.txtGrid = [];
     for(var i = 0; i < imgArr.currTxtArr.length; i ++)
     {
       var width = imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
       x += step;
-      imgArr.txtGrid[i] = {"x":x,"y":y - 2 * lineHeight,"w":width};
+      imgArr.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
       imgArr.ctx.fillText(imgArr.currTxtArr[i], x, y);
       x += width;
       x += step;
@@ -176,25 +179,11 @@ function letterScreen(update)
   {
     imgArr.ctx.save();
     libBackGround("red", "yellow");
-    var img = imgArr.currImg;
-    var txtWidth = 0;
-    var lineHeight = img.height / 5;
+    libDrawImgWithText(imgArr.currImg, imgArr.txt);
+    var lineHeight = cs.width / imgArr.currTxtArr.length / 2;
     imgArr.ctx.font = lineHeight + 'pt Calibri';
-    var x = cs.width / 2 - img.width / 2;
-    var y = lineHeight;
-    imgArr.imgLeft = x;
-    imgArr.imgTop = y;
-    imgArr.ctx.drawImage(img, x, y);
-    y += img.height;
-    y += lineHeight;
-    y += lineHeight;
-    imgArr.ctx.fillStyle = 'darkblue';
-    x = cs.width / 2 - imgArr.ctx.measureText(imgArr.txt).width / 2;
-    imgArr.ctx.fillText(imgArr.txt, x, y);
-    lineHeight = cs.width / imgArr.currTxtArr.length / 2;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
-    y = cs.height - 50;
-    x = 0;
+    var y = cs.height - cs.height / 20;
+    var x = 0;
     for(var i = 0; i < imgArr.currTxtArr.length; i ++)
     {
       imgArr.ctx.fillText(imgArr.currTxtArr[i], x + lineHeight - imgArr.ctx.measureText(imgArr.currTxtArr[i]).width / 2, y);
@@ -209,7 +198,7 @@ function letterScreen(update)
     var y = e.clientY - rc.top;
     if(y < imgArr.imgTop + imgArr.currImg.height) {return letterScreen(true);}
     var lineHeight = cs.width / imgArr.currTxtArr.length / 2;
-    if(y < cs.height - 100 - lineHeight) return;
+    if(y < cs.height - cs.height / 10 - lineHeight) return;
     var ch = imgArr.currTxtArr[Math.floor(x / (2 * lineHeight))];
     imgArr.txt += ch;
     if(imgArr.txt === imgArr.currImg.txt.norm()) return yesScreen(letterScreen);
