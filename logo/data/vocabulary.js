@@ -50,5 +50,12 @@ var g_vocab = [
 {t:"ջու-թակ",p:"violin.jpg"},
 {t:"պատ",p:"wall.jpg"},
 {t:"գայլ",p:"wolf.jpg"},
+{t:"կարապ",p:"swan.jpg"},
+{t:"Սի-րան",p:"Siran.jpg"},
+{t:"կա-րաս",p:"karas.jpg"},
+{t:"Ա-րամ",p:"Aram.jpg"},
+{t:"Ա-րա",p:"Ara.jpg"},
+{t:"Ան-նա",p:"Anna.jpg"},
+{t:"Ա-նի",p:"ani.jpg"},
 ];
 
