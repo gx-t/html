@@ -70,6 +70,73 @@ function libDrawImgWithText(img, txt)
     imgArr.ctx.fillText(txt, x, y);
 }
 
+function numberScreen(update)
+{
+  if(update)
+  {
+    while(true)
+    {
+      imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
+      if(imgArr.currImg.txt.split('-').length > 1) break;
+    }
+    imgArr.txt = "";
+    var tmp = [];
+    var arr = [];
+    var syllArr = imgArr.currImg.txt.split('-').concat(libGetAllSyll());
+    for(var i = 0; arr.length < 7 && i < syllArr.length; i ++)
+    {
+      if(tmp[syllArr[i]] != null) continue;
+      tmp[syllArr[i]] = "";
+      arr.push(syllArr[i]);
+    }
+    libShuffle(arr);
+    imgArr.currTxtArr = arr;
+  }
+  imgArr.draw = function()
+  {
+    imgArr.ctx.save();
+    libBackGround("red", "yellow");
+    libDrawImgWithText(imgArr.currImg, imgArr.txt);
+    var lineHeight = cs.width / imgArr.currTxtArr.join("").length / 2;
+    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    var y = cs.height - cs.height / 20;
+    var step = cs.width - imgArr.ctx.measureText(imgArr.currTxtArr.join()).width;
+    step /= (2 * imgArr.currTxtArr.length);
+    var x = 0;
+    imgArr.txtGrid = [];
+    for(var i = 0; i < imgArr.currTxtArr.length; i ++)
+    {
+      var width = imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+      x += step;
+      imgArr.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
+      imgArr.ctx.fillText(imgArr.currTxtArr[i], x, y);
+      x += width;
+      x += step;
+    }
+    imgArr.ctx.restore();
+  }
+  imgArr.onClick = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var x = e.clientX - rc.left;
+    var y = e.clientY - rc.top;
+    if(y < imgArr.imgTop + imgArr.currImg.height) {return syllableScreen(true);}
+    for(var i = 0; i < imgArr.txtGrid.length; i ++)
+    {
+      var s = imgArr.txtGrid[i];
+      if((x >= s.x) && (x <= s.x + s.w) && (y >= s.y))
+      {
+        var syll = imgArr.currTxtArr[i];
+        imgArr.txt += syll;
+        if(imgArr.txt === imgArr.currImg.txt.norm()) return yesScreen(syllableScreen);
+        if(imgArr.currImg.txt.norm().indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noScreen(syllableScreen);}
+      }
+    }
+    imgArr.draw();
+  }
+  imgArr.draw();
+}
+
 function syllableScreen(update)
 {
   if(update)
@@ -359,6 +426,7 @@ function loadingScreen()
 function test0() {document.title = "Բառեր"; wordScreen(true);}
 function test1() {document.title = "Տառեր"; letterScreen(true);}
 function test2() {document.title = "Վանկեր"; syllableScreen(true);}
+function test3() {document.title = "Թվեր"; numberScreen(true);}
 
 window.onload = function()
 {
