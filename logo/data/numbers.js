@@ -16,7 +16,7 @@ var g_numFiles = [
   "pear.jpg",
   "pencil.jpg",
   "pig.jpg",
-  "rope.jpg,
+  "rope.jpg",
   "strawberry.jpg",
   "t-shirt.jpg",
   "tea.jpg",
