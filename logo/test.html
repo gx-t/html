@@ -3,7 +3,6 @@
 <meta charset="utf-8">
 <script src="data/vocabulary.js"></script>
 <script src="data/abc.js"></script>
-<script src="data/numbers.js"></script>
 <script>
 var imgArr = [];
 
@@ -74,9 +73,11 @@ function numberScreen(update)
 {
   if(update)
   {
+    var numImgArr = [];
+    for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
     while(true)
     {
-      imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
+      imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
       if(imgArr.currImg.txt.split('-').length > 1) break;
     }
     imgArr.txt = "";
@@ -120,7 +121,7 @@ function numberScreen(update)
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < imgArr.imgTop + imgArr.currImg.height) {return syllableScreen(true);}
+    if(y < imgArr.imgTop + imgArr.currImg.height) {return numberScreen(true);}
     for(var i = 0; i < imgArr.txtGrid.length; i ++)
     {
       var s = imgArr.txtGrid[i];
@@ -128,8 +129,8 @@ function numberScreen(update)
       {
         var syll = imgArr.currTxtArr[i];
         imgArr.txt += syll;
-        if(imgArr.txt === imgArr.currImg.txt.norm()) return yesScreen(syllableScreen);
-        if(imgArr.currImg.txt.norm().indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noScreen(syllableScreen);}
+        if(imgArr.txt === imgArr.currImg.txt.norm()) return yesScreen(numberScreen);
+        if(imgArr.currImg.txt.norm().indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noScreen(numberScreen);}
       }
     }
     imgArr.draw();
@@ -440,6 +441,7 @@ window.onload = function()
   {
     var img = new Image();
     img.txt = g_vocab[i].t;
+    img.num = g_vocab[i].n;
     img.src = "img/"+g_vocab[i].p;
     img.onload = function(e)
     {
