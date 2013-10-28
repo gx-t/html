@@ -92,8 +92,8 @@ function compScreen(mn, mx, update)
     var cx = 1;
     var cy = Math.ceil(cnt / cx);
     while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
-    var ww = imgArr.currImg.width / 4;
-    var hh = imgArr.currImg.height / 4;
+    var ww = imgArr.currImg.width / 3;
+    var hh = imgArr.currImg.height / 3;
     var y = cs.height / 3 - hh * cy / 2;
     for(var cyy = 0; cyy < cy && cnt; cyy++)
     {
@@ -129,6 +129,7 @@ function compScreen(mn, mx, update)
   {
     imgArr.ctx.save();
     libBackGround("red", "yellow");
+    imgArr.ctx.drawImage(imgArr.refresh, 0, 0);
     var hh = cs.height / 10;
     var ww = cs.width / 4 - hh / 2;
     
@@ -146,7 +147,7 @@ function compScreen(mn, mx, update)
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(x < 100 && y < 100) return compScreen(mn, mx, true);
+    if(x < imgArr.refresh.width && y < imgArr.refresh.height) return compScreen(mn, mx, true);
     var hh = cs.height / 10;
     var ww = cs.width / 4;
     if(y < cs.height - 3 * hh) return;
@@ -568,6 +569,8 @@ window.onload = function()
   loadingScreen();
   imgArr.no = new Image();
   imgArr.no.src = "img/no-small.png";
+  imgArr.refresh = new Image();
+  imgArr.refresh.src = "img/refresh_32.png";
   for(var i = 0; i < g_vocab.length; i ++)
   {
     var img = new Image();
