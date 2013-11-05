@@ -69,15 +69,15 @@ function libDrawImgWithText(img, txt)
     imgArr.ctx.fillText(txt, x, y);
 }
 
-libDrawObjects = function()
+libDrawObjects = function(left, right, curr)
 {
-  var cnt = imgArr.left;
+  var cnt = left;
   var cx = 1;
   var cy = Math.ceil(cnt / cx);
   while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
   var ww = imgArr.currImg.width / 3;
   var hh = imgArr.currImg.height / 3;
-  var y = cs.height / 3 - hh * cy / 2;
+  var y = cs.height / 4 - hh * cy / 2;
   for(var cyy = 0; cyy < cy && cnt; cyy++)
   {
     var x = cs.width / 4 - ww * cx / 2;
@@ -89,12 +89,13 @@ libDrawObjects = function()
     }
     y += hh;
   }
+  var ty = y;
 
-  var cnt = imgArr.right;
+  var cnt = right;
   var cx = 1;
   var cy = Math.ceil(cnt / cx);
   while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
-  var y = cs.height / 3 - hh * cy / 2;
+  var y = cs.height / 4 - hh * cy / 2;
   for(var cyy = 0; cyy < cy && cnt; cyy++)
   {
     var x = cs.width / 4 - ww * cx / 2;
@@ -107,6 +108,13 @@ libDrawObjects = function()
     }
     y += hh;
   }
+  ty = Math.max(ty, y);
+  ty += cs.height / 5;
+  imgArr.ctx.save();
+  imgArr.ctx.font = cs.height / 10 + 'pt Calibri';
+  imgArr.ctx.fillStyle = 'darkblue';
+  imgArr.ctx.fillText(curr, cs.width / 2 - imgArr.ctx.measureText(curr).width / 2, ty);
+  imgArr.ctx.restore();
 }
 
 function compScreenNum(mn, mx, update)
@@ -117,11 +125,11 @@ function compScreenNum(mn, mx, update)
     libShuffle(op);
     imgArr.txtArr = op;
     var eq = 0 == Math.floor(Math.random() * 10000) % 3;
-    imgArr.left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
-    imgArr.right = eq ? imgArr.left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    right = eq ? left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
     imgArr.txt = '=';
-    if(imgArr.left < imgArr.right) imgArr.txt = '<';
-    if(imgArr.left > imgArr.right) imgArr.txt = '>';
+    if(left < right) imgArr.txt = '<';
+    if(left > right) imgArr.txt = '>';
     var numImgArr = [];
     for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
     imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
@@ -140,7 +148,7 @@ function compScreenNum(mn, mx, update)
     imgArr.ctx.fillText(imgArr.txtArr[0], cs.width / 4 - hh / 2, y);
     imgArr.ctx.fillText(imgArr.txtArr[1], cs.width / 2 - hh / 2, y);
     imgArr.ctx.fillText(imgArr.txtArr[2], cs.width - cs.width / 4 - hh / 2, y);
-    libDrawObjects();
+    libDrawObjects(left, right, "test");
     imgArr.ctx.restore();
   }
   imgArr.onClick = function(e)
@@ -170,14 +178,14 @@ function compScreenNum(mn, mx, update)
       libBackGround("red", "yellow");
       var hh = cs.height / 5;
       var x = cs.width / 2 - hh / 2;
-      var y = cs.height / 3 + hh / 2;
+      var y = cs.height / 4 + hh / 2;
       imgArr.ctx.font = hh + 'pt Calibri';
       imgArr.ctx.fillStyle = 'darkblue';
       imgArr.ctx.fillText(imgArr.txt, x, y);
-      libDrawObjects();
+      libDrawObjects(left, right, "test");
       imgArr.ctx.restore();
     }
-    imgArr.onClick = function(e) {compScreen(mn, mx, true);}
+    imgArr.onClick = function(e) {compScreenNum(mn, mx, true);}
     imgArr.draw();
   }
   compNoScreen = function(sign)
@@ -209,11 +217,11 @@ function compScreen(mn, mx, update)
     libShuffle(op);
     imgArr.txtArr = op;
     var eq = 0 == Math.floor(Math.random() * 10000) % 3;
-    imgArr.left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
-    imgArr.right = eq ? imgArr.left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    right = eq ? left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
     imgArr.txt = '=';
-    if(imgArr.left < imgArr.right) imgArr.txt = '<';
-    if(imgArr.left > imgArr.right) imgArr.txt = '>';
+    if(left < right) imgArr.txt = '<';
+    if(left > right) imgArr.txt = '>';
     var numImgArr = [];
     for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
     imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
@@ -232,7 +240,7 @@ function compScreen(mn, mx, update)
     imgArr.ctx.fillText(imgArr.txtArr[0], cs.width / 4 - hh / 2, y);
     imgArr.ctx.fillText(imgArr.txtArr[1], cs.width / 2 - hh / 2, y);
     imgArr.ctx.fillText(imgArr.txtArr[2], cs.width - cs.width / 4 - hh / 2, y);
-    libDrawObjects();
+    libDrawObjects(left, right, "test");
     imgArr.ctx.restore();
   }
   imgArr.onClick = function(e)
@@ -262,11 +270,11 @@ function compScreen(mn, mx, update)
       libBackGround("red", "yellow");
       var hh = cs.height / 5;
       var x = cs.width / 2 - hh / 2;
-      var y = cs.height / 3 + hh / 2;
+      var y = cs.height / 4 + hh / 2;
       imgArr.ctx.font = hh + 'pt Calibri';
       imgArr.ctx.fillStyle = 'darkblue';
       imgArr.ctx.fillText(imgArr.txt, x, y);
-      libDrawObjects();
+      libDrawObjects(left, right, "test");
       imgArr.ctx.restore();
     }
     imgArr.onClick = function(e) {compScreen(mn, mx, true);}
