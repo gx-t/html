@@ -69,6 +69,138 @@ function libDrawImgWithText(img, txt)
     imgArr.ctx.fillText(txt, x, y);
 }
 
+libDrawObjects = function()
+{
+  var cnt = imgArr.left;
+  var cx = 1;
+  var cy = Math.ceil(cnt / cx);
+  while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
+  var ww = imgArr.currImg.width / 3;
+  var hh = imgArr.currImg.height / 3;
+  var y = cs.height / 3 - hh * cy / 2;
+  for(var cyy = 0; cyy < cy && cnt; cyy++)
+  {
+    var x = cs.width / 4 - ww * cx / 2;
+    for(var cxx = 0; cxx < cx && cnt; cxx ++)
+    {
+      imgArr.ctx.drawImage(imgArr.currImg, x, y, ww, hh);
+      x += ww;
+      cnt --;
+    }
+    y += hh;
+  }
+
+  var cnt = imgArr.right;
+  var cx = 1;
+  var cy = Math.ceil(cnt / cx);
+  while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
+  var y = cs.height / 3 - hh * cy / 2;
+  for(var cyy = 0; cyy < cy && cnt; cyy++)
+  {
+    var x = cs.width / 4 - ww * cx / 2;
+    var x = cs.width - cs.width / 4 - ww * cx / 2;
+    for(var cxx = 0; cxx < cx && cnt; cxx ++)
+    {
+      imgArr.ctx.drawImage(imgArr.currImg, x, y, ww, hh);
+      x += ww;
+      cnt --;
+    }
+    y += hh;
+  }
+}
+
+function compScreenNum(mn, mx, update)
+{
+  if(update)
+  {
+    var op = ['<', '=', '>'];
+    libShuffle(op);
+    imgArr.txtArr = op;
+    var eq = 0 == Math.floor(Math.random() * 10000) % 3;
+    imgArr.left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    imgArr.right = eq ? imgArr.left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    imgArr.txt = '=';
+    if(imgArr.left < imgArr.right) imgArr.txt = '<';
+    if(imgArr.left > imgArr.right) imgArr.txt = '>';
+    var numImgArr = [];
+    for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
+    imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
+  }
+  imgArr.draw = function()
+  {
+    imgArr.ctx.save();
+    libBackGround("red", "yellow");
+    imgArr.ctx.drawImage(imgArr.refresh, 0, 0);
+    var hh = cs.height / 10;
+    var ww = cs.width / 4 - hh / 2;
+    
+    var y = cs.height - hh;
+    imgArr.ctx.font = hh + 'pt Calibri';
+    imgArr.ctx.fillStyle = 'darkblue';
+    imgArr.ctx.fillText(imgArr.txtArr[0], cs.width / 4 - hh / 2, y);
+    imgArr.ctx.fillText(imgArr.txtArr[1], cs.width / 2 - hh / 2, y);
+    imgArr.ctx.fillText(imgArr.txtArr[2], cs.width - cs.width / 4 - hh / 2, y);
+    libDrawObjects();
+    imgArr.ctx.restore();
+  }
+  imgArr.onClick = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var x = e.clientX - rc.left;
+    var y = e.clientY - rc.top;
+    if(x < imgArr.refresh.width && y < imgArr.refresh.height) return compScreenNum(mn, mx, true);
+    var hh = cs.height / 10;
+    var ww = cs.width / 4;
+    if(y < cs.height - 3 * hh) return;
+    var vx = ww / 2;
+    if(x < vx) {return};
+    vx += ww;
+    if(x < vx) {return imgArr.txtArr[0] == imgArr.txt ? compYesScreen() : compNoScreen(imgArr.txtArr[0]);}
+    vx += ww;
+    if(x < vx) {return imgArr.txtArr[1] == imgArr.txt ? compYesScreen() : compNoScreen(imgArr.txtArr[1]);}
+    vx += ww;
+    if(x < vx) {return imgArr.txtArr[2] == imgArr.txt ? compYesScreen() : compNoScreen(imgArr.txtArr[2]);}
+    return;
+  }
+  compYesScreen = function()
+  {
+    imgArr.draw = function()
+    {
+      imgArr.ctx.save();
+      libBackGround("red", "yellow");
+      var hh = cs.height / 5;
+      var x = cs.width / 2 - hh / 2;
+      var y = cs.height / 3 + hh / 2;
+      imgArr.ctx.font = hh + 'pt Calibri';
+      imgArr.ctx.fillStyle = 'darkblue';
+      imgArr.ctx.fillText(imgArr.txt, x, y);
+      libDrawObjects();
+      imgArr.ctx.restore();
+    }
+    imgArr.onClick = function(e) {compScreen(mn, mx, true);}
+    imgArr.draw();
+  }
+  compNoScreen = function(sign)
+  {
+    imgArr.draw = function()
+    {
+      imgArr.ctx.save();
+      libBackGround("red", "yellow");
+      var hh = cs.height / 5;
+      var x = cs.width / 2 - imgArr.no.width / 2;
+      var y = cs.height / 2;
+      imgArr.ctx.drawImage(imgArr.no, x, y - hh / 2);
+//      imgArr.ctx.font = hh / 2 + 'pt Calibri';
+//      imgArr.ctx.fillStyle = 'darkblue';
+//      imgArr.ctx.fillText('X', x, y);
+      imgArr.ctx.restore();
+    }
+    imgArr.onClick = function(e) {compScreenNum(mn, mx, false);}
+    imgArr.draw();
+  }
+  imgArr.draw();
+}
+
 function compScreen(mn, mx, update)
 {
   if(update)
@@ -86,45 +218,6 @@ function compScreen(mn, mx, update)
     for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
     imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
   }
-  drawObjects = function()
-  {
-    var cnt = imgArr.left;
-    var cx = 1;
-    var cy = Math.ceil(cnt / cx);
-    while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
-    var ww = imgArr.currImg.width / 3;
-    var hh = imgArr.currImg.height / 3;
-    var y = cs.height / 3 - hh * cy / 2;
-    for(var cyy = 0; cyy < cy && cnt; cyy++)
-    {
-      var x = cs.width / 4 - ww * cx / 2;
-      for(var cxx = 0; cxx < cx && cnt; cxx ++)
-      {
-        imgArr.ctx.drawImage(imgArr.currImg, x, y, ww, hh);
-        x += ww;
-        cnt --;
-      }
-      y += hh;
-    }
-
-    var cnt = imgArr.right;
-    var cx = 1;
-    var cy = Math.ceil(cnt / cx);
-    while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
-    var y = cs.height / 3 - hh * cy / 2;
-    for(var cyy = 0; cyy < cy && cnt; cyy++)
-    {
-      var x = cs.width / 4 - ww * cx / 2;
-      var x = cs.width - cs.width / 4 - ww * cx / 2;
-      for(var cxx = 0; cxx < cx && cnt; cxx ++)
-      {
-        imgArr.ctx.drawImage(imgArr.currImg, x, y, ww, hh);
-        x += ww;
-        cnt --;
-      }
-      y += hh;
-    }
-  }
   imgArr.draw = function()
   {
     imgArr.ctx.save();
@@ -139,7 +232,7 @@ function compScreen(mn, mx, update)
     imgArr.ctx.fillText(imgArr.txtArr[0], cs.width / 4 - hh / 2, y);
     imgArr.ctx.fillText(imgArr.txtArr[1], cs.width / 2 - hh / 2, y);
     imgArr.ctx.fillText(imgArr.txtArr[2], cs.width - cs.width / 4 - hh / 2, y);
-    drawObjects();
+    libDrawObjects();
     imgArr.ctx.restore();
   }
   imgArr.onClick = function(e)
@@ -173,7 +266,7 @@ function compScreen(mn, mx, update)
       imgArr.ctx.font = hh + 'pt Calibri';
       imgArr.ctx.fillStyle = 'darkblue';
       imgArr.ctx.fillText(imgArr.txt, x, y);
-      drawObjects();
+      libDrawObjects();
       imgArr.ctx.restore();
     }
     imgArr.onClick = function(e) {compScreen(mn, mx, true);}
@@ -560,6 +653,7 @@ function test1() {document.title = "Տառեր"; letterScreen(true);}
 function test2() {document.title = "Վանկեր"; syllableScreen(true);}
 function test3() {document.title = "Թվեր"; numberScreen(true);}
 function compare(mn, mx) {document.title = "Մեծ֊փոքր"; compScreen(mn, mx, true);}
+function compare_num(mn, mx) {document.title = "Մեծ֊փոքր"; compScreenNum(mn, mx, true);}
 
 window.onload = function()
 {
