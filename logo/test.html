@@ -135,20 +135,21 @@ libDrawNumSignPad = function()
 
 function compScreenNum(mn, mx, update)
 {
-  var curr = '';
+  var curr = "";
   if(update)
   {
     var eq = 0 == Math.floor(Math.random() * 10000) % 3;
     left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
     right = eq ? left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
-    var sign = '=';
+    sign = '=';
     if(left < right) sign = '<';
     if(left > right) sign = '>';
-    correct = left + sign + right;
+    display = left + sign + right;
     var numImgArr = [];
     for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
     imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
   }
+  correct = left + " " + right + sign;
   imgArr.draw = function()
   {
     imgArr.ctx.save();
@@ -168,9 +169,18 @@ function compScreenNum(mn, mx, update)
     if(y < cs.height - 10 - hh) return;
     var idx = Math.floor((x - hh / 2)/ 2 / hh);
     var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '<', '=', '>'];
-    curr += arr[idx];
-    if(correct === curr) return yesScreen();
-    if(correct.indexOf(curr) != 0) return noScreen();
+    if(correct.charAt(0) == " ")
+    {
+      curr += "   ";
+      correct = correct.substring(1);
+    }
+    if(correct.charAt(0) == arr[idx])
+    {
+      curr += arr[idx];
+      correct = correct.substring(1);
+    }
+    else {return noScreen();}
+    if(correct === "") return yesScreen();
     imgArr.draw();
     return;
   }
@@ -183,7 +193,7 @@ function compScreenNum(mn, mx, update)
       var hh = cs.height / 5;
       imgArr.ctx.font = hh + 'pt Calibri';
       imgArr.ctx.fillStyle = 'darkblue';
-      imgArr.ctx.fillText(curr, cs.width / 2 - imgArr.ctx.measureText(curr).width / 2, cs.height / 2);
+      imgArr.ctx.fillText(display, cs.width / 2 - imgArr.ctx.measureText(display).width / 2, cs.height / 2);
 //      libDrawObjects(left, right, curr);
       imgArr.ctx.restore();
     }
@@ -642,7 +652,7 @@ function loadingScreen()
     imgArr.ctx.save();
     libBackGround("green", "yellow");
     imgArr.ctx.font = 20 + 'pt Calibri';
-    var txt = "Նկարները բեռնվում են․․․";
+    var txt = "Նկարները բեռնվում են...";
     var txtWidth = imgArr.ctx.measureText(txt).width;
     var x = cs.width / 2 - txtWidth / 2;
     var y = cs.height / 2;
