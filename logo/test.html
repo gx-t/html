@@ -133,6 +133,73 @@ libDrawNumSignPad = function()
   }
 }
 
+function numSoundScreen()
+{
+  var x0;
+  var y0;
+  var hh;
+  gData.draw = function()
+  {
+    gData.ctx.save();
+    libBackGround("red", "yellow");
+    hh = Math.min(cs.width, cs.height) / 10;
+    gData.ctx.font = hh + "pt Calibri";
+    x0 = (cs.width - 7 * hh) / 2;
+    y0 = (cs.height - 9 * hh) / 2;
+    gData.ctx.fillStyle = "darkblue";
+    var y = y0;
+    var k = 1;
+    for(var j = 0; j < 3; j ++)
+    {
+      var x = x0;
+      y += hh;
+      for(var i = 0; i < 3; i ++)
+      {
+        x += hh;
+        gData.ctx.fillText(k++, x, y);
+        x += hh;
+      }
+      y += hh;
+    }
+    y += hh;
+    gData.ctx.fillText(k++, x0 + hh, y);
+    gData.ctx.restore();
+  }
+  gData.onClick = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var ex = e.clientX - rc.left;
+    var ey = e.clientY - rc.top;
+    var y = y0;
+    var y1 = 0;
+    var x = 0;
+    var x1 = 0;
+    for(var j = 0; j < 3; j ++, y = y1)
+    {
+      x = x0 + hh / 2;
+      y1 = y + 2 * hh;
+      if(ey < y || ey > y1) continue;
+      for(var i = 0; i < 3; i ++, x = x1)
+      {
+        x1 = x + 2 * hh;
+        if(ex < x || ex > x1) continue;
+        var audio = new Audio("sound/" + (1 + i + 3 * j) + ".mp3");
+        audio.play();
+        return;
+      }
+    }
+    x = x0 + hh / 2;
+    x1 = x + 2.5 * hh;
+    y1 = y + 2 * hh;
+    if(ey >= y && ey <= y1 && ex >= x && ex <= x1) {
+      var audio = new Audio("sound/10.mp3");
+      audio.play();
+      return;
+    }
+  }
+  gData.draw();
+}
+
 function compScreenNum(mn, mx, update)
 {
   var curr = "";
@@ -669,6 +736,7 @@ function test2() {document.title = "Վանկեր"; syllableScreen(true);}
 function test3() {document.title = "Թվեր"; numberScreen(true);}
 function compare(mn, mx) {document.title = "Մեծ֊փոքր"; compScreen(mn, mx, true);}
 function compare_num(mn, mx) {document.title = "Մեծ֊փոքր"; compScreenNum(mn, mx, true);}
+function num_sound() {document.title = "Խոսող թվեր"; numSoundScreen();}
 
 window.onload = function()
 {
