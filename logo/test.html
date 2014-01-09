@@ -4,7 +4,7 @@
 <script src="data/vocabulary.js"></script>
 <script src="data/abc.js"></script>
 <script>
-var imgArr = [];
+var gData = [];
 
 String.prototype.norm = function(s, r) {return this.split("-").join("");}
 
@@ -25,9 +25,9 @@ function libGetAllSyll()
 {
   var arr = [];
   var tmp = [];
-  for(var i = 0; i < imgArr.length; i ++)
+  for(var i = 0; i < gData.length; i ++)
   {
-    var arr1 = imgArr[i].txt.split('-');
+    var arr1 = gData[i].txt.split('-');
     if(arr1.length == 1) continue;
     for(var j = 0; j < arr1.length; j ++)
     {
@@ -43,30 +43,30 @@ function libGetAllSyll()
 function libBackGround(clr0, clr1)
 {
   // Create gradient
-  var grd = imgArr.ctx.createLinearGradient(0,0,cs.width,cs.height);
+  var grd = gData.ctx.createLinearGradient(0,0,cs.width,cs.height);
   grd.addColorStop(0, clr0);
   grd.addColorStop(1, clr1);
 
   // Fill with gradient
-  imgArr.ctx.fillStyle = grd;
-  imgArr.ctx.fillRect(0, 0, cs.width, cs.height);
+  gData.ctx.fillStyle = grd;
+  gData.ctx.fillRect(0, 0, cs.width, cs.height);
 }
 
 function libDrawImgWithText(img, txt)
 {
     var lineHeight = img.height / 5;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    gData.ctx.font = lineHeight + 'pt Calibri';
     var x = cs.width / 2 - img.width / 2;
     var y = cs.height / 20;
-    imgArr.imgLeft = x;
-    imgArr.imgTop = y;
-    imgArr.ctx.drawImage(img, x, y);
+    gData.imgLeft = x;
+    gData.imgTop = y;
+    gData.ctx.drawImage(img, x, y);
     y += img.height;
     y += cs.height / 40;
     y += lineHeight;
-    imgArr.ctx.fillStyle = 'darkblue';
-    x = cs.width / 2 - imgArr.ctx.measureText(txt).width / 2;
-    imgArr.ctx.fillText(txt, x, y);
+    gData.ctx.fillStyle = 'darkblue';
+    x = cs.width / 2 - gData.ctx.measureText(txt).width / 2;
+    gData.ctx.fillText(txt, x, y);
 }
 
 libDrawObjects = function(left, right, curr)
@@ -75,15 +75,15 @@ libDrawObjects = function(left, right, curr)
   var cx = 1;
   var cy = Math.ceil(cnt / cx);
   while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
-  var ww = imgArr.currImg.width / 3;
-  var hh = imgArr.currImg.height / 3;
+  var ww = gData.currImg.width / 3;
+  var hh = gData.currImg.height / 3;
   var y = cs.height / 4 - hh * cy / 2;
   for(var cyy = 0; cyy < cy && cnt; cyy++)
   {
     var x = cs.width / 4 - ww * cx / 2;
     for(var cxx = 0; cxx < cx && cnt; cxx ++)
     {
-      imgArr.ctx.drawImage(imgArr.currImg, x, y, ww, hh);
+      gData.ctx.drawImage(gData.currImg, x, y, ww, hh);
       x += ww;
       cnt --;
     }
@@ -102,7 +102,7 @@ libDrawObjects = function(left, right, curr)
     var x = cs.width - cs.width / 4 - ww * cx / 2;
     for(var cxx = 0; cxx < cx && cnt; cxx ++)
     {
-      imgArr.ctx.drawImage(imgArr.currImg, x, y, ww, hh);
+      gData.ctx.drawImage(gData.currImg, x, y, ww, hh);
       x += ww;
       cnt --;
     }
@@ -110,11 +110,11 @@ libDrawObjects = function(left, right, curr)
   }
   ty = Math.max(ty, y);
   ty += cs.height / 5;
-  imgArr.ctx.save();
-  imgArr.ctx.font = cs.width / 27 + 'pt Calibri';
-  imgArr.ctx.fillStyle = 'darkblue';
-  imgArr.ctx.fillText(curr, cs.width / 2 - imgArr.ctx.measureText(curr).width / 2, ty);
-  imgArr.ctx.restore();
+  gData.ctx.save();
+  gData.ctx.font = cs.width / 27 + 'pt Calibri';
+  gData.ctx.fillStyle = 'darkblue';
+  gData.ctx.fillText(curr, cs.width / 2 - gData.ctx.measureText(curr).width / 2, ty);
+  gData.ctx.restore();
 }
 
 libDrawNumSignPad = function()
@@ -122,13 +122,13 @@ libDrawNumSignPad = function()
   var hh = cs.width / 27; //10 numbers + 3 signs + spaces
   var y = cs.height - 10;
   var x = 0;
-  imgArr.ctx.font = hh + 'pt Calibri';
-  imgArr.ctx.fillStyle = 'darkblue';
+  gData.ctx.font = hh + 'pt Calibri';
+  gData.ctx.fillStyle = 'darkblue';
   var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '<', '=', '>'];
   for(var i in arr)
   {
     x += hh;
-    imgArr.ctx.fillText(arr[i], x, y);
+    gData.ctx.fillText(arr[i], x, y);
     x += hh;
   }
 }
@@ -145,26 +145,26 @@ function compScreenNum(mn, mx, update)
     if(left < right) sign = '<';
     if(left > right) sign = '>';
     display = left + sign + right;
-    var numImgArr = [];
-    for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
-    imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
+    var numgData = [];
+    for(var i = 0; i < gData.length; i ++) if(gData[i].num) numgData.push(gData[i]);
+    gData.currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
   }
   correct = left + " " + right + sign;
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    imgArr.ctx.drawImage(imgArr.refresh, 0, 0);
+    gData.ctx.drawImage(gData.refresh, 0, 0);
     libDrawObjects(left, right, curr);
     libDrawNumSignPad();
-    imgArr.ctx.restore();
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e)
+  gData.onClick = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(x < imgArr.refresh.width && y < imgArr.refresh.height) return compScreenNum(mn, mx, true);
+    if(x < gData.refresh.width && y < gData.refresh.height) return compScreenNum(mn, mx, true);
     var hh = cs.width / 27; //10 numbers + 3 signs + spaces
     if(y < cs.height - 10 - hh) return;
     var idx = Math.floor((x - hh / 2)/ 2 / hh);
@@ -181,39 +181,39 @@ function compScreenNum(mn, mx, update)
     }
     else {return noScreen();}
     if(correct === "") return yesScreen();
-    imgArr.draw();
+    gData.draw();
     return;
   }
   yesScreen = function()
   {
-    imgArr.draw = function()
+    gData.draw = function()
     {
-      imgArr.ctx.save();
+      gData.ctx.save();
       libBackGround("red", "yellow");
       var hh = cs.height / 5;
-      imgArr.ctx.font = hh + 'pt Calibri';
-      imgArr.ctx.fillStyle = 'darkblue';
-      imgArr.ctx.fillText(display, cs.width / 2 - imgArr.ctx.measureText(display).width / 2, cs.height / 2);
+      gData.ctx.font = hh + 'pt Calibri';
+      gData.ctx.fillStyle = 'darkblue';
+      gData.ctx.fillText(display, cs.width / 2 - gData.ctx.measureText(display).width / 2, cs.height / 2);
 //      libDrawObjects(left, right, curr);
-      imgArr.ctx.restore();
+      gData.ctx.restore();
     }
-    imgArr.onClick = function(e) {compScreenNum(mn, mx, true);}
-    imgArr.draw();
+    gData.onClick = function(e) {compScreenNum(mn, mx, true);}
+    gData.draw();
   }
   noScreen = function(sign)
   {
-    imgArr.draw = function()
+    gData.draw = function()
     {
-      imgArr.ctx.save();
+      gData.ctx.save();
       libBackGround("red", "yellow");
-      imgArr.ctx.drawImage(imgArr.no, cs.width / 2 - imgArr.no.width / 2, cs.height / 2 - imgArr.no.height / 2);
+      gData.ctx.drawImage(gData.no, cs.width / 2 - gData.no.width / 2, cs.height / 2 - gData.no.height / 2);
 
-      imgArr.ctx.restore();
+      gData.ctx.restore();
     }
-    imgArr.onClick = function(e) {compScreenNum(mn, mx, false);}
-    imgArr.draw();
+    gData.onClick = function(e) {compScreenNum(mn, mx, false);}
+    gData.draw();
   }
-  imgArr.draw();
+  gData.draw();
 }
 
 function compScreen(mn, mx, update)
@@ -222,107 +222,107 @@ function compScreen(mn, mx, update)
   {
     var op = ['<', '=', '>'];
     libShuffle(op);
-    imgArr.txtArr = op;
+    gData.txtArr = op;
     var eq = 0 == Math.floor(Math.random() * 10000) % 3;
     left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
     right = eq ? left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
-    imgArr.txt = '=';
-    if(left < right) imgArr.txt = '<';
-    if(left > right) imgArr.txt = '>';
-    var numImgArr = [];
-    for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
-    imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
+    gData.txt = '=';
+    if(left < right) gData.txt = '<';
+    if(left > right) gData.txt = '>';
+    var numgData = [];
+    for(var i = 0; i < gData.length; i ++) if(gData[i].num) numgData.push(gData[i]);
+    gData.currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
   }
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    imgArr.ctx.drawImage(imgArr.refresh, 0, 0);
+    gData.ctx.drawImage(gData.refresh, 0, 0);
     var hh = cs.height / 10;
     var ww = cs.width / 4 - hh / 2;
     
     var y = cs.height - hh;
-    imgArr.ctx.font = hh + 'pt Calibri';
-    imgArr.ctx.fillStyle = 'darkblue';
-    imgArr.ctx.fillText(imgArr.txtArr[0], cs.width / 4 - hh / 2, y);
-    imgArr.ctx.fillText(imgArr.txtArr[1], cs.width / 2 - hh / 2, y);
-    imgArr.ctx.fillText(imgArr.txtArr[2], cs.width - cs.width / 4 - hh / 2, y);
+    gData.ctx.font = hh + 'pt Calibri';
+    gData.ctx.fillStyle = 'darkblue';
+    gData.ctx.fillText(gData.txtArr[0], cs.width / 4 - hh / 2, y);
+    gData.ctx.fillText(gData.txtArr[1], cs.width / 2 - hh / 2, y);
+    gData.ctx.fillText(gData.txtArr[2], cs.width - cs.width / 4 - hh / 2, y);
     libDrawObjects(left, right, '');
-    imgArr.ctx.restore();
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e)
+  gData.onClick = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(x < imgArr.refresh.width && y < imgArr.refresh.height) return compScreen(mn, mx, true);
+    if(x < gData.refresh.width && y < gData.refresh.height) return compScreen(mn, mx, true);
     var hh = cs.height / 10;
     var ww = cs.width / 4;
     if(y < cs.height - 3 * hh) return;
     var vx = ww / 2;
     if(x < vx) {return};
     vx += ww;
-    if(x < vx) {return imgArr.txtArr[0] == imgArr.txt ? compYesScreen() : compNoScreen(imgArr.txtArr[0]);}
+    if(x < vx) {return gData.txtArr[0] == gData.txt ? compYesScreen() : compNoScreen(gData.txtArr[0]);}
     vx += ww;
-    if(x < vx) {return imgArr.txtArr[1] == imgArr.txt ? compYesScreen() : compNoScreen(imgArr.txtArr[1]);}
+    if(x < vx) {return gData.txtArr[1] == gData.txt ? compYesScreen() : compNoScreen(gData.txtArr[1]);}
     vx += ww;
-    if(x < vx) {return imgArr.txtArr[2] == imgArr.txt ? compYesScreen() : compNoScreen(imgArr.txtArr[2]);}
+    if(x < vx) {return gData.txtArr[2] == gData.txt ? compYesScreen() : compNoScreen(gData.txtArr[2]);}
     return;
   }
   compYesScreen = function()
   {
-    imgArr.draw = function()
+    gData.draw = function()
     {
-      imgArr.ctx.save();
+      gData.ctx.save();
       libBackGround("red", "yellow");
       var hh = cs.height / 5;
       var x = cs.width / 2 - hh / 2;
       var y = cs.height / 4 + hh / 2;
-      imgArr.ctx.font = hh + 'pt Calibri';
-      imgArr.ctx.fillStyle = 'darkblue';
-      imgArr.ctx.fillText(imgArr.txt, x, y);
+      gData.ctx.font = hh + 'pt Calibri';
+      gData.ctx.fillStyle = 'darkblue';
+      gData.ctx.fillText(gData.txt, x, y);
       libDrawObjects(left, right, '');
-      imgArr.ctx.restore();
+      gData.ctx.restore();
     }
-    imgArr.onClick = function(e) {compScreen(mn, mx, true);}
-    imgArr.draw();
+    gData.onClick = function(e) {compScreen(mn, mx, true);}
+    gData.draw();
   }
   compNoScreen = function(sign)
   {
-    imgArr.draw = function()
+    gData.draw = function()
     {
-      imgArr.ctx.save();
+      gData.ctx.save();
       libBackGround("red", "yellow");
       var hh = cs.height / 5;
-      var x = cs.width / 2 - imgArr.no.width / 2;
+      var x = cs.width / 2 - gData.no.width / 2;
       var y = cs.height / 2;
-      imgArr.ctx.drawImage(imgArr.no, x, y - hh / 2);
-//      imgArr.ctx.font = hh / 2 + 'pt Calibri';
-//      imgArr.ctx.fillStyle = 'darkblue';
-//      imgArr.ctx.fillText('X', x, y);
-      imgArr.ctx.restore();
+      gData.ctx.drawImage(gData.no, x, y - hh / 2);
+//      gData.ctx.font = hh / 2 + 'pt Calibri';
+//      gData.ctx.fillStyle = 'darkblue';
+//      gData.ctx.fillText('X', x, y);
+      gData.ctx.restore();
     }
-    imgArr.onClick = function(e) {compScreen(mn, mx, false);}
-    imgArr.draw();
+    gData.onClick = function(e) {compScreen(mn, mx, false);}
+    gData.draw();
   }
-  imgArr.draw();
+  gData.draw();
 }
 
 function numberScreen(update)
 {
   if(update)
   {
-    var numImgArr = [];
-    for(var i = 0; i < imgArr.length; i ++) if(imgArr[i].num) numImgArr.push(imgArr[i]);
+    var numgData = [];
+    for(var i = 0; i < gData.length; i ++) if(gData[i].num) numgData.push(gData[i]);
     while(true)
     {
-      imgArr.currImg = numImgArr[Math.floor(Math.random() * 10000) % numImgArr.length];
-      if(imgArr.currImg.txt.split('-').length > 1) break;
+      gData.currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
+      if(gData.currImg.txt.split('-').length > 1) break;
     }
-    imgArr.txt = "";
+    gData.txt = "";
     var tmp = [];
     var arr = [];
-    var syllArr = imgArr.currImg.txt.split('-').concat(libGetAllSyll());
+    var syllArr = gData.currImg.txt.split('-').concat(libGetAllSyll());
     for(var i = 0; arr.length < 7 && i < syllArr.length; i ++)
     {
       if(tmp[syllArr[i]] != null) continue;
@@ -330,51 +330,51 @@ function numberScreen(update)
       arr.push(syllArr[i]);
     }
     libShuffle(arr);
-    imgArr.currTxtArr = arr;
+    gData.currTxtArr = arr;
   }
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    libDrawImgWithText(imgArr.currImg, imgArr.txt);
-    var lineHeight = cs.width / imgArr.currTxtArr.join("").length / 2;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    libDrawImgWithText(gData.currImg, gData.txt);
+    var lineHeight = cs.width / gData.currTxtArr.join("").length / 2;
+    gData.ctx.font = lineHeight + 'pt Calibri';
     var y = cs.height - cs.height / 20;
-    var step = cs.width - imgArr.ctx.measureText(imgArr.currTxtArr.join()).width;
-    step /= (2 * imgArr.currTxtArr.length);
+    var step = cs.width - gData.ctx.measureText(gData.currTxtArr.join()).width;
+    step /= (2 * gData.currTxtArr.length);
     var x = 0;
-    imgArr.txtGrid = [];
-    for(var i = 0; i < imgArr.currTxtArr.length; i ++)
+    gData.txtGrid = [];
+    for(var i = 0; i < gData.currTxtArr.length; i ++)
     {
-      var width = imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+      var width = gData.ctx.measureText(gData.currTxtArr[i]).width;
       x += step;
-      imgArr.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
-      imgArr.ctx.fillText(imgArr.currTxtArr[i], x, y);
+      gData.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
+      gData.ctx.fillText(gData.currTxtArr[i], x, y);
       x += width;
       x += step;
     }
-    imgArr.ctx.restore();
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e)
+  gData.onClick = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < imgArr.imgTop + imgArr.currImg.height) {return numberScreen(true);}
-    for(var i = 0; i < imgArr.txtGrid.length; i ++)
+    if(y < gData.imgTop + gData.currImg.height) {return numberScreen(true);}
+    for(var i = 0; i < gData.txtGrid.length; i ++)
     {
-      var s = imgArr.txtGrid[i];
+      var s = gData.txtGrid[i];
       if((x >= s.x) && (x <= s.x + s.w) && (y >= s.y))
       {
-        var syll = imgArr.currTxtArr[i];
-        imgArr.txt += syll;
-        if(imgArr.txt === imgArr.currImg.txt.norm()) return yesScreen(numberScreen);
-        if(imgArr.currImg.txt.norm().indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noScreen(numberScreen);}
+        var syll = gData.currTxtArr[i];
+        gData.txt += syll;
+        if(gData.txt === gData.currImg.txt.norm()) return yesScreen(numberScreen);
+        if(gData.currImg.txt.norm().indexOf(gData.txt) != 0) {gData.txt = ""; return noScreen(numberScreen);}
       }
     }
-    imgArr.draw();
+    gData.draw();
   }
-  imgArr.draw();
+  gData.draw();
 }
 
 function syllableScreen(update)
@@ -383,13 +383,13 @@ function syllableScreen(update)
   {
     while(true)
     {
-      imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
-      if(imgArr.currImg.txt.split('-').length > 1) break;
+      gData.currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
+      if(gData.currImg.txt.split('-').length > 1) break;
     }
-    imgArr.txt = "";
+    gData.txt = "";
     var tmp = [];
     var arr = [];
-    var syllArr = imgArr.currImg.txt.split('-').concat(libGetAllSyll());
+    var syllArr = gData.currImg.txt.split('-').concat(libGetAllSyll());
     for(var i = 0; arr.length < 7 && i < syllArr.length; i ++)
     {
       if(tmp[syllArr[i]] != null) continue;
@@ -397,62 +397,62 @@ function syllableScreen(update)
       arr.push(syllArr[i]);
     }
     libShuffle(arr);
-    imgArr.currTxtArr = arr;
+    gData.currTxtArr = arr;
   }
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    libDrawImgWithText(imgArr.currImg, imgArr.txt);
-    var lineHeight = cs.width / imgArr.currTxtArr.join("").length / 2;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    libDrawImgWithText(gData.currImg, gData.txt);
+    var lineHeight = cs.width / gData.currTxtArr.join("").length / 2;
+    gData.ctx.font = lineHeight + 'pt Calibri';
     var y = cs.height - cs.height / 20;
-    var step = cs.width - imgArr.ctx.measureText(imgArr.currTxtArr.join()).width;
-    step /= (2 * imgArr.currTxtArr.length);
+    var step = cs.width - gData.ctx.measureText(gData.currTxtArr.join()).width;
+    step /= (2 * gData.currTxtArr.length);
     var x = 0;
-    imgArr.txtGrid = [];
-    for(var i = 0; i < imgArr.currTxtArr.length; i ++)
+    gData.txtGrid = [];
+    for(var i = 0; i < gData.currTxtArr.length; i ++)
     {
-      var width = imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+      var width = gData.ctx.measureText(gData.currTxtArr[i]).width;
       x += step;
-      imgArr.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
-      imgArr.ctx.fillText(imgArr.currTxtArr[i], x, y);
+      gData.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
+      gData.ctx.fillText(gData.currTxtArr[i], x, y);
       x += width;
       x += step;
     }
-    imgArr.ctx.restore();
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e)
+  gData.onClick = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < imgArr.imgTop + imgArr.currImg.height) {return syllableScreen(true);}
-    for(var i = 0; i < imgArr.txtGrid.length; i ++)
+    if(y < gData.imgTop + gData.currImg.height) {return syllableScreen(true);}
+    for(var i = 0; i < gData.txtGrid.length; i ++)
     {
-      var s = imgArr.txtGrid[i];
+      var s = gData.txtGrid[i];
       if((x >= s.x) && (x <= s.x + s.w) && (y >= s.y))
       {
-        var syll = imgArr.currTxtArr[i];
-        imgArr.txt += syll;
-        if(imgArr.txt === imgArr.currImg.txt.norm()) return yesScreen(syllableScreen);
-        if(imgArr.currImg.txt.norm().indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noScreen(syllableScreen);}
+        var syll = gData.currTxtArr[i];
+        gData.txt += syll;
+        if(gData.txt === gData.currImg.txt.norm()) return yesScreen(syllableScreen);
+        if(gData.currImg.txt.norm().indexOf(gData.txt) != 0) {gData.txt = ""; return noScreen(syllableScreen);}
       }
     }
-    imgArr.draw();
+    gData.draw();
   }
-  imgArr.draw();
+  gData.draw();
 }
 
 function letterScreen(update)
 {
   if(update)
   {
-    imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
-    imgArr.txt = "";
+    gData.currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
+    gData.txt = "";
     var tmp = [];
     var arr = [];
-    var txt = imgArr.currImg.txt.norm();
+    var txt = gData.currImg.txt.norm();
     for(var i = 0; i < txt.length; i ++)
     {
       var ch = txt.charAt(i);
@@ -481,186 +481,186 @@ function letterScreen(update)
       arr.push(ch);
     }
     libShuffle(arr);
-    imgArr.currTxtArr = arr;
+    gData.currTxtArr = arr;
   }
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    libDrawImgWithText(imgArr.currImg, imgArr.txt);
-    var lineHeight = cs.width / imgArr.currTxtArr.length / 2;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    libDrawImgWithText(gData.currImg, gData.txt);
+    var lineHeight = cs.width / gData.currTxtArr.length / 2;
+    gData.ctx.font = lineHeight + 'pt Calibri';
     var y = cs.height - cs.height / 20;
     var x = 0;
-    for(var i = 0; i < imgArr.currTxtArr.length; i ++)
+    for(var i = 0; i < gData.currTxtArr.length; i ++)
     {
-      imgArr.ctx.fillText(imgArr.currTxtArr[i], x + lineHeight - imgArr.ctx.measureText(imgArr.currTxtArr[i]).width / 2, y);
+      gData.ctx.fillText(gData.currTxtArr[i], x + lineHeight - gData.ctx.measureText(gData.currTxtArr[i]).width / 2, y);
       x += 2 * lineHeight;
     }
-    imgArr.ctx.restore();
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e)
+  gData.onClick = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < imgArr.imgTop + imgArr.currImg.height) {return letterScreen(true);}
-    var lineHeight = cs.width / imgArr.currTxtArr.length / 2;
+    if(y < gData.imgTop + gData.currImg.height) {return letterScreen(true);}
+    var lineHeight = cs.width / gData.currTxtArr.length / 2;
     if(y < cs.height - cs.height / 10 - lineHeight) return;
-    var ch = imgArr.currTxtArr[Math.floor(x / (2 * lineHeight))];
-    imgArr.txt += ch;
-    if(imgArr.txt === imgArr.currImg.txt.norm()) return yesScreen(letterScreen);
-    if(imgArr.currImg.txt.norm().indexOf(imgArr.txt) != 0) {imgArr.txt = ""; return noScreen(letterScreen);}
-    imgArr.draw();
+    var ch = gData.currTxtArr[Math.floor(x / (2 * lineHeight))];
+    gData.txt += ch;
+    if(gData.txt === gData.currImg.txt.norm()) return yesScreen(letterScreen);
+    if(gData.currImg.txt.norm().indexOf(gData.txt) != 0) {gData.txt = ""; return noScreen(letterScreen);}
+    gData.draw();
   }
-  imgArr.draw();
+  gData.draw();
 }
 
 function wordScreen(update)
 {
   if(update)
   {
-    imgArr.currImg = imgArr[Math.floor(Math.random() * 10000) % imgArr.length];
+    gData.currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
     var tmp = [];
     var arr = [];
     var cnt = 1;
-    var txt = imgArr.currImg.txt.norm();
+    var txt = gData.currImg.txt.norm();
     tmp[txt] = "";
     arr.push(txt);
     while(cnt < 3)
     {
-      var txt = imgArr[Math.floor(Math.random() * 10000) % imgArr.length].txt.norm();
+      var txt = gData[Math.floor(Math.random() * 10000) % gData.length].txt.norm();
       if(tmp[txt] != null) continue;
       tmp[txt] = "";
       arr.push(txt);
       cnt ++;
     }
     libShuffle(arr);
-    imgArr.currTxtArr = arr;
+    gData.currTxtArr = arr;
   }
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    var img = imgArr.currImg;
+    var img = gData.currImg;
     var txtWidth = 0;
     var lineHeight = img.height / 3 - 10;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    gData.ctx.font = lineHeight + 'pt Calibri';
 
-    for(var i = 0; i < imgArr.currTxtArr.length; i ++) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[i]).width;
+    for(var i = 0; i < gData.currTxtArr.length; i ++) txtWidth += gData.ctx.measureText(gData.currTxtArr[i]).width;
     if(txtWidth > cs.width - img.width)
     {
       lineHeight *= (cs.width - img.width);
       lineHeight /= txtWidth;
-      imgArr.ctx.font = lineHeight + 'pt Calibri';
+      gData.ctx.font = lineHeight + 'pt Calibri';
       txtWidth = 0;
-      for(var j = 0; j < imgArr.currTxtArr.length; j ++) txtWidth += imgArr.ctx.measureText(imgArr.currTxtArr[j]).width;
+      for(var j = 0; j < gData.currTxtArr.length; j ++) txtWidth += gData.ctx.measureText(gData.currTxtArr[j]).width;
     }
     var x = cs.width / 2 - (img.width + txtWidth) / 2;
     var y = cs.height / 2 - img.height / 2;
-    imgArr.imgLeft = x;
-    imgArr.imgTop = y;
-    imgArr.ctx.drawImage(img, x, y);
+    gData.imgLeft = x;
+    gData.imgTop = y;
+    gData.ctx.drawImage(img, x, y);
     x += img.width;
     y += lineHeight;
-    imgArr.ctx.fillStyle = 'darkblue';
-    imgArr.txtGrid = [];
-    for(var i = 0; i < imgArr.currTxtArr.length; i ++)
+    gData.ctx.fillStyle = 'darkblue';
+    gData.txtGrid = [];
+    for(var i = 0; i < gData.currTxtArr.length; i ++)
     {
-      var txt = imgArr.currTxtArr[i];
-      imgArr.ctx.fillText(txt, x, y);
-      w = imgArr.ctx.measureText(txt).width;
-      imgArr.txtGrid[i] = {"x":x,"y":y,"w":w};
+      var txt = gData.currTxtArr[i];
+      gData.ctx.fillText(txt, x, y);
+      w = gData.ctx.measureText(txt).width;
+      gData.txtGrid[i] = {"x":x,"y":y,"w":w};
       x += w;
       y += (lineHeight + 10);
     }
-    imgArr.ctx.restore();
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e)
+  gData.onClick = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(x < imgArr.imgLeft) return;
-    if(y < imgArr.imgTop) return;
-    if(y > imgArr.imgTop + imgArr.currImg.height) return;
-    if(x < imgArr.txtGrid[0].x)
+    if(x < gData.imgLeft) return;
+    if(y < gData.imgTop) return;
+    if(y > gData.imgTop + gData.currImg.height) return;
+    if(x < gData.txtGrid[0].x)
     {
       wordScreen(true);
-      imgArr.draw();
+      gData.draw();
       return;
     }
     //in text
     var selTxt = "";
-    if(x < imgArr.txtGrid[1].x) selTxt = imgArr.currTxtArr[0];
-    else if(x < imgArr.txtGrid[2].x) selTxt = imgArr.currTxtArr[1];
-    else selTxt = imgArr.currTxtArr[2];
-    selTxt == imgArr.currImg.txt.norm() ? yesScreen(wordScreen) : noScreen(wordScreen);
+    if(x < gData.txtGrid[1].x) selTxt = gData.currTxtArr[0];
+    else if(x < gData.txtGrid[2].x) selTxt = gData.currTxtArr[1];
+    else selTxt = gData.currTxtArr[2];
+    selTxt == gData.currImg.txt.norm() ? yesScreen(wordScreen) : noScreen(wordScreen);
   }
-  imgArr.draw();
+  gData.draw();
 }
 
 function yesScreen(retFunc)
 {
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    var img = imgArr.currImg;
+    var img = gData.currImg;
     var lineHeight = 20;
     var txt = img.txt.norm();
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
-    var txtWidth = imgArr.ctx.measureText(txt).width;
+    gData.ctx.font = lineHeight + 'pt Calibri';
+    var txtWidth = gData.ctx.measureText(txt).width;
     lineHeight *= img.width;
     lineHeight /= txtWidth;
-    imgArr.ctx.font = lineHeight + 'pt Calibri';
+    gData.ctx.font = lineHeight + 'pt Calibri';
     var x = cs.width / 2 - img.width / 2;
     var y = cs.height / 2 - img.height / 2 - (lineHeight + 10) / 2;
-    imgArr.ctx.drawImage(img, x, y);
-    imgArr.ctx.fillStyle = 'darkblue';
-    imgArr.ctx.fillText(txt, x, y + img.height + lineHeight + 10);
-    imgArr.ctx.restore();
+    gData.ctx.drawImage(img, x, y);
+    gData.ctx.fillStyle = 'darkblue';
+    gData.ctx.fillText(txt, x, y + img.height + lineHeight + 10);
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e) {retFunc(true);}
-  imgArr.draw();
+  gData.onClick = function(e) {retFunc(true);}
+  gData.draw();
 }
 
 function noScreen(retFunc)
 {
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("red", "yellow");
-    var img = imgArr.currImg;
+    var img = gData.currImg;
     var x = cs.width / 2 - img.width / 2;
     var y = cs.height / 2 - img.height / 2;
-    imgArr.ctx.drawImage(img, x, y);
-    var img = imgArr.no;
+    gData.ctx.drawImage(img, x, y);
+    var img = gData.no;
     var x = cs.width / 2 - img.width / 2;
     var y = cs.height / 2 - img.height / 2;
-    imgArr.ctx.drawImage(img, x, y);
-    imgArr.ctx.restore();
+    gData.ctx.drawImage(img, x, y);
+    gData.ctx.restore();
   }
-  imgArr.onClick = function(e) {retFunc(false);}
-  imgArr.draw();
+  gData.onClick = function(e) {retFunc(false);}
+  gData.draw();
 }
 
 function loadingScreen()
 {
-  imgArr.draw = function()
+  gData.draw = function()
   {
-    imgArr.ctx.save();
+    gData.ctx.save();
     libBackGround("green", "yellow");
-    imgArr.ctx.font = 20 + 'pt Calibri';
+    gData.ctx.font = 20 + 'pt Calibri';
     var txt = "Նկարները բեռնվում են...";
-    var txtWidth = imgArr.ctx.measureText(txt).width;
+    var txtWidth = gData.ctx.measureText(txt).width;
     var x = cs.width / 2 - txtWidth / 2;
     var y = cs.height / 2;
-    imgArr.ctx.fillStyle = 'darkblue';
-    imgArr.ctx.fillText(txt, x, y);
-    imgArr.ctx.restore();
+    gData.ctx.fillStyle = 'darkblue';
+    gData.ctx.fillText(txt, x, y);
+    gData.ctx.restore();
   }
-  imgArr.draw();
+  gData.draw();
 }
 
 function test0() {document.title = "Բառեր"; wordScreen(true);}
@@ -674,12 +674,12 @@ window.onload = function()
 {
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
-  imgArr.ctx = cs.getContext("2d");
+  gData.ctx = cs.getContext("2d");
   loadingScreen();
-  imgArr.no = new Image();
-  imgArr.no.src = "img/no-small.png";
-  imgArr.refresh = new Image();
-  imgArr.refresh.src = "img/refresh_32.png";
+  gData.no = new Image();
+  gData.no.src = "img/no-small.png";
+  gData.refresh = new Image();
+  gData.refresh.src = "img/refresh_32.png";
   for(var i = 0; i < g_vocab.length; i ++)
   {
     var img = new Image();
@@ -688,11 +688,11 @@ window.onload = function()
     img.src = "img/"+g_vocab[i].p;
     img.onload = function(e)
     {
-      imgArr.push(e.target);
-      if(imgArr.length == g_vocab.length) {window.onhashchange();}
+      gData.push(e.target);
+      if(gData.length == g_vocab.length) {window.onhashchange();}
     }
   }
-  cs.addEventListener("click", function(e) {imgArr.onClick(e);})
+  cs.addEventListener("click", function(e) {gData.onClick(e);})
 }
 
 window.onhashchange = function()
@@ -706,16 +706,15 @@ window.onresize = function()
 {
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
-  imgArr.draw();
+  gData.draw();
 }
 
 </script>
 <head>
 
-<body>
+<body style="background: linear-gradient(top, #55aaee, #003366);">
 <canvas id="cs" style="border:1px solid #000000">
 Ձեր ծրագիրը շատ հին է, օգտագործեք Google Crome կամ Mozila Firefox
 </canvas>
 </body>
 </html>
-
