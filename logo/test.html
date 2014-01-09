@@ -760,7 +760,7 @@ window.onload = function()
       if(gData.length == g_vocab.length) {window.onhashchange();}
     }
   }
-  cs.addEventListener("click", function(e) {gData.onClick(e);})
+  cs.addEventListener("mousedown", function(e) {gData.onClick(e);})
 }
 
 window.onhashchange = function()
