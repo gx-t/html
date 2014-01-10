@@ -58,8 +58,7 @@ function libDrawImgWithText(img, txt)
     gData.ctx.font = lineHeight + 'pt Calibri';
     var x = cs.width / 2 - img.width / 2;
     var y = cs.height / 20;
-    gData.imgLeft = x;
-    gData.imgTop = y;
+    imgTop = y;
     gData.ctx.drawImage(img, x, y);
     y += img.height;
     y += cs.height / 40;
@@ -69,21 +68,21 @@ function libDrawImgWithText(img, txt)
     gData.ctx.fillText(txt, x, y);
 }
 
-libDrawObjects = function(left, right, curr)
+libDrawObjects = function(img, left, right, curr)
 {
   var cnt = left;
   var cx = 1;
   var cy = Math.ceil(cnt / cx);
   while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
-  var ww = gData.currImg.width / 3;
-  var hh = gData.currImg.height / 3;
+  var ww = img.width / 3;
+  var hh = img.height / 3;
   var y = cs.height / 4 - hh * cy / 2;
   for(var cyy = 0; cyy < cy && cnt; cyy++)
   {
     var x = cs.width / 4 - ww * cx / 2;
     for(var cxx = 0; cxx < cx && cnt; cxx ++)
     {
-      gData.ctx.drawImage(gData.currImg, x, y, ww, hh);
+      gData.ctx.drawImage(img, x, y, ww, hh);
       x += ww;
       cnt --;
     }
@@ -102,7 +101,7 @@ libDrawObjects = function(left, right, curr)
     var x = cs.width - cs.width / 4 - ww * cx / 2;
     for(var cxx = 0; cxx < cx && cnt; cxx ++)
     {
-      gData.ctx.drawImage(gData.currImg, x, y, ww, hh);
+      gData.ctx.drawImage(img, x, y, ww, hh);
       x += ww;
       cnt --;
     }
@@ -138,7 +137,7 @@ function numSoundScreen()
   var x0;
   var y0;
   var hh;
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("red", "yellow");
@@ -165,7 +164,7 @@ function numSoundScreen()
     gData.ctx.fillText(k++, x0 + hh, y);
     gData.ctx.restore();
   }
-  gData.onClick = function(e)
+  onclick_ = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var ex = e.clientX - rc.left;
@@ -197,7 +196,7 @@ function numSoundScreen()
       return;
     }
   }
-  gData.draw();
+  draw();
 }
 
 function compScreenNum(mn, mx, update)
@@ -214,19 +213,19 @@ function compScreenNum(mn, mx, update)
     display = left + sign + right;
     var numgData = [];
     for(var i = 0; i < gData.length; i ++) if(gData[i].num) numgData.push(gData[i]);
-    gData.currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
+    currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
   }
   correct = left + " " + right + sign;
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("red", "yellow");
     gData.ctx.drawImage(gData.refresh, 0, 0);
-    libDrawObjects(left, right, curr);
+    libDrawObjects(currImg, left, right, curr);
     libDrawNumSignPad();
     gData.ctx.restore();
   }
-  gData.onClick = function(e)
+  onclick_ = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
@@ -248,12 +247,12 @@ function compScreenNum(mn, mx, update)
     }
     else {return noScreen();}
     if(correct === "") return yesScreen();
-    gData.draw();
+    draw();
     return;
   }
   yesScreen = function()
   {
-    gData.draw = function()
+    draw = function()
     {
       gData.ctx.save();
       libBackGround("red", "yellow");
@@ -261,15 +260,15 @@ function compScreenNum(mn, mx, update)
       gData.ctx.font = hh + 'pt Calibri';
       gData.ctx.fillStyle = 'darkblue';
       gData.ctx.fillText(display, cs.width / 2 - gData.ctx.measureText(display).width / 2, cs.height / 2);
-//      libDrawObjects(left, right, curr);
+      libDrawObjects(currImg, left, right, "");
       gData.ctx.restore();
     }
-    gData.onClick = function(e) {compScreenNum(mn, mx, true);}
-    gData.draw();
+    onclick_ = function(e) {compScreenNum(mn, mx, true);}
+    draw();
   }
   noScreen = function(sign)
   {
-    gData.draw = function()
+    draw = function()
     {
       gData.ctx.save();
       libBackGround("red", "yellow");
@@ -277,30 +276,29 @@ function compScreenNum(mn, mx, update)
 
       gData.ctx.restore();
     }
-    gData.onClick = function(e) {compScreenNum(mn, mx, false);}
-    gData.draw();
+    onclick_ = function(e) {compScreenNum(mn, mx, false);}
+    draw();
   }
-  gData.draw();
+  draw();
 }
 
 function compScreen(mn, mx, update)
 {
   if(update)
   {
-    var op = ['<', '=', '>'];
-    libShuffle(op);
-    gData.txtArr = op;
+    operArr = ['<', '=', '>'];
+    libShuffle(operArr);
     var eq = 0 == Math.floor(Math.random() * 10000) % 3;
     left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
     right = eq ? left : mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
-    gData.txt = '=';
-    if(left < right) gData.txt = '<';
-    if(left > right) gData.txt = '>';
+    currTxt = '=';
+    if(left < right) currTxt = '<';
+    if(left > right) currTxt = '>';
     var numgData = [];
     for(var i = 0; i < gData.length; i ++) if(gData[i].num) numgData.push(gData[i]);
-    gData.currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
+    currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
   }
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("red", "yellow");
@@ -311,13 +309,13 @@ function compScreen(mn, mx, update)
     var y = cs.height - hh;
     gData.ctx.font = hh + 'pt Calibri';
     gData.ctx.fillStyle = 'darkblue';
-    gData.ctx.fillText(gData.txtArr[0], cs.width / 4 - hh / 2, y);
-    gData.ctx.fillText(gData.txtArr[1], cs.width / 2 - hh / 2, y);
-    gData.ctx.fillText(gData.txtArr[2], cs.width - cs.width / 4 - hh / 2, y);
-    libDrawObjects(left, right, '');
+    gData.ctx.fillText(operArr[0], cs.width / 4 - hh / 2, y);
+    gData.ctx.fillText(operArr[1], cs.width / 2 - hh / 2, y);
+    gData.ctx.fillText(operArr[2], cs.width - cs.width / 4 - hh / 2, y);
+    libDrawObjects(currImg, left, right, '');
     gData.ctx.restore();
   }
-  gData.onClick = function(e)
+  onclick_ = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
@@ -329,16 +327,16 @@ function compScreen(mn, mx, update)
     var vx = ww / 2;
     if(x < vx) {return};
     vx += ww;
-    if(x < vx) {return gData.txtArr[0] == gData.txt ? compYesScreen() : compNoScreen(gData.txtArr[0]);}
+    if(x < vx) {return operArr[0] == currTxt ? compYesScreen() : compNoScreen(operArr[0]);}
     vx += ww;
-    if(x < vx) {return gData.txtArr[1] == gData.txt ? compYesScreen() : compNoScreen(gData.txtArr[1]);}
+    if(x < vx) {return operArr[1] == currTxt ? compYesScreen() : compNoScreen(operArr[1]);}
     vx += ww;
-    if(x < vx) {return gData.txtArr[2] == gData.txt ? compYesScreen() : compNoScreen(gData.txtArr[2]);}
+    if(x < vx) {return operArr[2] == currTxt ? compYesScreen() : compNoScreen(operArr[2]);}
     return;
   }
   compYesScreen = function()
   {
-    gData.draw = function()
+    draw = function()
     {
       gData.ctx.save();
       libBackGround("red", "yellow");
@@ -347,32 +345,26 @@ function compScreen(mn, mx, update)
       var y = cs.height / 4 + hh / 2;
       gData.ctx.font = hh + 'pt Calibri';
       gData.ctx.fillStyle = 'darkblue';
-      gData.ctx.fillText(gData.txt, x, y);
+      gData.ctx.fillText(currTxt, x, y);
       libDrawObjects(left, right, '');
       gData.ctx.restore();
     }
-    gData.onClick = function(e) {compScreen(mn, mx, true);}
-    gData.draw();
+    onclick_ = function(e) {compScreen(mn, mx, true);}
+    draw();
   }
   compNoScreen = function(sign)
   {
-    gData.draw = function()
+    draw = function()
     {
       gData.ctx.save();
       libBackGround("red", "yellow");
-      var hh = cs.height / 5;
-      var x = cs.width / 2 - gData.no.width / 2;
-      var y = cs.height / 2;
-      gData.ctx.drawImage(gData.no, x, y - hh / 2);
-//      gData.ctx.font = hh / 2 + 'pt Calibri';
-//      gData.ctx.fillStyle = 'darkblue';
-//      gData.ctx.fillText('X', x, y);
+      gData.ctx.drawImage(gData.no, cs.width / 2 - gData.no.width / 2, cs.height / 2 - cs.height / 5 / 2);
       gData.ctx.restore();
     }
-    gData.onClick = function(e) {compScreen(mn, mx, false);}
-    gData.draw();
+    onclick_ = function(e) {compScreen(mn, mx, false);}
+    draw();
   }
-  gData.draw();
+  draw();
 }
 
 function numberScreen(update)
@@ -383,13 +375,13 @@ function numberScreen(update)
     for(var i = 0; i < gData.length; i ++) if(gData[i].num) numgData.push(gData[i]);
     while(true)
     {
-      gData.currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
-      if(gData.currImg.txt.split('-').length > 1) break;
+      currImg = numgData[Math.floor(Math.random() * 10000) % numgData.length];
+      if(currImg.txt.split('-').length > 1) break;
     }
-    gData.txt = "";
+    currTxt = "";
     var tmp = [];
     var arr = [];
-    var syllArr = gData.currImg.txt.split('-').concat(libGetAllSyll());
+    var syllArr = currImg.txt.split('-').concat(libGetAllSyll());
     for(var i = 0; arr.length < 7 && i < syllArr.length; i ++)
     {
       if(tmp[syllArr[i]] != null) continue;
@@ -397,51 +389,88 @@ function numberScreen(update)
       arr.push(syllArr[i]);
     }
     libShuffle(arr);
-    gData.currTxtArr = arr;
+    currTxtArr = arr;
   }
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("red", "yellow");
-    libDrawImgWithText(gData.currImg, gData.txt);
-    var lineHeight = cs.width / gData.currTxtArr.join("").length / 2;
+    libDrawImgWithText(currImg, currTxt);
+    var lineHeight = cs.width / currTxtArr.join("").length / 2;
     gData.ctx.font = lineHeight + 'pt Calibri';
     var y = cs.height - cs.height / 20;
-    var step = cs.width - gData.ctx.measureText(gData.currTxtArr.join()).width;
-    step /= (2 * gData.currTxtArr.length);
+    var step = cs.width - gData.ctx.measureText(currTxtArr.join()).width;
+    step /= (2 * currTxtArr.length);
     var x = 0;
-    gData.txtGrid = [];
-    for(var i = 0; i < gData.currTxtArr.length; i ++)
+    txtGrid = [];
+    for(var i = 0; i < currTxtArr.length; i ++)
     {
-      var width = gData.ctx.measureText(gData.currTxtArr[i]).width;
+      var width = gData.ctx.measureText(currTxtArr[i]).width;
       x += step;
-      gData.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
-      gData.ctx.fillText(gData.currTxtArr[i], x, y);
+      txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
+      gData.ctx.fillText(currTxtArr[i], x, y);
       x += width;
       x += step;
     }
     gData.ctx.restore();
   }
-  gData.onClick = function(e)
+  onclick_ = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < gData.imgTop + gData.currImg.height) {return numberScreen(true);}
-    for(var i = 0; i < gData.txtGrid.length; i ++)
+    if(y < imgTop + currImg.height) {return numberScreen(true);}
+    for(var i = 0; i < txtGrid.length; i ++)
     {
-      var s = gData.txtGrid[i];
+      var s = txtGrid[i];
       if((x >= s.x) && (x <= s.x + s.w) && (y >= s.y))
       {
-        var syll = gData.currTxtArr[i];
-        gData.txt += syll;
-        if(gData.txt === gData.currImg.txt.norm()) return yesScreen(numberScreen);
-        if(gData.currImg.txt.norm().indexOf(gData.txt) != 0) {gData.txt = ""; return noScreen(numberScreen);}
+        var syll = currTxtArr[i];
+        currTxt += syll;
+        if(currTxt === currImg.txt.norm())
+        {
+          draw = function()
+          {
+            gData.ctx.save();
+            libBackGround("red", "yellow");
+            var lineHeight = 20;
+            var txt = currImg.txt.norm();
+            gData.ctx.font = lineHeight + 'pt Calibri';
+            var txtWidth = gData.ctx.measureText(txt).width;
+            lineHeight *= currImg.width;
+            lineHeight /= txtWidth;
+            gData.ctx.font = lineHeight + 'pt Calibri';
+            var x = cs.width / 2 - currImg.width / 2;
+            var y = cs.height / 2 - currImg.height / 2 - (lineHeight + 10) / 2;
+            gData.ctx.drawImage(currImg, x, y);
+            gData.ctx.fillStyle = 'darkblue';
+            gData.ctx.fillText(txt, x, y + currImg.height + lineHeight + 10);
+            gData.ctx.restore();
+          }
+          onclick_ = function(e) {numberScreen(true);}
+          draw();
+          return;
+        }
+        if(currImg.txt.norm().indexOf(currTxt) != 0)
+        {
+          currTxt = "";
+          draw = function()
+          {
+            gData.ctx.save();
+            libBackGround("red", "yellow");
+            gData.ctx.drawImage(currImg, cs.width / 2 - currImg.width / 2, cs.height / 2 - currImg.height / 2);
+            gData.ctx.drawImage(gData.no, cs.width / 2 - gData.no.width / 2, cs.height / 2 - gData.no.height / 2);
+            gData.ctx.restore();
+          }
+          onclick_ = function(e) {numberScreen(false);}
+          draw();
+          return;
+        }
       }
     }
-    gData.draw();
+    draw();
   }
-  gData.draw();
+  draw();
 }
 
 function syllableScreen(update)
@@ -450,13 +479,13 @@ function syllableScreen(update)
   {
     while(true)
     {
-      gData.currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
-      if(gData.currImg.txt.split('-').length > 1) break;
+      currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
+      if(currImg.txt.split('-').length > 1) break;
     }
-    gData.txt = "";
+    currTxt = "";
     var tmp = [];
     var arr = [];
-    var syllArr = gData.currImg.txt.split('-').concat(libGetAllSyll());
+    var syllArr = currImg.txt.split('-').concat(libGetAllSyll());
     for(var i = 0; arr.length < 7 && i < syllArr.length; i ++)
     {
       if(tmp[syllArr[i]] != null) continue;
@@ -464,62 +493,99 @@ function syllableScreen(update)
       arr.push(syllArr[i]);
     }
     libShuffle(arr);
-    gData.currTxtArr = arr;
+    currTxtArr = arr;
   }
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("red", "yellow");
-    libDrawImgWithText(gData.currImg, gData.txt);
-    var lineHeight = cs.width / gData.currTxtArr.join("").length / 2;
+    libDrawImgWithText(currImg, currTxt);
+    var lineHeight = cs.width / currTxtArr.join("").length / 2;
     gData.ctx.font = lineHeight + 'pt Calibri';
     var y = cs.height - cs.height / 20;
-    var step = cs.width - gData.ctx.measureText(gData.currTxtArr.join()).width;
-    step /= (2 * gData.currTxtArr.length);
+    var step = cs.width - gData.ctx.measureText(currTxtArr.join()).width;
+    step /= (2 * currTxtArr.length);
     var x = 0;
-    gData.txtGrid = [];
-    for(var i = 0; i < gData.currTxtArr.length; i ++)
+    txtGrid = [];
+    for(var i = 0; i < currTxtArr.length; i ++)
     {
-      var width = gData.ctx.measureText(gData.currTxtArr[i]).width;
+      var width = gData.ctx.measureText(currTxtArr[i]).width;
       x += step;
-      gData.txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
-      gData.ctx.fillText(gData.currTxtArr[i], x, y);
+      txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
+      gData.ctx.fillText(currTxtArr[i], x, y);
       x += width;
       x += step;
     }
     gData.ctx.restore();
   }
-  gData.onClick = function(e)
+  onclick_ = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < gData.imgTop + gData.currImg.height) {return syllableScreen(true);}
-    for(var i = 0; i < gData.txtGrid.length; i ++)
+    if(y < imgTop + currImg.height) {return syllableScreen(true);}
+    for(var i = 0; i < txtGrid.length; i ++)
     {
-      var s = gData.txtGrid[i];
+      var s = txtGrid[i];
       if((x >= s.x) && (x <= s.x + s.w) && (y >= s.y))
       {
-        var syll = gData.currTxtArr[i];
-        gData.txt += syll;
-        if(gData.txt === gData.currImg.txt.norm()) return yesScreen(syllableScreen);
-        if(gData.currImg.txt.norm().indexOf(gData.txt) != 0) {gData.txt = ""; return noScreen(syllableScreen);}
+        var syll = currTxtArr[i];
+        currTxt += syll;
+        if(currTxt === currImg.txt.norm())
+        {
+          draw = function()
+          {
+            gData.ctx.save();
+            libBackGround("red", "yellow");
+            var lineHeight = 20;
+            var txt = currImg.txt.norm();
+            gData.ctx.font = lineHeight + 'pt Calibri';
+            var txtWidth = gData.ctx.measureText(txt).width;
+            lineHeight *= currImg.width;
+            lineHeight /= txtWidth;
+            gData.ctx.font = lineHeight + 'pt Calibri';
+            var x = cs.width / 2 - currImg.width / 2;
+            var y = cs.height / 2 - currImg.height / 2 - (lineHeight + 10) / 2;
+            gData.ctx.drawImage(currImg, x, y);
+            gData.ctx.fillStyle = 'darkblue';
+            gData.ctx.fillText(txt, x, y + currImg.height + lineHeight + 10);
+            gData.ctx.restore();
+          }
+          onclick_ = function(e) {syllableScreen(true);}
+          draw();
+          return;
+        }
+        if(currImg.txt.norm().indexOf(currTxt) != 0)
+        {
+          currTxt = "";
+          draw = function()
+          {
+            gData.ctx.save();
+            libBackGround("red", "yellow");
+            gData.ctx.drawImage(currImg, cs.width / 2 - currImg.width / 2, cs.height / 2 - currImg.height / 2);
+            gData.ctx.drawImage(gData.no, cs.width / 2 - gData.no.width / 2, cs.height / 2 - gData.no.height / 2);
+            gData.ctx.restore();
+          }
+          onclick_ = function(e) {syllableScreen(false);}
+          draw();
+          return;
+        }
       }
     }
-    gData.draw();
+    draw();
   }
-  gData.draw();
+  draw();
 }
 
 function letterScreen(update)
 {
   if(update)
   {
-    gData.currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
-    gData.txt = "";
+    currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
+    currTxt = "";
     var tmp = [];
     var arr = [];
-    var txt = gData.currImg.txt.norm();
+    var txt = currImg.txt.norm();
     for(var i = 0; i < txt.length; i ++)
     {
       var ch = txt.charAt(i);
@@ -548,50 +614,89 @@ function letterScreen(update)
       arr.push(ch);
     }
     libShuffle(arr);
-    gData.currTxtArr = arr;
+    currTxtArr = arr;
   }
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("red", "yellow");
-    libDrawImgWithText(gData.currImg, gData.txt);
-    var lineHeight = cs.width / gData.currTxtArr.length / 2;
+    libDrawImgWithText(currImg, currTxt);
+    var lineHeight = cs.width / currTxtArr.length / 2;
     gData.ctx.font = lineHeight + 'pt Calibri';
     var y = cs.height - cs.height / 20;
     var x = 0;
-    for(var i = 0; i < gData.currTxtArr.length; i ++)
+    for(var i = 0; i < currTxtArr.length; i ++)
     {
-      gData.ctx.fillText(gData.currTxtArr[i], x + lineHeight - gData.ctx.measureText(gData.currTxtArr[i]).width / 2, y);
+      gData.ctx.fillText(currTxtArr[i], x + lineHeight - gData.ctx.measureText(currTxtArr[i]).width / 2, y);
       x += 2 * lineHeight;
     }
     gData.ctx.restore();
   }
-  gData.onClick = function(e)
+  onclick_ = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < gData.imgTop + gData.currImg.height) {return letterScreen(true);}
-    var lineHeight = cs.width / gData.currTxtArr.length / 2;
+    if(y < imgTop + currImg.height) {return letterScreen(true);}
+    var lineHeight = cs.width / currTxtArr.length / 2;
     if(y < cs.height - cs.height / 10 - lineHeight) return;
-    var ch = gData.currTxtArr[Math.floor(x / (2 * lineHeight))];
-    gData.txt += ch;
-    if(gData.txt === gData.currImg.txt.norm()) return yesScreen(letterScreen);
-    if(gData.currImg.txt.norm().indexOf(gData.txt) != 0) {gData.txt = ""; return noScreen(letterScreen);}
-    gData.draw();
+    var ch = currTxtArr[Math.floor(x / (2 * lineHeight))];
+    currTxt += ch;
+    if(currTxt === currImg.txt.norm())
+    {
+      draw = function()
+      {
+        gData.ctx.save();
+        libBackGround("red", "yellow");
+        var img = currImg;
+        var lineHeight = 20;
+        var txt = img.txt.norm();
+        gData.ctx.font = lineHeight + 'pt Calibri';
+        var txtWidth = gData.ctx.measureText(txt).width;
+        lineHeight *= img.width;
+        lineHeight /= txtWidth;
+        gData.ctx.font = lineHeight + 'pt Calibri';
+        var x = cs.width / 2 - img.width / 2;
+        var y = cs.height / 2 - img.height / 2 - (lineHeight + 10) / 2;
+        gData.ctx.drawImage(img, x, y);
+        gData.ctx.fillStyle = 'darkblue';
+        gData.ctx.fillText(txt, x, y + img.height + lineHeight + 10);
+        gData.ctx.restore();
+      }
+      onclick_ = function(e) {letterScreen(true);}
+      draw();
+      return;
+    }
+    if(currImg.txt.norm().indexOf(currTxt) != 0)
+    {
+      currTxt = "";
+      draw = function()
+      {
+        gData.ctx.save();
+        libBackGround("red", "yellow");
+        gData.ctx.drawImage(currImg, cs.width / 2 - currImg.width / 2, cs.height / 2 - currImg.height / 2);
+        gData.ctx.drawImage(gData.no, cs.width / 2 - gData.no.width / 2, cs.height / 2 - gData.no.height / 2);
+        gData.ctx.restore();
+      }
+      onclick_ = function(e) {letterScreen(false);}
+      draw();
+      return;
+    }
+    draw();
   }
-  gData.draw();
+  draw();
 }
 
 function wordScreen(update)
 {
   if(update)
   {
-    gData.currImg = gData[Math.floor(Math.random() * 10000) % gData.length];
+    var idx = Math.floor(Math.random() * 10000) % gData.length;
+    currImg = gData[idx];
     var tmp = [];
     var arr = [];
     var cnt = 1;
-    var txt = gData.currImg.txt.norm();
+    var txt = currImg.txt.norm();
     tmp[txt] = "";
     arr.push(txt);
     while(cnt < 3)
@@ -603,118 +708,108 @@ function wordScreen(update)
       cnt ++;
     }
     libShuffle(arr);
-    gData.currTxtArr = arr;
+    currTxtArr = arr;
   }
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("red", "yellow");
-    var img = gData.currImg;
+    var img = currImg;
     var txtWidth = 0;
     var lineHeight = img.height / 3 - 10;
     gData.ctx.font = lineHeight + 'pt Calibri';
 
-    for(var i = 0; i < gData.currTxtArr.length; i ++) txtWidth += gData.ctx.measureText(gData.currTxtArr[i]).width;
+    for(var i = 0; i < currTxtArr.length; i ++) txtWidth += gData.ctx.measureText(currTxtArr[i]).width;
     if(txtWidth > cs.width - img.width)
     {
       lineHeight *= (cs.width - img.width);
       lineHeight /= txtWidth;
       gData.ctx.font = lineHeight + 'pt Calibri';
       txtWidth = 0;
-      for(var j = 0; j < gData.currTxtArr.length; j ++) txtWidth += gData.ctx.measureText(gData.currTxtArr[j]).width;
+      for(var j = 0; j < currTxtArr.length; j ++) txtWidth += gData.ctx.measureText(currTxtArr[j]).width;
     }
     var x = cs.width / 2 - (img.width + txtWidth) / 2;
     var y = cs.height / 2 - img.height / 2;
-    gData.imgLeft = x;
-    gData.imgTop = y;
+    imgLeft = x;
+    imgTop = y;
     gData.ctx.drawImage(img, x, y);
     x += img.width;
     y += lineHeight;
     gData.ctx.fillStyle = 'darkblue';
-    gData.txtGrid = [];
-    for(var i = 0; i < gData.currTxtArr.length; i ++)
+    txtGrid = [];
+    for(var i = 0; i < currTxtArr.length; i ++)
     {
-      var txt = gData.currTxtArr[i];
+      var txt = currTxtArr[i];
       gData.ctx.fillText(txt, x, y);
       w = gData.ctx.measureText(txt).width;
-      gData.txtGrid[i] = {"x":x,"y":y,"w":w};
+      txtGrid[i] = {"x":x,"y":y,"w":w};
       x += w;
       y += (lineHeight + 10);
     }
     gData.ctx.restore();
   }
-  gData.onClick = function(e)
+  onclick_ = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(x < gData.imgLeft) return;
-    if(y < gData.imgTop) return;
-    if(y > gData.imgTop + gData.currImg.height) return;
-    if(x < gData.txtGrid[0].x)
+    if(x < imgLeft) return;
+    if(y < imgTop) return;
+    if(y > imgTop + currImg.height) return;
+    if(x < txtGrid[0].x)
     {
       wordScreen(true);
-      gData.draw();
+      draw();
       return;
     }
     //in text
     var selTxt = "";
-    if(x < gData.txtGrid[1].x) selTxt = gData.currTxtArr[0];
-    else if(x < gData.txtGrid[2].x) selTxt = gData.currTxtArr[1];
-    else selTxt = gData.currTxtArr[2];
-    selTxt == gData.currImg.txt.norm() ? yesScreen(wordScreen) : noScreen(wordScreen);
+    if(x < txtGrid[1].x) selTxt = currTxtArr[0];
+    else if(x < txtGrid[2].x) selTxt = currTxtArr[1];
+    else selTxt = currTxtArr[2];
+    if(selTxt == currImg.txt.norm())
+    {
+      draw = function()
+      {
+        gData.ctx.save();
+        libBackGround("red", "yellow");
+        var lineHeight = 20;
+        var txt = currImg.txt.norm();
+        gData.ctx.font = lineHeight + 'pt Calibri';
+        var txtWidth = gData.ctx.measureText(txt).width;
+        lineHeight *= currImg.width;
+        lineHeight /= txtWidth;
+        gData.ctx.font = lineHeight + 'pt Calibri';
+        var x = cs.width / 2 - currImg.width / 2;
+        var y = cs.height / 2 - currImg.height / 2 - (lineHeight + 10) / 2;
+        gData.ctx.drawImage(currImg, x, y);
+        gData.ctx.fillStyle = 'darkblue';
+        gData.ctx.fillText(txt, x, y + currImg.height + lineHeight + 10);
+        gData.ctx.restore();
+      }
+      onclick_ = function(e) {wordScreen(true);}
+      draw();
+    }
+    else
+    {
+      draw = function()
+      {
+        gData.ctx.save();
+        libBackGround("red", "yellow");
+        gData.ctx.drawImage(currImg, cs.width / 2 - currImg.width / 2, cs.height / 2 - currImg.height / 2);
+        gData.ctx.drawImage(gData.no, cs.width / 2 - gData.no.width / 2, cs.height / 2 - gData.no.height / 2);
+        gData.ctx.restore();
+      }
+      onclick_ = function(e) {wordScreen(false);}
+      draw();
+    }
   }
-  gData.draw();
-}
-
-function yesScreen(retFunc)
-{
-  gData.draw = function()
-  {
-    gData.ctx.save();
-    libBackGround("red", "yellow");
-    var img = gData.currImg;
-    var lineHeight = 20;
-    var txt = img.txt.norm();
-    gData.ctx.font = lineHeight + 'pt Calibri';
-    var txtWidth = gData.ctx.measureText(txt).width;
-    lineHeight *= img.width;
-    lineHeight /= txtWidth;
-    gData.ctx.font = lineHeight + 'pt Calibri';
-    var x = cs.width / 2 - img.width / 2;
-    var y = cs.height / 2 - img.height / 2 - (lineHeight + 10) / 2;
-    gData.ctx.drawImage(img, x, y);
-    gData.ctx.fillStyle = 'darkblue';
-    gData.ctx.fillText(txt, x, y + img.height + lineHeight + 10);
-    gData.ctx.restore();
-  }
-  gData.onClick = function(e) {retFunc(true);}
-  gData.draw();
-}
-
-function noScreen(retFunc)
-{
-  gData.draw = function()
-  {
-    gData.ctx.save();
-    libBackGround("red", "yellow");
-    var img = gData.currImg;
-    var x = cs.width / 2 - img.width / 2;
-    var y = cs.height / 2 - img.height / 2;
-    gData.ctx.drawImage(img, x, y);
-    var img = gData.no;
-    var x = cs.width / 2 - img.width / 2;
-    var y = cs.height / 2 - img.height / 2;
-    gData.ctx.drawImage(img, x, y);
-    gData.ctx.restore();
-  }
-  gData.onClick = function(e) {retFunc(false);}
-  gData.draw();
+  draw();
 }
 
 function loadingScreen()
 {
-  gData.draw = function()
+  draw = function()
   {
     gData.ctx.save();
     libBackGround("green", "yellow");
@@ -727,7 +822,7 @@ function loadingScreen()
     gData.ctx.fillText(txt, x, y);
     gData.ctx.restore();
   }
-  gData.draw();
+  draw();
 }
 
 function test0() {document.title = "Բառեր"; wordScreen(true);}
@@ -744,7 +839,7 @@ window.onload = function()
   cs.height = cs.parentNode.clientHeight - 30;
   gData.ctx = cs.getContext("2d");
   loadingScreen();
-  gData.no = new Image();
+  gData.no = new Image("img/no-small.png");
   gData.no.src = "img/no-small.png";
   gData.refresh = new Image();
   gData.refresh.src = "img/refresh_32.png";
@@ -756,11 +851,12 @@ window.onload = function()
     img.src = "img/"+g_vocab[i].p;
     img.onload = function(e)
     {
+      e.target.onload = null;
       gData.push(e.target);
       if(gData.length == g_vocab.length) {window.onhashchange();}
     }
   }
-  cs.addEventListener("mousedown", function(e) {gData.onClick(e);})
+  cs.addEventListener("mousedown", function(e) {onclick_(e);})
 }
 
 window.onhashchange = function()
@@ -774,7 +870,7 @@ window.onresize = function()
 {
   cs.width = cs.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.clientHeight - 30;
-  gData.draw();
+  draw();
 }
 
 </script>
