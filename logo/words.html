@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script>
+var imgs = [];
+function words(refresh)
+{
+  if(refresh)
+  {
+    curr = imgs[Math.floor(Math.random() * 10000) % imgs.length];
+    var tmp = [];
+    var arr = [];
+    var cnt = 1;
+    var txt = curr.txt;
+    tmp[txt] = "";
+    arr.push(txt);
+    while(cnt < 3)
+    {
+      txt = imgs[Math.floor(Math.random() * 10000) % imgs.length].txt;
+      if(tmp[txt] != null) continue;
+      tmp[txt] = "";
+      arr.push(txt);
+      cnt ++;
+    }
+    cnt = arr.length * 32;
+    for(var i = 0; i < cnt; i ++)
+    {
+      var i1 = Math.floor(Math.random() * 10000) % arr.length;
+      var i2 = Math.floor(Math.random() * 10000) % arr.length;
+      var tmp = arr[i1];
+      arr[i1] = arr[i2];
+      arr[i2] = tmp;
+    }
+    currTxtArr = arr;
+  }
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "red");
+    grd.addColorStop(1, "yellow");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    var txtWidth = 0;
+    var lineHeight = curr.height / 3 - 10;
+    ctx.font = lineHeight + 'pt Calibri';
+
+    for(var i = 0; i < currTxtArr.length; i ++) txtWidth += ctx.measureText(currTxtArr[i]).width;
+    if(txtWidth > cs.width - curr.width)
+    {
+      lineHeight *= (cs.width - curr.width);
+      lineHeight /= txtWidth;
+      ctx.font = lineHeight + 'pt Calibri';
+      txtWidth = 0;
+      for(var j = 0; j < currTxtArr.length; j ++) txtWidth += ctx.measureText(currTxtArr[j]).width;
+    }
+    var x = cs.width / 2 - (curr.width + txtWidth) / 2;
+    var y = cs.height / 2 - curr.height / 2;
+    imgLeft = x;
+    imgTop = y;
+    ctx.drawImage(curr, x, y);
+    x += curr.width;
+    y += lineHeight;
+    ctx.fillStyle = 'darkblue';
+    txtGrid = [];
+    for(var i = 0; i < currTxtArr.length; i ++)
+    {
+      var txt = currTxtArr[i];
+      ctx.fillText(txt, x, y);
+      w = ctx.measureText(txt).width;
+      txtGrid[i] = {"x":x,"y":y,"w":w};
+      x += w;
+      y += (lineHeight + 10);
+    }
+  }
+  onclick_ = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var x = e.clientX - rc.left;
+    var y = e.clientY - rc.top;
+    if(x < imgLeft) return;
+    if(y < imgTop) return;
+    if(y > imgTop + curr.height) return;
+    if(x < txtGrid[0].x)
+    {
+      words(true);
+      draw();
+      return;
+    }
+    //in text
+    var selTxt = "";
+    if(x < txtGrid[1].x) selTxt = currTxtArr[0];
+    else if(x < txtGrid[2].x) selTxt = currTxtArr[1];
+    else selTxt = currTxtArr[2];
+    if(selTxt == curr.txt)
+    {
+      draw = function()
+      {
+        ctx.save();
+        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        var lineHeight = 20;
+        var txt = curr.txt;
+        ctx.font = lineHeight + 'pt Calibri';
+        var txtWidth = ctx.measureText(txt).width;
+        lineHeight *= curr.width;
+        lineHeight /= txtWidth;
+        ctx.font = lineHeight + 'pt Calibri';
+        var x = cs.width / 2 - curr.width / 2;
+        var y = cs.height / 2 - curr.height / 2 - (lineHeight + 10) / 2;
+        ctx.drawImage(curr, x, y);
+        ctx.fillStyle = 'darkblue';
+        ctx.fillText(txt, x, y + curr.height + lineHeight + 10);
+        ctx.restore();
+      }
+      onclick_ = function(e) {words(true);}
+      draw();
+    }
+    else
+    {
+      draw = function()
+      {
+        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        ctx.drawImage(curr, cs.width / 2 - curr.width / 2, cs.height / 2 - curr.height / 2);
+        ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
+      }
+      onclick_ = function(e) {words(false);}
+      draw();
+    }
+  }
+  draw();
+}
+window.onresize = function()
+{
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  draw();
+}
+
+window.onload = function()
+{
+  var vocab = [
+  {t:"խնձոր",p:"apple.jpg"},
+  {t:"ծիրան",p:"apricot.jpg"},
+  {t:"բանան",p:"banana.jpg"},
+  {t:"մեղու",p:"bee.jpg"},
+  {t:"գիրք",p:"book.jpg"},
+  {t:"տորթ",p:"cake.jpg"},
+  {t:"գլխարկ",p:"cap.jpg"},
+  {t:"մեքենա",p:"car.jpg"},
+  {t:"կատու",p:"cat.jpg"},
+  {t:"աթոռ",p:"chear.jpg"},
+  {t:"պանիր",p:"cheese.jpg"},
+  {t:"ամպ",p:"cloud.jpg"},
+  {t:"կով",p:"cow.jpg"},
+  {t:"շուն",p:"dog.jpg"},
+  {t:"բադ",p:"duck.jpg"},
+  {t:"ձու",p:"egg.jpg"},
+  {t:"մասուր",p:"eglantine.jpg"},
+  {t:"փիղ",p:"elephant.jpg"},
+  {t:"ձուկ",p:"Fish.jpg"},
+  {t:"ծաղիկ",p:"flower.jpg"},
+  {t:"աղվես",p:"fox.jpg"},
+  {t:"միրգ",p:"fruits.jpg"},
+  {t:"այծ",p:"goat.jpg"},
+  {t:"զատիկ",p:"God's kow.jpg"},
+  {t:"կիթառ",p:"guitar.jpg"},
+  {t:"մուրճ",p:"hammer.jpg"},
+  {t:"ձի",p:"horse.jpg"},
+  {t:"պաղպաղակ",p:"ice-cream.jpg"},
+  {t:"լամպ",p:"lamp.jpg"},
+  {t:"կիտրոն",p:"lemo.jpg"},
+  {t:"դեղ",p:"medicine.jpg"},
+  {t:"լուսին",p:"moon.jpg"},
+  {t:"սար",p:"mount.jpg"},
+  {t:"մուկ",p:"mouse.jpg"},
+  {t:"դեղձ",p:"peach.jpg"},
+  {t:"տանձ",p:"pear.jpg"},
+  {t:"մատիտ",p:"pencil.jpg"},
+  {t:"նկար",p:"pictire.jpg"},
+  {t:"խոզ",p:"pig.jpg"},
+  {t:"պարան",p:"rope.jpg"},
+  {t:"ոչխար",p:"sheep.jpg"},
+  {t:"նավ",p:"ship.jpg"},
+  {t:"կոշիկ",p:"shoes.jpg"},
+  {t:"ելակ",p:"strawberries.jpg"},
+  {t:"սեղան",p:"table.jpg"},
+  {t:"թեյ",p:"tea.jpg"},
+  {t:"ծառ",p:"tree.jpg"},
+  {t:"շապիկ",p:"t-shirt.jpg"},
+  {t:"ջութակ",p:"violin.jpg"},
+  {t:"պատ",p:"wall.jpg"},
+  {t:"գայլ",p:"wolf.jpg"},
+  {t:"կարապ",p:"swan.jpg"},
+  {t:"Սիրան",p:"Siran.jpg"},
+  {t:"կարաս",p:"karas.jpg"},
+  {t:"Արամ",p:"Aram.jpg"},
+  {t:"Արա",p:"Ara.jpg"},
+  {t:"Աննա",p:"Anna.jpg"},
+  {t:"Անի",p:"ani.jpg"},
+  ];
+  document.title = "Բառեր";
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  ctx = cs.getContext("2d");
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "yellow");
+    grd.addColorStop(1, "green");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    ctx.font = 20 + 'pt Calibri';
+    var txt = "Նկարները բեռնվում են...";
+    var txtWidth = ctx.measureText(txt).width;
+    var x = cs.width / 2 - txtWidth / 2;
+    var y = cs.height / 2;
+    ctx.fillStyle = 'darkblue';
+    ctx.fillText(txt, x, y);
+  }
+  draw();
+  imgs.no = new Image();
+  imgs.no.src = "img/no-small.png";
+  for(var i = 0; i < vocab.length; i ++)
+  {
+    var img = new Image();
+    img.txt = vocab[i].t;
+    img.src = "img/"+vocab[i].p;
+    img.onload = function(e)
+    {
+      imgs.push(e.target);
+      if(imgs.length == vocab.length) {words(true);}
+    }
+  }
+  cs.addEventListener("mousedown", function(e) {onclick_(e);})
+}
+</script>
+</head>
+<body>
+<canvas id="cs" style="border:1px solid #000000">
+Ձեր ծրագիրը շատ հին է, օգտագործեք Google Crome կամ Mozila Firefox
+</canvas>
+</body>
+</html>
