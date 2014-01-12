@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script>
+var imgs = [];
+function compare(mn, mx, refresh)
+{
+  if(refresh)
+  {
+    curr = imgs[Math.floor(Math.random() * 10000) % imgs.length];
+    currTxt = "";
+    oper = ["<", "=", ">"];
+    var cnt = oper.length * 32;
+    for(var i = 0; i < cnt; i++)
+    {
+      var i1 = Math.floor(Math.random() * 10000) % oper.length;
+      var i2 = Math.floor(Math.random() * 10000) % oper.length;
+      var tmp = oper[i1];
+      oper[i1] = oper[i2];
+      oper[i2] = tmp;
+    }
+    left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    right = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    if(left < right) correct = "<";
+    else if(left > right) correct = ">";
+    else correct = "=";
+  }
+  drawObjs = function()
+  {
+    var cnt = left;
+    var cx = 1;
+    var cy = Math.ceil(cnt / cx);
+    while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
+    var ww = curr.width / 3;
+    var hh = curr.height / 3;
+    var y = cs.height / 4 - hh * cy / 2;
+    for(var cyy = 0; cyy < cy && cnt; cyy++)
+    {
+      var x = cs.width / 4 - ww * cx / 2;
+      for(var cxx = 0; cxx < cx && cnt; cxx ++)
+      {
+        ctx.drawImage(curr, x, y, ww, hh);
+        x += ww;
+        cnt --;
+      }
+      y += hh;
+    }
+    var cnt = right;
+    var cx = 1;
+    var cy = Math.ceil(cnt / cx);
+    while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
+    var y = cs.height / 4 - hh * cy / 2;
+    for(var cyy = 0; cyy < cy && cnt; cyy++)
+    {
+      var x = cs.width / 4 - ww * cx / 2;
+      var x = cs.width - cs.width / 4 - ww * cx / 2;
+      for(var cxx = 0; cxx < cx && cnt; cxx ++)
+      {
+        ctx.drawImage(curr, x, y, ww, hh);
+        x += ww;
+        cnt --;
+      }
+      y += hh;
+    }
+    ctx.font = cs.height / 10 + 'pt Calibri';
+    ctx.fillStyle = 'darkblue';
+    ctx.fillText(currTxt, cs.width / 2 - ctx.measureText(currTxt).width / 2, y - cx * cs.height / 20 + cs.height / 10);
+  }
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "red");
+    grd.addColorStop(1, "yellow");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    ctx.drawImage(imgs.refresh, 0, 0);
+    var hh = cs.height / 10;
+    var ww = cs.width / 4 - hh / 2;
+    var hh = cs.height / 10;
+    var ww = cs.width / 4 - hh / 2;
+    
+    var y = cs.height - hh;
+    ctx.font = hh + 'pt Calibri';
+    ctx.fillStyle = 'darkblue';
+    ctx.fillText(oper[0], cs.width / 4 - hh / 2, y);
+    ctx.fillText(oper[1], cs.width / 2 - hh / 2, y);
+    ctx.fillText(oper[2], cs.width - cs.width / 4 - hh / 2, y);
+    drawObjs();
+  }
+  onclick_ = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var x = e.clientX - rc.left;
+    var y = e.clientY - rc.top;
+    if(x <= imgs.refresh.width && y <= imgs.refresh.height) return compare(mn, mx, true);
+    if(y < cs.height - cs.height / 4) return;
+    var res = "";
+    if(x >= cs.width / 4 - cs.height / 10 && x <= cs.width / 4 + cs.height / 10) res = oper[0];
+    else if(x >= cs.width / 2 - cs.height / 10 && x <= cs.width / 2 + cs.height / 10) res = oper[1];
+    else if(x >= cs.width - cs.width / 4 - cs.height / 10 && x <= cs.width - cs.width / 4 + cs.height / 10) res = oper[2];
+    if(res === correct)
+    {
+      currTxt = res;
+      draw = function()
+      {
+        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        drawObjs();
+      }
+      onclick_ = function(e) {compare(mn, mx, true);}
+    }
+    else
+    {
+      draw = function()
+      {
+        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        ctx.drawImage(curr, cs.width / 2 - curr.width / 2, cs.height / 2 - curr.height / 2);
+        ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
+      }
+      onclick_ = function(e) {compare(mn, mx, false);}
+    }
+    draw();
+  }
+  draw();
+}
+window.onhashchange = function()
+{
+  var entry = document.URL.split("#")[1];
+  if(entry == undefined) entry = "compare(1,3,true);";
+  console.log(entry);
+  eval(entry)
+//  try{eval(entry);}catch(e){compare(1,3,true);}
+}
+window.onresize = function()
+{
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  draw();
+}
+window.onload = function()
+{
+  var vocab = [
+  {t:"խնձոր",p:"apple.jpg"},
+  {t:"բանան",p:"banana.jpg"},
+  {t:"մեղու",p:"bee.jpg"},
+  {t:"գիրք",p:"book.jpg"},
+  {t:"գլխարկ",p:"cap.jpg"},
+  {t:"կատու",p:"cat.jpg"},
+  {t:"աթոռ",p:"chear.jpg"},
+  {t:"պանիր",p:"cheese.jpg"},
+  {t:"շուն",p:"dog.jpg"},
+  {t:"ձու",p:"egg.jpg"},
+  {t:"կիթառ",p:"guitar.jpg"},
+  {t:"մուրճ",p:"hammer.jpg"},
+  {t:"կիտրոն",p:"lemo.jpg"},
+  {t:"դեղձ",p:"peach.jpg"},
+  {t:"տանձ",p:"pear.jpg"},
+  {t:"մատիտ",p:"pencil.jpg"},
+  {t:"խոզ",p:"pig.jpg"},
+  {t:"պարան",p:"rope.jpg"},
+  {t:"ելակ",p:"strawberries.jpg"},
+  {t:"թեյ",p:"tea.jpg"},
+  {t:"ծառ",p:"tree.jpg"},
+  {t:"շապիկ",p:"t-shirt.jpg"},
+  {t:"ջութակ",p:"violin.jpg"},
+  ];
+  document.title = "Մեծ ու փոքր";
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  ctx = cs.getContext("2d");
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "yellow");
+    grd.addColorStop(1, "green");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    ctx.font = 20 + 'pt Calibri';
+    var txt = "Նկարները բեռնվում են...";
+    var txtWidth = ctx.measureText(txt).width;
+    var x = cs.width / 2 - txtWidth / 2;
+    var y = cs.height / 2;
+    ctx.fillStyle = 'darkblue';
+    ctx.fillText(txt, x, y);
+  }
+  draw();
+  imgs.no = new Image();
+  imgs.no.src = "img/no-small.png";
+  imgs.refresh = new Image();
+  imgs.refresh.src = "img/refresh_32.png";
+  for(var i = 0; i < vocab.length; i ++)
+  {
+    var img = new Image();
+    img.txt = vocab[i].t;
+    img.src = "img/"+vocab[i].p;
+    img.onload = function(e)
+    {
+      imgs.push(e.target);
+      if(imgs.length == vocab.length) {window.onhashchange();}
+    }
+  }
+  cs.addEventListener("mousedown", function(e) {onclick_(e);})
+}
+</script>
+</head>
+<body>
+<canvas id="cs" style="border:1px solid #000000">
+Ձեր ծրագիրը շատ հին է, օգտագործեք Google Crome կամ Mozila Firefox
+</canvas>
+</body>
+</html>

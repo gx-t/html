@@ -4,58 +4,56 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <script>
 var imgs = [];
-function letters(refresh)
+function syllables(refresh)
 {
-  var abc = [
-  "ա","բ","գ","դ","ե","զ","է","ը","թ","ժ","ի","լ","խ","ծ","կ","հ","ձ","ղ",
-  "ճ","մ","յ","ն","շ","ո","չ","պ","ջ","ռ","ս","վ","տ","ր","ց","ու","փ","ք",
-  "և","օ","ֆ"
-  ];
   if(refresh)
   {
     curr = imgs[Math.floor(Math.random() * 10000) % imgs.length];
     currTxt = "";
+    currTxtArr = [];
+    var all = [];
     var tmp = [];
-    var arr = [];
-    var txt = curr.txt;
-    tmp[txt] = "";
-    for(var i = 0; i < txt.length; i ++)
+    for(var i = 0; i < imgs.length; i ++)
     {
-      var ch = txt.charAt(i);
-      if(ch == "ո" && txt.charAt(i + 1) == "ւ") {ch = "ու"; i ++;}
-      else if(ch == "Ո" && txt.charAt(i + 1) == "Ւ") {ch = "ՈՒ"; i ++;}
-      if(ch === ch.toUpperCase())
+      for(var j = 0; j < imgs[i].syll.length; j ++)
       {
-        if(tmp[ch.toLowerCase()] == null)
-        {
-          tmp[ch.toLowerCase()] = "";
-          arr.push(ch.toLowerCase());
-        }
+        if(tmp[imgs[i].syll[j]] != null) continue;
+        tmp[imgs[i].syll[j]] = "";
+        all.push(imgs[i].syll[j]);
       }
-      if(tmp[ch] != null) continue;
-      tmp[ch] = "";
-      arr.push(ch);
     }
-    var cnt = arr.length * 2;
-    if(cnt < 7) cnt = 7;
-    var i = arr.length;
-    while(arr.length < cnt)
-    {
-      var ch = abc[Math.floor(Math.random() * 10000) % abc.length];
-      if(tmp[ch] != null) continue;
-      tmp[ch] = "";
-      arr.push(ch);
-    }
-    cnt = arr.length * 32;
+    var tmp = [];
+    var cnt = all.length * 32;
     for(var i = 0; i < cnt; i ++)
     {
-      var i1 = Math.floor(Math.random() * 10000) % arr.length;
-      var i2 = Math.floor(Math.random() * 10000) % arr.length;
-      var tmp = arr[i1];
-      arr[i1] = arr[i2];
-      arr[i2] = tmp;
+      var i1 = Math.floor(Math.random() * 10000) % all.length;
+      var i2 = Math.floor(Math.random() * 10000) % all.length;
+      var tmp = all[i1];
+      all[i1] = all[i2];
+      all[i2] = tmp;
     }
-    currTxtArr = arr;
+    var tmp = [];
+    for(var i = 0; i < curr.syll.length; i ++)
+    {
+      currTxtArr.push(curr.syll[i]);
+      tmp[curr.syll[i]] = "";
+    }
+    for(var i = 0; currTxtArr.length < 7; i ++)
+    {
+      if(tmp[all[i]] != null) continue;
+      currTxtArr.push(all[i]);
+      tmp[all[i]] = "";
+    }
+    var tmp = [];
+    var cnt = currTxtArr.length * 32;
+    for(var i = 0; i < cnt; i ++)
+    {
+      var i1 = Math.floor(Math.random() * 10000) % currTxtArr.length;
+      var i2 = Math.floor(Math.random() * 10000) % currTxtArr.length;
+      var tmp = currTxtArr[i1];
+      currTxtArr[i1] = currTxtArr[i2];
+      currTxtArr[i2] = tmp;
+    }
   }
   draw = function()
   {
@@ -77,14 +75,21 @@ function letters(refresh)
     ctx.fillStyle = 'darkblue';
     x = cs.width / 2 - ctx.measureText(currTxt).width / 2;
     ctx.fillText(currTxt, x, y);
-    var lineHeight = cs.width / currTxtArr.length / 2;
+    var lineHeight = cs.width / currTxtArr.join("").length / 2;
     ctx.font = lineHeight + 'pt Calibri';
     var y = cs.height - cs.height / 20;
+    var step = cs.width - ctx.measureText(currTxtArr.join()).width;
+    step /= (2 * currTxtArr.length);
     var x = 0;
+    txtGrid = [];
     for(var i = 0; i < currTxtArr.length; i ++)
     {
-      ctx.fillText(currTxtArr[i], x + lineHeight - ctx.measureText(currTxtArr[i]).width / 2, y);
-      x += 2 * lineHeight;
+      var width = ctx.measureText(currTxtArr[i]).width;
+      x += step;
+      txtGrid[i] = {"x":x,"y":y - lineHeight - cs.height / 20,"w":width};
+      ctx.fillText(currTxtArr[i], x, y);
+      x += width;
+      x += step;
     }
   }
   onclick_ = function(e)
@@ -92,7 +97,7 @@ function letters(refresh)
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(y < imgTop + curr.height) {return letters(true);}
+    if(y < imgTop + curr.height) {return syllables(true);}
     var lineHeight = cs.width / currTxtArr.length / 2;
     if(y < cs.height - cs.height / 10 - lineHeight) return;
     var ch = currTxtArr[Math.floor(x / (2 * lineHeight))];
@@ -119,7 +124,7 @@ function letters(refresh)
         ctx.fillStyle = 'darkblue';
         ctx.fillText(curr.txt, x, y + curr.height + lineHeight + 10);
       }
-      onclick_ = function(e) {letters(true);}
+      onclick_ = function(e) {syllables(true);}
       draw();
       return;
     }
@@ -137,7 +142,7 @@ function letters(refresh)
         ctx.drawImage(curr, cs.width / 2 - curr.width / 2, cs.height / 2 - curr.height / 2);
         ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
       }
-      onclick_ = function(e) {letters(false);}
+      onclick_ = function(e) {syllables(false);}
       draw();
       return;
     }
@@ -155,66 +160,41 @@ window.onresize = function()
 window.onload = function()
 {
   var vocab = [
-  {t:"խնձոր",p:"apple.jpg"},
-  {t:"ծիրան",p:"apricot.jpg"},
-  {t:"բանան",p:"banana.jpg"},
-  {t:"մեղու",p:"bee.jpg"},
-  {t:"գիրք",p:"book.jpg"},
-  {t:"տորթ",p:"cake.jpg"},
-  {t:"գլխարկ",p:"cap.jpg"},
-  {t:"մեքենա",p:"car.jpg"},
-  {t:"կատու",p:"cat.jpg"},
-  {t:"աթոռ",p:"chear.jpg"},
-  {t:"պանիր",p:"cheese.jpg"},
-  {t:"ամպ",p:"cloud.jpg"},
-  {t:"կով",p:"cow.jpg"},
-  {t:"շուն",p:"dog.jpg"},
-  {t:"բադ",p:"duck.jpg"},
-  {t:"ձու",p:"egg.jpg"},
-  {t:"մասուր",p:"eglantine.jpg"},
-  {t:"փիղ",p:"elephant.jpg"},
-  {t:"ձուկ",p:"Fish.jpg"},
-  {t:"ծաղիկ",p:"flower.jpg"},
-  {t:"աղվես",p:"fox.jpg"},
-  {t:"միրգ",p:"fruits.jpg"},
-  {t:"այծ",p:"goat.jpg"},
-  {t:"զատիկ",p:"God's kow.jpg"},
-  {t:"կիթառ",p:"guitar.jpg"},
-  {t:"մուրճ",p:"hammer.jpg"},
-  {t:"ձի",p:"horse.jpg"},
-  {t:"պաղպաղակ",p:"ice-cream.jpg"},
-  {t:"լամպ",p:"lamp.jpg"},
-  {t:"կիտրոն",p:"lemo.jpg"},
-  {t:"դեղ",p:"medicine.jpg"},
-  {t:"լուսին",p:"moon.jpg"},
-  {t:"սար",p:"mount.jpg"},
-  {t:"մուկ",p:"mouse.jpg"},
-  {t:"դեղձ",p:"peach.jpg"},
-  {t:"տանձ",p:"pear.jpg"},
-  {t:"մատիտ",p:"pencil.jpg"},
-  {t:"նկար",p:"pictire.jpg"},
-  {t:"խոզ",p:"pig.jpg"},
-  {t:"պարան",p:"rope.jpg"},
-  {t:"ոչխար",p:"sheep.jpg"},
-  {t:"նավ",p:"ship.jpg"},
-  {t:"կոշիկ",p:"shoes.jpg"},
-  {t:"ելակ",p:"strawberries.jpg"},
-  {t:"սեղան",p:"table.jpg"},
-  {t:"թեյ",p:"tea.jpg"},
-  {t:"ծառ",p:"tree.jpg"},
-  {t:"շապիկ",p:"t-shirt.jpg"},
-  {t:"ջութակ",p:"violin.jpg"},
-  {t:"պատ",p:"wall.jpg"},
-  {t:"գայլ",p:"wolf.jpg"},
-  {t:"կարապ",p:"swan.jpg"},
-  {t:"Սիրան",p:"Siran.jpg"},
-  {t:"կարաս",p:"karas.jpg"},
-  {t:"Արամ",p:"Aram.jpg"},
-  {t:"Արա",p:"Ara.jpg"},
-  {t:"Աննա",p:"Anna.jpg"},
-  {t:"Անի",p:"ani.jpg"},
+  {t:"խնձոր",s:["խն","ձոր"],p:"apple.jpg"},
+  {t:"ծիրան",s:["ծի","րան"],p:"apricot.jpg"},
+  {t:"բանան",s:["բա","նան"],p:"banana.jpg"},
+  {t:"մեղու",s:["մե","ղու"],p:"bee.jpg"},
+  {t:"գլխարկ",s:["գլ","խարկ"],p:"cap.jpg"},
+  {t:"մեքենա",s:["մե","քե","նա"],p:"car.jpg"},
+  {t:"կատու",s:["կա","տու"],p:"cat.jpg"},
+  {t:"աթոռ",s:["ա","թոռ"],p:"chear.jpg"},
+  {t:"պանիր",s:["պա","նիր"],p:"cheese.jpg"},
+  {t:"մասուր",s:["մա","սուր"],p:"eglantine.jpg"},
+  {t:"ծաղիկ",s:["ծա","ղիկ"],p:"flower.jpg"},
+  {t:"աղվես",s:["աղ","վես"],p:"fox.jpg"},
+  {t:"զատիկ",s:["զա","տիկ"],p:"God's kow.jpg"},
+  {t:"կիթառ",s:["կի","թառ"],p:"guitar.jpg"},
+  {t:"պաղպաղակ",s:["պաղ","պա","ղակ"],p:"ice-cream.jpg"},
+  {t:"կիտրոն",s:["կիտ","րոն"],p:"lemo.jpg"},
+  {t:"լուսին",s:["լու","սին"],p:"moon.jpg"},
+  {t:"մատիտ",s:["մա","տիտ"],p:"pencil.jpg"},
+  {t:"նկար",s:["ն","կար"],p:"pictire.jpg"},
+  {t:"պարան",s:["պա","րան"],p:"rope.jpg"},
+  {t:"ոչխար",s:["ոչ","խար"],p:"sheep.jpg"},
+  {t:"կոշիկ",s:["կո","շիկ"],p:"shoes.jpg"},
+  {t:"ելակ",s:["ե","լակ"],p:"strawberries.jpg"},
+  {t:"սեղան",s:["սե","ղան"],p:"table.jpg"},
+  {t:"շապիկ",s:["շա","պիկ"],p:"t-shirt.jpg"},
+  {t:"ջութակ",s:["ջու","թակ"],p:"violin.jpg"},
+  {t:"կարապ",s:["կա","րապ"],p:"swan.jpg"},
+  {t:"Սիրան",s:["Սի","րան"],p:"Siran.jpg"},
+  {t:"կարաս",s:["կա","րաս"],p:"karas.jpg"},
+  {t:"Արամ",s:["Ա","րամ"],p:"Aram.jpg"},
+  {t:"Արա",s:["Ա","րա"],p:"Ara.jpg"},
+  {t:"Աննա",s:["Ան","նա"],p:"Anna.jpg"},
+  {t:"Անի",s:["Ա","նի"],p:"ani.jpg"},
   ];
-  document.title = "Տառեր";
+  document.title = "Վանկեր";
   cs.width = cs.parentNode.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.parentNode.clientHeight - 30;
   ctx = cs.getContext("2d");
@@ -241,11 +221,12 @@ window.onload = function()
   {
     var img = new Image();
     img.txt = vocab[i].t;
+    img.syll = vocab[i].s;
     img.src = "img/"+vocab[i].p;
     img.onload = function(e)
     {
       imgs.push(e.target);
-      if(imgs.length == vocab.length) {letters(true);}
+      if(imgs.length == vocab.length) {syllables(true);}
     }
   }
   cs.addEventListener("mousedown", function(e) {onclick_(e);})
