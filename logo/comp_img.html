@@ -125,7 +125,6 @@ function compare(mn, mx, refresh)
         // Fill with gradient
         ctx.fillStyle = grd;
         ctx.fillRect(0, 0, cs.width, cs.height);
-        ctx.drawImage(curr, cs.width / 2 - curr.width / 2, cs.height / 2 - curr.height / 2);
         ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
       }
       onclick_ = function(e) {compare(mn, mx, false);}
