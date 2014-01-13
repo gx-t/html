@@ -240,10 +240,13 @@ window.onload = function()
     img.onload = function(e)
     {
       imgs.push(e.target);
-      if(imgs.length == vocab.length) {words(true);}
+      if(imgs.length == vocab.length)
+      {
+        words(true);
+        cs.addEventListener("mousedown", function(e) {onclick_(e);});
+      }
     }
   }
-  cs.addEventListener("mousedown", function(e) {onclick_(e);})
 }
 </script>
 </head>

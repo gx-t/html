@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script>
+var sndarr = [];
+function sounds()
+{
+  var x0;
+  var y0;
+  var hh;
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "red");
+    grd.addColorStop(1, "yellow");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    hh = Math.min(cs.width, cs.height) / 10;
+    ctx.font = hh + "pt Calibri";
+    x0 = (cs.width - 7 * hh) / 2;
+    y0 = (cs.height - 9 * hh) / 2;
+    ctx.fillStyle = "darkblue";
+    var y = y0;
+    var k = 1;
+    for(var j = 0; j < 3; j ++)
+    {
+      var x = x0;
+      y += hh;
+      for(var i = 0; i < 3; i ++)
+      {
+        x += hh;
+        ctx.fillText(k++, x, y);
+        x += hh;
+      }
+      y += hh;
+    }
+    y += hh;
+    ctx.fillText(k++, x0 + hh, y);
+  }
+  onclick_ = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var ex = e.clientX - rc.left;
+    var ey = e.clientY - rc.top;
+    var y = y0;
+    var y1 = 0;
+    var x = 0;
+    var x1 = 0;
+    for(var j = 0; j < 3; j ++, y = y1)
+    {
+      x = x0 + hh / 2;
+      y1 = y + 2 * hh;
+      if(ey < y || ey > y1) continue;
+      for(var i = 0; i < 3; i ++, x = x1)
+      {
+        x1 = x + 2 * hh;
+        if(ex < x || ex > x1) continue;
+        sndarr[1 + i + 3 * j].play();
+        return;
+      }
+    }
+    x = x0 + hh / 2;
+    x1 = x + 2.5 * hh;
+    y1 = y + 2 * hh;
+    if(ey >= y && ey <= y1 && ex >= x && ex <= x1) {
+      sndarr[10].play();
+      return;
+    }
+  }
+  draw();
+}
+window.onresize = function()
+{
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  draw();
+}
+
+window.onload = function()
+{
+  document.title = "Խոսող թվեր";
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  ctx = cs.getContext("2d");
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "yellow");
+    grd.addColorStop(1, "green");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    ctx.font = 20 + 'pt Calibri';
+    var txt = "Ձայները բեռնվում են...";
+    var txtWidth = ctx.measureText(txt).width;
+    var x = cs.width / 2 - txtWidth / 2;
+    var y = cs.height / 2;
+    ctx.fillStyle = 'darkblue';
+    ctx.fillText(txt, x, y);
+  }
+  draw();
+  for(var i = 1; i < 11; i ++)
+  {
+    var snd = new Audio("sound/" + i + ".ogg");
+    snd.preload = "auto";
+    sndarr[i] = snd;
+  }
+  sounds();
+  cs.addEventListener("mousedown", function(e) {onclick_(e);})
+}
+</script>
+</head>
+<body>
+<canvas id="cs" style="border:1px solid #000000">
+Ձեր ծրագիրը շատ հին է, օգտագործեք Google Crome կամ Mozila Firefox
+</canvas>
+</body>
+</html>

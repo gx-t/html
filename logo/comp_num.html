@@ -9,23 +9,16 @@ function compare(mn, mx, refresh)
   if(refresh)
   {
     curr = imgs[Math.floor(Math.random() * 10000) % imgs.length];
-    currTxt = "";
-    oper = ["<", "=", ">"];
-    var cnt = oper.length * 32;
-    for(var i = 0; i < cnt; i++)
-    {
-      var i1 = Math.floor(Math.random() * 10000) % oper.length;
-      var i2 = Math.floor(Math.random() * 10000) % oper.length;
-      var tmp = oper[i1];
-      oper[i1] = oper[i2];
-      oper[i2] = tmp;
-    }
     left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
     right = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
-    if(left < right) correct = "<";
-    else if(left > right) correct = ">";
-    else correct = "=";
   }
+  currTxt = "";
+  check = left + " " + right + " ";
+  correct = left;
+  if(left < right) {correct += "<"; check += "<";}
+  else if(left > right) {correct += ">"; check += ">";}
+  else {correct += "="; check += "=";}
+  correct += right;
   drawObjs = function()
   {
     var cnt = left;
@@ -80,13 +73,21 @@ function compare(mn, mx, refresh)
     var ww = cs.width / 4 - hh / 2;
     var hh = cs.height / 10;
     var ww = cs.width / 4 - hh / 2;
-    
     var y = cs.height - hh;
     ctx.font = hh + 'pt Calibri';
     ctx.fillStyle = 'darkblue';
-    ctx.fillText(oper[0], cs.width / 4 - hh / 2, y);
-    ctx.fillText(oper[1], cs.width / 2 - hh / 2, y);
-    ctx.fillText(oper[2], cs.width - cs.width / 4 - hh / 2, y);
+    var hh = cs.width / 27; //10 numbers + 3 signs + spaces
+    var y = cs.height - 10;
+    var x = 0;
+    ctx.font = hh + 'pt Calibri';
+    ctx.fillStyle = 'darkblue';
+    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '<', '=', '>'];
+    for(var i in arr)
+    {
+      x += hh;
+      ctx.fillText(arr[i], x, y);
+      x += hh;
+    }
     drawObjs();
   }
   onclick_ = function(e)
@@ -95,25 +96,19 @@ function compare(mn, mx, refresh)
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
     if(x <= imgs.refresh.width && y <= imgs.refresh.height) return compare(mn, mx, true);
-    if(y < cs.height - cs.height / 4) return;
-    var res = "";
-    if(x >= cs.width / 4 - cs.height / 10 && x <= cs.width / 4 + cs.height / 10) res = oper[0];
-    else if(x >= cs.width / 2 - cs.height / 10 && x <= cs.width / 2 + cs.height / 10) res = oper[1];
-    else if(x >= cs.width - cs.width / 4 - cs.height / 10 && x <= cs.width - cs.width / 4 + cs.height / 10) res = oper[2];
-    if(res === correct)
+    var hh = cs.width / 27; //10 numbers + 3 signs + spaces
+    if(y < cs.height - 10 - hh) return;
+    var idx = Math.floor((x - hh / 2)/ 2 / hh);
+    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '<', '=', '>'];
+    if(check.charAt(0) == " ")
     {
-      currTxt = res;
-      draw = function()
-      {
-        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
-        grd.addColorStop(0, "red");
-        grd.addColorStop(1, "yellow");
-        // Fill with gradient
-        ctx.fillStyle = grd;
-        ctx.fillRect(0, 0, cs.width, cs.height);
-        drawObjs();
-      }
-      onclick_ = function(e) {compare(mn, mx, true);}
+      currTxt += "   ";
+      check = check.substring(1);
+    }
+    if(check.charAt(0) == arr[idx])
+    {
+      currTxt += arr[idx];
+      check = check.substring(1);
     }
     else
     {
@@ -128,6 +123,21 @@ function compare(mn, mx, refresh)
         ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
       }
       onclick_ = function(e) {compare(mn, mx, false);}
+    }
+    if(check == "")
+    {
+      currTxt = correct;
+      draw = function()
+      {
+        var grd = ctx.createLinearGradient(0, 0, cs.width, cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        drawObjs();
+      }
+      onclick_ = function(e) {compare(mn, mx, true);}
     }
     draw();
   }
@@ -208,7 +218,7 @@ window.onload = function()
       if(imgs.length == vocab.length)
       {
         window.onhashchange();
-        cs.addEventListener("mousedown", function(e) {onclick_(e);})
+        cs.addEventListener("mousedown", function(e) {onclick_(e);});
       }
     }
   }
