@@ -39,7 +39,7 @@ function sounds()
     y += hh;
     ctx.fillText(k++, x0 + hh, y);
   }
-  onclick_ = function(e)
+  cs.onmousedown = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var ex = e.clientX - rc.left;
@@ -108,7 +108,6 @@ window.onload = function()
     sndarr[i] = snd;
   }
   sounds();
-  cs.addEventListener("mousedown", function(e) {onclick_(e);})
 }
 </script>
 </head>
