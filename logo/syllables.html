@@ -92,7 +92,7 @@ function syllables(refresh)
       x += step;
     }
   }
-  onclick_ = function(e)
+  cs.onmousedown = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
@@ -125,7 +125,7 @@ function syllables(refresh)
         ctx.fillStyle = 'darkblue';
         ctx.fillText(curr.txt, x, y + curr.height + lineHeight + 10);
       }
-      onclick_ = function(e) {syllables(true);}
+      cs.onmousedown = function(e) {syllables(true);}
       draw();
       return;
     }
@@ -143,7 +143,7 @@ function syllables(refresh)
         ctx.drawImage(curr, cs.width / 2 - curr.width / 2, cs.height / 2 - curr.height / 2);
         ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
       }
-      onclick_ = function(e) {syllables(false);}
+      cs.onmousedown = function(e) {syllables(false);}
       draw();
       return;
     }
@@ -227,11 +227,7 @@ window.onload = function()
     img.onload = function(e)
     {
       imgs.push(e.target);
-      if(imgs.length == vocab.length)
-      {
-        syllables(true);
-        cs.addEventListener("mousedown", function(e) {onclick_(e);});
-      }
+      if(imgs.length == vocab.length) syllables(true);
     }
   }
 }
