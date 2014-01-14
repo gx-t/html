@@ -4,50 +4,26 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <script>
 var imgs = [];
-function compare(mn, mx, refresh)
+function numbers(mn, mx, refresh)
 {
   if(refresh)
   {
     curr = imgs[Math.floor(Math.random() * 10000) % imgs.length];
-    left = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
-    right = mn + Math.floor(Math.random() * 10000) % (mx - mn + 1);
+    correct = "" + (mn + Math.floor(Math.random() * 10000) % (mx - mn + 1));
   }
   currTxt = "";
-  check = left + " " + right + " ";
-  correct = left;
-  if(left < right) {correct += "<"; check += "<";}
-  else if(left > right) {correct += ">"; check += ">";}
-  else {correct += "="; check += "=";}
-  correct += right;
   drawObjs = function()
   {
-    var cnt = left;
+    var cnt = correct;
     var cx = 1;
     var cy = Math.ceil(cnt / cx);
     while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
     var ww = curr.width / 3;
     var hh = curr.height / 3;
-    var y = cs.height / 4 - hh * cy / 2;
+    var y = cs.height / 3 - hh * cy / 2;
     for(var cyy = 0; cyy < cy && cnt; cyy++)
     {
       var x = cs.width / 4 - ww * cx / 2;
-      for(var cxx = 0; cxx < cx && cnt; cxx ++)
-      {
-        ctx.drawImage(curr, x, y, ww, hh);
-        x += ww;
-        cnt --;
-      }
-      y += hh;
-    }
-    var cnt = right;
-    var cx = 1;
-    var cy = Math.ceil(cnt / cx);
-    while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
-    var y = cs.height / 4 - hh * cy / 2;
-    for(var cyy = 0; cyy < cy && cnt; cyy++)
-    {
-      var x = cs.width / 4 - ww * cx / 2;
-      var x = cs.width - cs.width / 4 - ww * cx / 2;
       for(var cxx = 0; cxx < cx && cnt; cxx ++)
       {
         ctx.drawImage(curr, x, y, ww, hh);
@@ -58,7 +34,7 @@ function compare(mn, mx, refresh)
     }
     ctx.font = cs.height / 10 + 'pt Calibri';
     ctx.fillStyle = 'darkblue';
-    ctx.fillText(currTxt, cs.width / 2 - ctx.measureText(currTxt).width / 2, y - cx * cs.height / 20 + cs.height / 10);
+    ctx.fillText(currTxt, cs.width - ctx.measureText(currTxt).width - cs.width / 4, cs.height / 3 + cs.height / 10);
   }
   draw = function()
   {
@@ -79,12 +55,12 @@ function compare(mn, mx, refresh)
     var x = 0;
     ctx.font = hh + 'pt Calibri';
     ctx.fillStyle = 'darkblue';
-    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '<', '=', '>'];
+    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var step = cs.width / arr.length;
     for(var i in arr)
     {
-      x += hh;
-      ctx.fillText(arr[i], x, y);
-      x += hh;
+      ctx.fillText(arr[i], x + (step - ctx.measureText(arr[i]).width) / 2, y);
+      x += step;
     }
     drawObjs();
   }
@@ -93,23 +69,30 @@ function compare(mn, mx, refresh)
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
     var y = e.clientY - rc.top;
-    if(x <= imgs.refresh.width && y <= imgs.refresh.height) return compare(mn, mx, true);
+    if(x <= imgs.refresh.width && y <= imgs.refresh.height) return numbers(mn, mx, true);
     var hh = cs.width / 27; //10 numbers + 3 signs + spaces
     if(y < cs.height - 10 - hh) return;
-    var idx = Math.floor((x - hh / 2)/ 2 / hh);
-    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '<', '=', '>'];
-    if(check.charAt(0) == " ")
+    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var idx = Math.floor(x * arr.length / cs.width);
+    if(idx >= arr.length) return;
+    currTxt += arr[idx];
+    if(currTxt == correct)
     {
-      currTxt += "   ";
-      check = check.substring(1);
+      draw = function()
+      {
+        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        drawObjs();
+      }
+      cs.onmousedown = function(e) {numbers(mn, mx, true);}
     }
-    if(check.charAt(0) == arr[idx])
+    else if(correct.indexOf(currTxt) != 0)
     {
-      currTxt += arr[idx];
-      check = check.substring(1);
-    }
-    else
-    {
+      currTxt = "";
       draw = function()
       {
         var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
@@ -120,22 +103,7 @@ function compare(mn, mx, refresh)
         ctx.fillRect(0, 0, cs.width, cs.height);
         ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
       }
-      cs.onmousedown = function(e) {compare(mn, mx, false);}
-    }
-    if(check == "")
-    {
-      currTxt = correct;
-      draw = function()
-      {
-        var grd = ctx.createLinearGradient(0, 0, cs.width, cs.height);
-        grd.addColorStop(0, "red");
-        grd.addColorStop(1, "yellow");
-        // Fill with gradient
-        ctx.fillStyle = grd;
-        ctx.fillRect(0, 0, cs.width, cs.height);
-        drawObjs();
-      }
-      cs.onmousedown = function(e) {compare(mn, mx, true);}
+      cs.onmousedown = function(e) {numbers(mn, mx, false);}
     }
     draw();
   }
@@ -144,8 +112,8 @@ function compare(mn, mx, refresh)
 window.onhashchange = function()
 {
   var entry = document.URL.split("#")[1];
-  if(entry == undefined) entry = "compare(1,3,true);";
-  try{eval(entry);}catch(e){compare(1,3,true);}
+  if(entry == undefined) entry = "numbers(1,3,true);";
+  try{eval(entry);}catch(e){numbers(1,3,true);}
 }
 window.onresize = function()
 {
@@ -180,7 +148,7 @@ window.onload = function()
   {t:"շապիկ",p:"t-shirt.jpg"},
   {t:"ջութակ",p:"violin.jpg"},
   ];
-  document.title = "Մեծ ու փոքր";
+  document.title = "Թվերը նկարներից";
   cs.width = cs.parentNode.parentNode.clientWidth - 30;
   cs.height = cs.parentNode.parentNode.clientHeight - 30;
   ctx = cs.getContext("2d");

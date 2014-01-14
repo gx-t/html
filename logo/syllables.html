@@ -97,7 +97,9 @@ function syllables(refresh)
     if(y < imgTop + curr.height) {return syllables(true);}
     var lineHeight = cs.width / currTxtArr.length / 2;
     if(y < cs.height - lineHeight) return;
-    currTxt += currTxtArr[Math.floor(x * currTxtArr.length / cs.width)];
+    var idx = Math.floor(x * currTxtArr.length / cs.width);
+    if(idx >= currTxtArr.length) return;
+    currTxt += currTxtArr[idx];
     if(currTxt == curr.txt)
     {
       draw = function()
