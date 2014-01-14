@@ -87,7 +87,7 @@ function letters(refresh)
       x += 2 * lineHeight;
     }
   }
-  onclick_ = function(e)
+  cs.onmousedown = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
@@ -119,7 +119,7 @@ function letters(refresh)
         ctx.fillStyle = 'darkblue';
         ctx.fillText(curr.txt, x, y + curr.height + lineHeight + 10);
       }
-      onclick_ = function(e) {letters(true);}
+      cs.onmousedown = function(e) {letters(true);}
       draw();
       return;
     }
@@ -137,7 +137,7 @@ function letters(refresh)
         ctx.drawImage(curr, cs.width / 2 - curr.width / 2, cs.height / 2 - curr.height / 2);
         ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
       }
-      onclick_ = function(e) {letters(false);}
+      cs.onmousedown = function(e) {letters(false);}
       draw();
       return;
     }
@@ -245,11 +245,7 @@ window.onload = function()
     img.onload = function(e)
     {
       imgs.push(e.target);
-      if(imgs.length == vocab.length)
-      {
-        letters(true);
-        cs.addEventListener("mousedown", function(e) {onclick_(e);});
-      }
+      if(imgs.length == vocab.length) letters(true);
     }
   }
 }
