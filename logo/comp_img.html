@@ -89,7 +89,7 @@ function compare(mn, mx, refresh)
     ctx.fillText(oper[2], cs.width - cs.width / 4 - hh / 2, y);
     drawObjs();
   }
-  onclick_ = function(e)
+  cs.onmousedown = function(e)
   {
     var rc = cs.getBoundingClientRect();
     var x = e.clientX - rc.left;
@@ -113,7 +113,7 @@ function compare(mn, mx, refresh)
         ctx.fillRect(0, 0, cs.width, cs.height);
         drawObjs();
       }
-      onclick_ = function(e) {compare(mn, mx, true);}
+      cs.onmousedown = function(e) {compare(mn, mx, true);}
     }
     else
     {
@@ -127,7 +127,7 @@ function compare(mn, mx, refresh)
         ctx.fillRect(0, 0, cs.width, cs.height);
         ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
       }
-      onclick_ = function(e) {compare(mn, mx, false);}
+      cs.onmousedown = function(e) {compare(mn, mx, false);}
     }
     draw();
   }
@@ -205,11 +205,7 @@ window.onload = function()
     img.onload = function(e)
     {
       imgs.push(e.target);
-      if(imgs.length == vocab.length)
-      {
-        window.onhashchange();
-        cs.addEventListener("mousedown", function(e) {onclick_(e);})
-      }
+      if(imgs.length == vocab.length) window.onhashchange();
     }
   }
 }
