@@ -80,11 +80,11 @@ function syllables(refresh)
     var y = cs.height - cs.height / 20;
     var step = cs.width / currTxtArr.length;
     var x = 0;
-    var dx = ctx.measureText(".").width / 2;
+//    var dx = ctx.measureText(".").width / 2;
     var dy = lineHeight / 3;
     for(var i = 0; i < currTxtArr.length; i ++, x += step)
     {
-      ctx.fillText(".", x - dx, y - dy);
+//      ctx.fillText(".", x - dx, y - dy);
       var width = ctx.measureText(currTxtArr[i]).width;
       ctx.fillText(currTxtArr[i], x + (step - width) / 2, y);
     }
