@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<script>
+var imgs = [];
+function numbers(mn, mx, refresh)
+{
+  if(refresh)
+  {
+    curr = imgs[Math.floor(Math.random() * 10000) % imgs.length];
+    correct = "" + (mn + Math.floor(Math.random() * 10000) % (mx - mn + 1));
+  }
+  currTxt = "";
+  drawObjs = function()
+  {
+    var cnt = correct;
+    var cx = 1;
+    var cy = Math.ceil(cnt / cx);
+    while(cx < (cy = Math.ceil(cnt / cx))) cx ++;
+    var ww = curr.width / 3;
+    var hh = curr.height / 3;
+    var y = cs.height / 3 - hh * cy / 2;
+    for(var cyy = 0; cyy < cy && cnt; cyy++)
+    {
+      var x = cs.width / 4 - ww * cx / 2;
+      for(var cxx = 0; cxx < cx && cnt; cxx ++)
+      {
+        ctx.drawImage(curr, x, y, ww, hh);
+        x += ww;
+        cnt --;
+      }
+      y += hh;
+    }
+    ctx.font = cs.height / 10 + 'pt Calibri';
+    ctx.fillStyle = 'darkblue';
+    ctx.fillText(currTxt, cs.width - ctx.measureText(currTxt).width - cs.width / 4, cs.height / 3 + cs.height / 10);
+  }
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "red");
+    grd.addColorStop(1, "yellow");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    var aw;
+    var ah;
+    var cc;
+    var rc;
+    if(cs.width > cs.height)
+    {
+      aw = cs.width / 4;
+      ah = cs.height / 3;
+      cc = 4;
+      rc = 3;
+    }
+    else
+    {
+      aw = cs.width / 3;
+      sh = cs.height / 4;
+      cc = 3;
+      cc = 4;
+    }
+    for(var col = 0, x = 0; col < cc; col ++, x += aw)
+    {
+      for(var row = 0, y = 0; row < rc; row ++, y = ah)
+      {
+        if(col == 0 && row == 0)
+        {
+          ctx.drawImage(imgs.refresh, 0, 0);
+          continue;
+        }
+        if(col == cc - 1 && row == rc - 1)
+        {
+          var hh = Math.min(aw, ah) / 1.5;
+          ctx.font = hh + 'pt Calibri';
+          ctx.fillStyle = 'darkblue';
+          ctx.fillText(correct, cs.width - ctx.measureText(correct).width, hh);
+        }
+      }
+    }
+    var hh = cs.height / 10;
+    var ww = cs.width / 4 - hh / 2;
+    var y = cs.height - hh;
+    ctx.font = hh + 'pt Calibri';
+    ctx.fillStyle = 'darkblue';
+    var hh = cs.width / 27; //10 numbers + 3 signs + spaces
+    var y = cs.height - 10;
+    var x = 0;
+    ctx.font = hh + 'pt Calibri';
+    ctx.fillStyle = 'darkblue';
+    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var step = cs.width / arr.length;
+    for(var i in arr)
+    {
+      ctx.fillText(arr[i], x + (step - ctx.measureText(arr[i]).width) / 2, y);
+      x += step;
+    }
+    drawObjs();
+  }
+  cs.onmousedown = function(e)
+  {
+    var rc = cs.getBoundingClientRect();
+    var x = e.clientX - rc.left;
+    var y = e.clientY - rc.top;
+    if(x <= imgs.refresh.width && y <= imgs.refresh.height) return numbers(mn, mx, true);
+    var hh = cs.width / 27; //10 numbers + 3 signs + spaces
+    if(y < cs.height - 10 - hh) return;
+    var arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var idx = Math.floor(x * arr.length / cs.width);
+    if(idx >= arr.length) return;
+    currTxt += arr[idx];
+    if(currTxt == correct)
+    {
+      draw = function()
+      {
+        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        drawObjs();
+      }
+      cs.onmousedown = function(e) {numbers(mn, mx, true);}
+    }
+    else if(correct.indexOf(currTxt) != 0)
+    {
+      currTxt = "";
+      draw = function()
+      {
+        var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+        grd.addColorStop(0, "red");
+        grd.addColorStop(1, "yellow");
+        // Fill with gradient
+        ctx.fillStyle = grd;
+        ctx.fillRect(0, 0, cs.width, cs.height);
+        ctx.drawImage(imgs.no, cs.width / 2 - imgs.no.width / 2, cs.height / 2 - imgs.no.height / 2);
+      }
+      cs.onmousedown = function(e) {numbers(mn, mx, false);}
+    }
+    draw();
+  }
+  draw();
+}
+window.onhashchange = function()
+{
+  var entry = document.URL.split("#")[1];
+  if(entry == undefined) entry = "numbers(1,3,true);";
+  try{eval(entry);}catch(e){numbers(1,3,true);}
+}
+window.onresize = function()
+{
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  draw();
+}
+window.onload = function()
+{
+  var vocab = [
+  {t:"խնձոր",p:"apple.jpg"},
+  {t:"բանան",p:"banana.jpg"},
+  {t:"մեղու",p:"bee.jpg"},
+  {t:"գիրք",p:"book.jpg"},
+  {t:"գլխարկ",p:"cap.jpg"},
+  {t:"կատու",p:"cat.jpg"},
+  {t:"աթոռ",p:"chear.jpg"},
+  {t:"պանիր",p:"cheese.jpg"},
+  {t:"շուն",p:"dog.jpg"},
+  {t:"ձու",p:"egg.jpg"},
+  {t:"կիթառ",p:"guitar.jpg"},
+  {t:"մուրճ",p:"hammer.jpg"},
+  {t:"կիտրոն",p:"lemo.jpg"},
+  {t:"դեղձ",p:"peach.jpg"},
+  {t:"տանձ",p:"pear.jpg"},
+  {t:"մատիտ",p:"pencil.jpg"},
+  {t:"խոզ",p:"pig.jpg"},
+  {t:"պարան",p:"rope.jpg"},
+  {t:"ելակ",p:"strawberries.jpg"},
+  {t:"թեյ",p:"tea.jpg"},
+  {t:"ծառ",p:"tree.jpg"},
+  {t:"շապիկ",p:"t-shirt.jpg"},
+  {t:"ջութակ",p:"violin.jpg"},
+  ];
+  document.title = "Նկարը թվից";
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  ctx = cs.getContext("2d");
+  draw = function()
+  {
+    var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+    grd.addColorStop(0, "yellow");
+    grd.addColorStop(1, "green");
+    // Fill with gradient
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, cs.width, cs.height);
+    ctx.font = 20 + 'pt Calibri';
+    var txt = "Նկարները բեռնվում են...";
+    var txtWidth = ctx.measureText(txt).width;
+    var x = cs.width / 2 - txtWidth / 2;
+    var y = cs.height / 2;
+    ctx.fillStyle = 'darkblue';
+    ctx.fillText(txt, x, y);
+  }
+  draw();
+  imgs.no = new Image();
+  imgs.no.src = "img/no-small.png";
+  imgs.refresh = new Image();
+  imgs.refresh.src = "img/refresh_32.png";
+  for(var i = 0; i < vocab.length; i ++)
+  {
+    var img = new Image();
+    img.txt = vocab[i].t;
+    img.src = "img/"+vocab[i].p;
+    img.onload = function(e)
+    {
+      imgs.push(e.target);
+      if(imgs.length == vocab.length) window.onhashchange();
+    }
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="cs" style="border:1px solid #000000">
+Ձեր ծրագիրը շատ հին է, օգտագործեք Google Crome կամ Mozila Firefox
+</canvas>
+</body>
+</html>
