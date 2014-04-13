@@ -1,4 +1,5 @@
 html
 ====
 
-Web applications
+* logo - HTML5/Canvas based special logopedic applications for children
+* reports - special report management application
