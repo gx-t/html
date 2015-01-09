@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html manifest='geo-test.appcache'>
+<body >
+
+<p id="demo"></p>
+<hr>
+<p id="gmaps"></p>
+
+<script>
+
+window.onload=function() {
+    var x = document.getElementById("demo");
+    var m = document.getElementById("gmaps");
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+        	function(position) {
+   			x.innerHTML = 
+    			"<h1>Latitude: " + position.coords.latitude + 
+    			"<br>Longitude: " + position.coords.longitude +
+    			"<br>Altitude: " + position.coords.altitude +
+    			"<br>Accuracy: " + position.coords.accuracy +
+    			"<br>Alt. Accuracy: " + position.coords.altitudeAccuracy +
+    			"<br>Heading: " + position.coords.heading +
+    			"<br>Speed: " + position.coords.speed +
+    			"<br>Timestamp: " + position.timestamp +
+			"</h1>";
+			      m.innerHTML = "<a href=http://maps.google.com/maps?q=" +
+			      position.coords.latitude + "," +
+			      position.coords.longitude +
+			      ">Show on google maps</a>";
+			},
+			function(error) {
+				switch(error.code) {
+					case error.PERMISSION_DENIED:
+						x.innerHTML = "User denied the request for Geolocation."
+						break;
+					case error.POSITION_UNAVAILABLE:
+						x.innerHTML = "Location information is unavailable."
+						break;
+					case error.TIMEOUT:
+						x.innerHTML = "The request to get user location timed out."
+						break;
+					case error.UNKNOWN_ERROR:
+						x.innerHTML = "An unknown error occurred."
+						break;
+				}
+			},
+        {
+        	enableHighAccuracy: true
+        });
+    } else { 
+        x.innerHTML = "Geolocation is not supported by this browser.";
+    }
+};
+
+
+</script>
+
+</body>
+</html>
+
