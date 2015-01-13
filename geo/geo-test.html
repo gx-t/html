@@ -8,6 +8,7 @@
 <p id="info"></p>
 <hr>
 <p id="save"></p>
+<p><h2><a href='javascript:clear();'>Ջնջել Հիշվածը</a></h2></p>
 <hr>
 <p id="gmaps"></p>
 <script>
@@ -15,19 +16,30 @@
 g_position = null;
 g_timestamp = new Date();
 
+function clear() {
+	if(confirm("Բոլոր հիշված դիրքերը կմոռացվեն։ Շարունակե՞լ")) {
+		localStorage.positionArray = "[]";
+		alert("Բոլոր հիշված դիրքերը ջնջված են");
+	}
+}
+
 function save() {
+	if(localStorage.positionArray == undefined) localStorage.positionArray = "[]";
+	var arr = JSON.parse(localStorage.positionArray);
+	arr.push(g_position);
+	localStorage.positionArray = JSON.stringify(arr);
 	document.getElementById("save").innerHTML = "<h2>Հիշված է</h2>";
 }
 
 window.onload=function() {
 	if (navigator.geolocation) {
-		document.getElementById("info").innerHTML = "<h1>Տվյալները դեռ հասանելի չեն...</h1>";
+		document.getElementById("info").innerHTML = "<h2>Տվյալները դեռ հասանելի չեն...</h2>";
 		navigator.geolocation.watchPosition(
 			function(position) {
 				g_position = position;
 				g_timestamp.setTime(position.timestamp);
    				document.getElementById("info").innerHTML =
-	   				"<h1><table><tr><td>Լայնությունը`</td><td>" + position.coords.latitude +
+	   				"<h2><table><tr><td>Լայնությունը`</td><td>" + position.coords.latitude +
 					"</td></tr><tr><td>Երկայնությունը`</td><td>" + position.coords.longitude +
 					"</td></tr><tr><td>Բարձրությունը`</td><td>" + position.coords.altitude +
 					"</td></tr><tr><td>Ճշգրտությունը`</td><td>" + position.coords.accuracy +
@@ -35,7 +47,7 @@ window.onload=function() {
 					"</td></tr><tr><td>Շարժ․ Ուղղությունը`</td><td>" + position.coords.heading +
 					"</td></tr><tr><td>Արագությունը (մ/վ)`</td><td>" + position.coords.speed +
 					"</td></tr><tr><td colspan=\"2\"><hr></td></tr><tr><td colspan=\"2\">" +
-					g_timestamp.toString() + "</td></tr></table></h1>";
+					g_timestamp.toString() + "</td></tr></table></h2>";
 				document.getElementById("save").innerHTML = "<h2><a href=\'javascript:save();\'>Հիշել</a></h2>";
 				document.getElementById("gmaps").innerHTML = "<a href=http://maps.google.com/maps?q=" +
 				position.coords.latitude + "," +
@@ -43,26 +55,24 @@ window.onload=function() {
 				">Google Maps -ով բացել</a>";
 			},
 			function(error) {
+				var err = "An unknown error occurred.";
 				switch(error.code) {
 					case error.PERMISSION_DENIED:
-						x.innerHTML = "User denied the request for Geolocation."
+						err = "User denied the request for Geolocation."
 						break;
 					case error.POSITION_UNAVAILABLE:
-						x.innerHTML = "Location information is unavailable."
+						err = "Location information is unavailable."
 						break;
 					case error.TIMEOUT:
-						x.innerHTML = "The request to get user location timed out."
-						break;
-					case error.UNKNOWN_ERROR:
-						x.innerHTML = "An unknown error occurred."
+						err = "The request to get user location timed out."
 						break;
 				}
+				document.getElementById("info").innerHTML = err;
 			},
-		{
-			enableHighAccuracy: true
-		});
+			{ enableHighAccuracy: true }
+		);
 	} else { 
-		document.getElementById("info").innerHTML = "<h1>Դիրքի հայտնաբերումը ձեր ծրագրով հնարավոր չէ։</h1>";
+		document.getElementById("info").innerHTML = "<h2>Դիրքի հայտնաբերումը ձեր ծրագրով անհնար է։</h2>";
 	}
 };
 
