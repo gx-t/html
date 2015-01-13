@@ -8,7 +8,8 @@
 <p id="info"></p>
 <hr>
 <p id="save"></p>
-<p><h2><a href='javascript:clear();'>Ջնջել Հիշվածը</a></h2></p>
+<hr>
+<p id="clear"></p>
 <hr>
 <p id="gmaps"></p>
 <script>
@@ -17,10 +18,9 @@ g_position = null;
 g_timestamp = new Date();
 
 function clear() {
-	if(confirm("Բոլոր հիշված դիրքերը կմոռացվեն։ Շարունակե՞լ")) {
-		localStorage.positionArray = "[]";
-		alert("Բոլոր հիշված դիրքերը ջնջված են");
-	}
+	localStorage.positionArray = "[]";
+	updateClearLink();
+	document.getElementById("save").innerHTML = "<h2><a href=\'javascript:save();\'>Հիշել</a></h2>";
 }
 
 function save() {
@@ -29,9 +29,18 @@ function save() {
 	arr.push(g_position);
 	localStorage.positionArray = JSON.stringify(arr);
 	document.getElementById("save").innerHTML = "<h2>Հիշված է</h2>";
+	updateClearLink();
+}
+
+function updateClearLink() {
+	var ss = "<h2>Հիշված դիրքեր չկան</h2>";
+	if(localStorage.positionArray != undefined && localStorage.positionArray != "[]")
+		ss = "<h2><a style=\"color:red;\" href=\'javascript:clear();\'>Ջնջել Բոլոր Հիշված Դիրքերը</a></h2>";
+	document.getElementById("clear").innerHTML = ss;
 }
 
 window.onload=function() {
+	updateClearLink();
 	if (navigator.geolocation) {
 		document.getElementById("info").innerHTML = "<h2>Տվյալները դեռ հասանելի չեն...</h2>";
 		navigator.geolocation.watchPosition(
