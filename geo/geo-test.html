@@ -2,6 +2,9 @@
 <html manifest='geo-test.appcache'>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="img/Globe-icon.png">
 <title>Geo Test</title>
 </head>
 <body >
@@ -39,6 +42,11 @@ function updateClearLink() {
 	document.getElementById("clear").innerHTML = ss;
 }
 
+function value(val, unit) {
+	if(val == null) return "<i>անհայտ</i>";
+	return val + unit;
+}
+
 window.onload=function() {
 	updateClearLink();
 	if (navigator.geolocation) {
@@ -48,13 +56,13 @@ window.onload=function() {
 				g_position = position;
 				g_timestamp.setTime(position.timestamp);
    				document.getElementById("info").innerHTML =
-	   				"<h2><table><tr><td>Լայնությունը`</td><td>" + position.coords.latitude +
-					"</td></tr><tr><td>Երկայնությունը`</td><td>" + position.coords.longitude +
-					"</td></tr><tr><td>Բարձրությունը`</td><td>" + position.coords.altitude +
-					"</td></tr><tr><td>Ճշգրտությունը`</td><td>" + position.coords.accuracy +
-					"</td></tr><tr><td>Բարձ․ Ճշգրտությունը`</td><td>" + position.coords.altitudeAccuracy +
-					"</td></tr><tr><td>Շարժ․ Ուղղությունը`</td><td>" + position.coords.heading +
-					"</td></tr><tr><td>Արագությունը (մ/վ)`</td><td>" + position.coords.speed +
+	   				"<h2><table><tr><td>Լայնությունը`</td><td>" + value(position.coords.latitude, "&deg;") +
+					"</td></tr><tr><td>Երկայնությունը`</td><td>" + value(position.coords.longitude, "&deg;") +
+					"</td></tr><tr><td>Բարձրությունը`</td><td>" + value(position.coords.altitude, "մ") +
+					"</td></tr><tr><td>Ճշգրտությունը`</td><td>" + value(position.coords.accuracy, "մ") +
+					"</td></tr><tr><td>Բարձ․ Ճշգրտությունը`</td><td>" + value(position.coords.altitudeAccuracy, "մ") +
+					"</td></tr><tr><td>Շարժ․ Ուղղությունը`</td><td>" + value(position.coords.heading, "&deg;") +
+					"</td></tr><tr><td>Արագությունը`</td><td>" + value(position.coords.speed, "մ/վ") +
 					"</td></tr><tr><td colspan=\"2\"><hr></td></tr><tr><td colspan=\"2\">" +
 					g_timestamp.toString() + "</td></tr></table></h2>";
 				document.getElementById("save").innerHTML = "<h2><a href=\'javascript:save();\'>Հիշել</a></h2>";
