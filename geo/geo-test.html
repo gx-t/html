@@ -14,22 +14,93 @@
 <hr>
 <p id="clear"></p>
 <hr>
+<p id="reset"><h2><a href="javascript:g_state.reset();g_state.show();">Զրոյացնել հաշվիչները</a></h2></p>
+<hr>
 <p id="gmaps"></p>
 <script>
 
-g_position = null;
-g_timestamp = new Date();
+Number.prototype.toRad = function() {
+	return this * Math.PI / 180;
+}
+
+function dist(lat1, lon1, lat2, lon2) {
+	var φ1 = lat1.toRad();
+	var φ2 = lat2.toRad();
+	var Δφ = (lat2-lat1).toRad();
+	var Δλ = (lon2-lon1).toRad();
+	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+	return 12742000 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+g_state = {};
+g_state.gps = null;
+g_state.time = new Date();
+
+g_state.update = function(gps) {
+	if(gps.coords.altitude < this.minAlt || this.minAlt == undefined) this.minAlt = gps.coords.altitude;
+	if(gps.coords.altitude > this.maxAlt || this.maxAlt == undefined) this.maxAlt = gps.coords.altitude;
+	if(gps.coords.speed > this.maxSpeed) this.maxSpeed = gps.coords.speed;
+	if(this.gps != null) {
+		this.countTime += (gps.timestamp - this.gps.timestamp);
+		if(gps.coords.speed != undefined && gps.coords.speed != 0) {
+			this.moveTime += (gps.timestamp - this.gps.timestamp);
+		}
+		this.dist += dist(this.gps.coords.latitude, this.gps.coords.longitude, gps.coords.latitude, gps.coords.longitude);
+	}
+	this.gps = gps;
+	this.time.setTime(gps.timestamp);
+}
+
+g_state.reset = function() {
+	this.countTime = 0;
+	this.moveTime = 0;
+	this.dist = 0;
+	this.maxSpeed = 0;
+	this.maxAlt = undefined;
+	this.minAlt = undefined;
+}
+
+g_state.show = function() {
+	var avgSpeed = g_state.countTime == 0 ? 0 : 1000.0 * g_state.dist / g_state.countTime;
+	var avgMoveSpeed = g_state.moveTime == 0 ? 0 : 1000.0 * g_state.dist / g_state.moveTime;
+	document.getElementById("info").innerHTML =
+		"<h2><table><tr><td>Լայնությունը`</td><td>" + value(this.gps.coords.latitude, "&deg;") +
+		"</td></tr><tr><td>Երկայնությունը`</td><td>" + value(this.gps.coords.longitude, "&deg;") +
+		"</td></tr><tr><td>Բարձրությունը`</td><td>" + value(this.gps.coords.altitude, "մ") +
+		"</td></tr><tr><td>Ճշգրտությունը`</td><td>" + value(this.gps.coords.accuracy, "մ") +
+		"</td></tr><tr><td>Բարձ․ Ճշգրտությունը`</td><td>" + value(this.gps.coords.altitudeAccuracy, "մ") +
+		"</td></tr><tr><td>Շարժ․ Ուղղությունը`</td><td>" + value(this.gps.coords.heading, "&deg;") +
+		"</td></tr><tr><td>Արագությունը`</td><td>" + value(this.gps.coords.speed, "մ/վ") +
+		"</td></tr><tr><td colspan=\"2\"><hr></td></tr><tr><td colspan=\"2\">" +
+		"</td></tr><tr><td>Անցած ճանապարհը`</td><td>" + value(g_state.dist, "մ") +
+		"</td></tr><tr><td>Միջին արագությունը`</td><td>" + avgSpeed + "մ/վ" +
+		"</td></tr><tr><td>Միջին արագությունը շարժվելիս`</td><td>" + avgMoveSpeed + "մ/վ" +
+		"</td></tr><tr><td>Առավելագույն արագությունը`</td><td>" + value(g_state.maxSpeed, "մ/վ") +
+		"</td></tr><tr><td>Առավելագույն բարձրությունը`</td><td>" + value(g_state.maxAlt, "մ") +
+		"</td></tr><tr><td>Նվազագույն բարձրությունը`</td><td>" + value(g_state.minAlt, "մ") +
+		"</td></tr><tr><td>Չափման տևողությունը`</td><td>" + value(g_state.countTime / 1000, "վ") +
+		"</td></tr><tr><td>Շարժման տևողությունը`</td><td>" + value(g_state.moveTime / 1000, "վ") +
+		"</td></tr><tr><td colspan=\"2\"><hr></td></tr><tr><td colspan=\"2\">" +
+		g_state.time.toString() + "</td></tr></table></h2>";
+	document.getElementById("gmaps").innerHTML = "<a href=http://maps.google.com/maps?q=" +
+	this.gps.coords.latitude + "," +
+	this.gps.coords.longitude +
+	">Google Maps -ով բացել</a>";
+}
+
+g_state.reset();
 
 function clear() {
 	localStorage.positionArray = "[]";
 	updateClearLink();
-	document.getElementById("save").innerHTML = "<h2><a href=\'javascript:save();\'>Հիշել</a></h2>";
+	document.getElementById("save").innerHTML = "<h2><a href=\'javascript:save();\'>Հիշել ընթացիկ դիրքը</a></h2>";
 }
 
 function save() {
+	if(g_state.gps == null) return;
 	if(localStorage.positionArray == undefined) localStorage.positionArray = "[]";
 	var arr = JSON.parse(localStorage.positionArray);
-	arr.push(g_position);
+	arr.push(g_state.gps);
 	localStorage.positionArray = JSON.stringify(arr);
 	document.getElementById("save").innerHTML = "<h2>Հիշված է</h2>";
 	updateClearLink();
@@ -53,35 +124,21 @@ window.onload=function() {
 		document.getElementById("info").innerHTML = "<h2>Տվյալները դեռ հասանելի չեն...</h2>";
 		navigator.geolocation.watchPosition(
 			function(position) {
-				g_position = position;
-				g_timestamp.setTime(position.timestamp);
-   				document.getElementById("info").innerHTML =
-	   				"<h2><table><tr><td>Լայնությունը`</td><td>" + value(position.coords.latitude, "&deg;") +
-					"</td></tr><tr><td>Երկայնությունը`</td><td>" + value(position.coords.longitude, "&deg;") +
-					"</td></tr><tr><td>Բարձրությունը`</td><td>" + value(position.coords.altitude, "մ") +
-					"</td></tr><tr><td>Ճշգրտությունը`</td><td>" + value(position.coords.accuracy, "մ") +
-					"</td></tr><tr><td>Բարձ․ Ճշգրտությունը`</td><td>" + value(position.coords.altitudeAccuracy, "մ") +
-					"</td></tr><tr><td>Շարժ․ Ուղղությունը`</td><td>" + value(position.coords.heading, "&deg;") +
-					"</td></tr><tr><td>Արագությունը`</td><td>" + value(position.coords.speed, "մ/վ") +
-					"</td></tr><tr><td colspan=\"2\"><hr></td></tr><tr><td colspan=\"2\">" +
-					g_timestamp.toString() + "</td></tr></table></h2>";
-				document.getElementById("save").innerHTML = "<h2><a href=\'javascript:save();\'>Հիշել</a></h2>";
-				document.getElementById("gmaps").innerHTML = "<a href=http://maps.google.com/maps?q=" +
-				position.coords.latitude + "," +
-				position.coords.longitude +
-				">Google Maps -ով բացել</a>";
+				g_state.update(position);
+				g_state.show();
+				document.getElementById("save").innerHTML = "<h2><a href=\'javascript:save();\'>Հիշել ընթացիկ դիրքը</a></h2>";
 			},
 			function(error) {
-				var err = "An unknown error occurred.";
+				var err = "Անհայտ սխալ է տեղի ունեցել";
 				switch(error.code) {
 					case error.PERMISSION_DENIED:
-						err = "User denied the request for Geolocation."
+						err = "Դուք մերժել եք տեղակայման մասին տվյալների ստացումը"
 						break;
 					case error.POSITION_UNAVAILABLE:
-						err = "Location information is unavailable."
+						err = "Տեղակայման տվյալները անհասանելի են"
 						break;
 					case error.TIMEOUT:
-						err = "The request to get user location timed out."
+						err = "Տեղակայման տվյալներին սպասելու առավելագույն թույլատրելի ժամանակը գերազանցված է"
 						break;
 				}
 				document.getElementById("info").innerHTML = err;
