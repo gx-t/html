@@ -10,7 +10,7 @@
 <body >
 <h2>
 <table>
-	<tr><td colspan='2' id='timestamp'>Տվյալները դեռ հասանելի չեն</td></tr>
+	<tr><td colspan='2' id='timestamp'><div style="color:red;"><br>Տվյալները դեռ հասանելի չեն...<br><br></div></td></tr>
 	<tr><td colspan='2'><hr></td></tr>
 	<tr><td>Լայնությունը`</td><td id='latitude'></td></tr>
 	<tr><td>Երկայնությունը`</td><td id='longitude'></td></tr>
@@ -52,6 +52,7 @@ Number.prototype.toRad = function() {
 	return this * Math.PI / 180;
 }
 
+
 function dist(lat1, lon1, lat2, lon2) {
 	var φ1 = lat1.toRad();
 	var φ2 = lat2.toRad();
@@ -60,6 +61,7 @@ function dist(lat1, lon1, lat2, lon2) {
 	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
 	return 12742000 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
+
 
 g_state = {};
 g_state.gps = null;
@@ -75,16 +77,17 @@ g_state.toggleRun = function() {
 g_state.toggleRun();
 
 g_state.update = function(gps) {
-	if(g_state.running) {
+	if(this.running) {
 		if(gps.coords.altitude < this.minAlt || this.minAlt == undefined) this.minAlt = gps.coords.altitude;
 		if(gps.coords.altitude > this.maxAlt || this.maxAlt == undefined) this.maxAlt = gps.coords.altitude;
 		if(gps.coords.speed > this.maxSpeed) this.maxSpeed = gps.coords.speed;
 		if(this.gps != null) {
-			this.countTime += (gps.timestamp - this.gps.timestamp);
+			var Δt = (gps.timestamp - this.gps.timestamp);
+			this.countTime += Δt;
 			if(gps.coords.speed != undefined && gps.coords.speed != 0) {
-				this.moveTime += (gps.timestamp - this.gps.timestamp);
+				this.moveTime += Δt;
+				this.dist += dist(this.gps.coords.latitude, this.gps.coords.longitude, gps.coords.latitude, gps.coords.longitude);
 			}
-			this.dist += dist(this.gps.coords.latitude, this.gps.coords.longitude, gps.coords.latitude, gps.coords.longitude);
 		}
 	}
 	this.gps = gps;
