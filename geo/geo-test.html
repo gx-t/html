@@ -19,6 +19,7 @@
 	<tr><td>Բարձ․ Ճշգրտությունը`</td><td id='altaccuracy'></td></tr>
 	<tr><td>Շարժ․ Ուղղությունը`</td><td id='heading'></td></tr>
 	<tr><td>Արագությունը`</td><td id='speed'></td></tr>
+	<tr><td>Հաշվարկված արագությունը`</td><td id='speed1'></td></tr>
 </table>
 <p id='save'></p><hr>
 <table>
@@ -32,7 +33,7 @@
 	<tr><td>Շարժման տևողությունը`</td><td id='movduration'></td></tr>
 </table><br>
 <a id="run" href="javascript:g_state.toggleRun();"></a><hr>
-<a id="reset" href="javascript:g_state.reset();g_state.show();">Զրոյացնել հաշվիչները</a><hr>
+<a id="reset" href="javascript:g_state.reset();">Զրոյացնել հաշվիչները</a><hr>
 <p id='clear'></p>
 </h2>
 <hr>
@@ -62,10 +63,14 @@ function dist(lat1, lon1, lat2, lon2) {
 	return 12742000 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
+function value(val, unit) {
+	if(val == null) return "<i>անհայտ</i>";
+	return val + " " + unit;
+}
+
 
 g_state = {};
 g_state.gps = null;
-g_state.time = new Date();
 g_state.running = true;
 
 g_state.toggleRun = function() {
@@ -78,20 +83,37 @@ g_state.toggleRun();
 
 g_state.update = function(gps) {
 	if(this.running) {
-		if(gps.coords.altitude < this.minAlt || this.minAlt == undefined) this.minAlt = gps.coords.altitude;
-		if(gps.coords.altitude > this.maxAlt || this.maxAlt == undefined) this.maxAlt = gps.coords.altitude;
-		if(gps.coords.speed > this.maxSpeed) this.maxSpeed = gps.coords.speed;
+		if(gps.coords.altitude < this.minAlt || this.minAlt == undefined) {
+			this.minAlt = gps.coords.altitude;
+			document.getElementById("minaltitude").innerHTML = value(this.minAlt, "մ");
+		}
+		if(gps.coords.altitude > this.maxAlt || this.maxAlt == undefined) {
+			this.maxAlt = gps.coords.altitude;
+			document.getElementById("maxaltitude").innerHTML = value(this.maxAlt, "մ");
+		}
 		if(this.gps != null) {
 			var Δt = (gps.timestamp - this.gps.timestamp);
+			var Δl = dist(this.gps.coords.latitude, this.gps.coords.longitude, gps.coords.latitude, gps.coords.longitude);
 			this.countTime += Δt;
-			if(gps.coords.speed != undefined && gps.coords.speed != 0) {
+			document.getElementById("msrduration").innerHTML = value(this.countTime/60000, "ր");
+			var speed = null;
+			if(Δl > gps.coords.accuracy / 3) {
+				speed = 1000 * Δl / Δt;
+				document.getElementById("speed1").innerHTML = value(speed * 3.6, "կմ/ժ");
 				this.moveTime += Δt;
-				this.dist += dist(this.gps.coords.latitude, this.gps.coords.longitude, gps.coords.latitude, gps.coords.longitude);
+				document.getElementById("movduration").innerHTML = value(this.moveTime/60000, "ր");
+				this.dist += Δl;
+				document.getElementById("distance").innerHTML = value(this.dist / 1000.0, "կմ");
+				document.getElementById("avgspeed").innerHTML = value(3600.0 * this.dist / this.countTime, "կմ/ժ");
+				document.getElementById("avgmovespeed").innerHTML = value(3600.0 * this.dist / this.moveTime, "կմ/ժ");
+				if(speed > this.maxSpeed) {
+					this.maxSpeed = speed;
+					document.getElementById("maxspeed").innerHTML = value(this.maxSpeed * 3.6, "կմ/ժ");
+				}
 			}
 		}
 	}
 	this.gps = gps;
-	this.time.setTime(gps.timestamp);
 }
 
 g_state.reset = function() {
@@ -101,34 +123,18 @@ g_state.reset = function() {
 	this.maxSpeed = 0;
 	this.maxAlt = undefined;
 	this.minAlt = undefined;
+	document.getElementById("speed1").innerHTML = "<i>անհայտ</i>";
+	document.getElementById("distance").innerHTML = "0 կմ";
+	document.getElementById("avgspeed").innerHTML = "0 կմ/ժ";
+	document.getElementById("avgmovespeed").innerHTML = "0 կմ/ժ";
+	document.getElementById("maxspeed").innerHTML = "0 կմ/ժ";
+	document.getElementById("maxaltitude").innerHTML = "<i>անհայտ</i>";
+	document.getElementById("minaltitude").innerHTML = "<i>անհայտ</i>";
+	document.getElementById("msrduration").innerHTML = "0 ր";
+	document.getElementById("movduration").innerHTML = "0 ր";
 }
 
 g_state.reset();
-
-g_state.show = function() {
-	var avgSpeed = g_state.countTime == 0 ? 0 : 1000.0 * g_state.dist / g_state.countTime;
-	var avgMoveSpeed = g_state.moveTime == 0 ? 0 : 1000.0 * g_state.dist / g_state.moveTime;
-	document.getElementById("gmaps").innerHTML = "<a href=http://maps.google.com/maps?q=" +
-	this.gps.coords.latitude + "," +
-	this.gps.coords.longitude +
-	">Google Maps -ով բացել</a>";
-	document.getElementById("timestamp").innerHTML = g_state.time.toString();
-	document.getElementById("latitude").innerHTML = value(this.gps.coords.latitude, "&deg;");
-	document.getElementById("longitude").innerHTML = value(this.gps.coords.longitude, "&deg;");
-	document.getElementById("altitude").innerHTML = value(this.gps.coords.altitude, "մ");
-	document.getElementById("accuracy").innerHTML = value(this.gps.coords.accuracy, "մ");
-	document.getElementById("altaccuracy").innerHTML = value(this.gps.coords.altitudeAccuracy,  "մ");
-	document.getElementById("heading").innerHTML = value(this.gps.coords.heading, "&deg");
-	document.getElementById("speed").innerHTML = value(this.gps.coords.speed * 3.6, "կմ/ժ");
-	document.getElementById("distance").innerHTML = value(g_state.dist / 1000.0, "կմ");
-	document.getElementById("avgspeed").innerHTML = value(avgSpeed * 3.6, "կմ/ժ");
-	document.getElementById("avgmovespeed").innerHTML = value(avgMoveSpeed * 3.6, "կմ/ժ");
-	document.getElementById("maxspeed").innerHTML = value(g_state.maxSpeed * 3.6, "կմ/ժ");
-	document.getElementById("maxaltitude").innerHTML = value(g_state.maxAlt, "մ");
-	document.getElementById("minaltitude").innerHTML = value(g_state.minAlt, "մ");
-	document.getElementById("msrduration").innerHTML = value(g_state.countTime/60000, "ր");
-	document.getElementById("movduration").innerHTML = value(g_state.moveTime/60000, "ր");
-}
 
 g_state.clearAllSaved = function() {
 	localStorage.positionArray = "[]";
@@ -153,24 +159,28 @@ document.getElementById("clear").update = function() {
 	this.innerHTML = ss;
 }
 
-function value(val, unit) {
-	if(val == null) return "<i>անհայտ</i>";
-	return val + unit;
-}
-
-function value1(val) {
-	if(val == null) return "անհայտ";
-	return val;
-}
 
 window.onload=function() {
 	document.getElementById('clear').update();
-	if (navigator.geolocation) {
+	if(navigator.geolocation) {
+		var dt = new Date();
 		navigator.geolocation.watchPosition(
-			function(position) {
-				g_state.update(position);
-				g_state.show();
+			function(gps) {
+				g_state.update(gps);
 				document.getElementById("save").setMode(true);
+				dt.setTime(gps.timestamp);
+				document.getElementById("timestamp").innerHTML = dt.toString();
+				document.getElementById("latitude").innerHTML = value(gps.coords.latitude, "&deg;");
+				document.getElementById("longitude").innerHTML = value(gps.coords.longitude, "&deg;");
+				document.getElementById("altitude").innerHTML = value(gps.coords.altitude, "մ");
+				document.getElementById("accuracy").innerHTML = value(gps.coords.accuracy, "մ");
+				document.getElementById("altaccuracy").innerHTML = value(gps.coords.altitudeAccuracy,  "մ");
+				document.getElementById("heading").innerHTML = value(gps.coords.heading, "&deg");
+				document.getElementById("speed").innerHTML = value(gps.coords.speed * 3.6, "կմ/ժ");
+				document.getElementById("gmaps").innerHTML = "<a href=http://maps.google.com/maps?q=" +
+					gps.coords.latitude + "," +
+					gps.coords.longitude +
+					">Google Maps -ով բացել</a>";
 			},
 			function(error) {
 				var err = "Անհայտ սխալ է տեղի ունեցել";
