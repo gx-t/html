@@ -6,207 +6,33 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" href="img/Globe-icon.png">
 <title>Geo Test</title>
-</head>
-<body >
-<h2>
-<table>
-	<tr><td colspan='2' id='timestamp'><div style="color:red;"><br>Տվյալները դեռ հասանելի չեն...<br><br></div></td></tr>
-	<tr><td colspan='2'><hr></td></tr>
-	<tr><td>Լայնությունը`</td><td id='latitude'></td></tr>
-	<tr><td>Երկայնությունը`</td><td id='longitude'></td></tr>
-	<tr><td>Բարձրությունը`</td><td id='altitude'></td></tr>
-	<tr><td>Ճշգրտությունը`</td><td id='accuracy'></td></tr>
-	<tr><td>Բարձ․ Ճշգրտությունը`</td><td id='altaccuracy'></td></tr>
-	<tr><td>Շարժ․ Ուղղությունը`</td><td id='heading'></td></tr>
-	<tr><td>Արագությունը`</td><td id='speed'></td></tr>
-	<tr><td>Հաշվարկված արագությունը`</td><td id='speed1'></td></tr>
-</table>
-<p id='save'></p><hr>
-<table>
-	<tr><td>Անցած ճանապարհը`</td><td id='distance'></td></tr>
-	<tr><td>Միջին արագությունը`</td><td id='avgspeed'></td></tr>
-	<tr><td>Միջին արագությունը շարժվելիս`</td><td id='avgmovespeed'></td></tr>
-	<tr><td>Առավելագույն արագությունը`</td><td id='maxspeed'></td></tr>
-	<tr><td>Առավելագույն բարձրությունը`</td><td id='maxaltitude'></td></tr>
-	<tr><td>Նվազագույն բարձրությունը`</td><td id='minaltitude'></td></tr>
-	<tr><td>Չափման տևողությունը`</td><td id='msrduration'></td></tr>
-	<tr><td>Շարժման տևողությունը`</td><td id='movduration'></td></tr>
-</table><br>
-<a id="run" href="javascript:g_state.toggleRun();"></a><hr>
-<a id="reset" href="javascript:g_state.reset();">Զրոյացնել հաշվիչները</a><hr>
-<p id='clear'></p>
-</h2>
-<hr>
-<p id="gmaps"></p>
+	<style>
+		body { margin: 0; }
+		canvas { display: block; }
+	</style>
 <script>
-
-document.getElementById('save').setMode = function(mode) {
-	if(mode) {
-		this.innerHTML = "<a href=\'javascript:g_state.save();\'>Հիշել ընթացիկ դիրքը</a>";
+	var state = {};
+	var cs = null;
+	var ctx = null;
+	var normalDraw = function() {
+		ctx.fillRect(0, 0, cs.width, cs.height);
 	}
-	else {
-		this.innerHTML = "Դիրքը հիշված է";
+	var draw = normalDraw;
+	var update = function() {
+		window.requestAnimationFrame(draw);
 	}
-}
-
-Number.prototype.toRad = function() {
-	return this * Math.PI / 180;
-}
-
-
-function dist(lat1, lon1, lat2, lon2) {
-	var φ1 = lat1.toRad();
-	var φ2 = lat2.toRad();
-	var Δφ = (lat2-lat1).toRad();
-	var Δλ = (lon2-lon1).toRad();
-	var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
-	return 12742000 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-function value(val, unit) {
-	if(val == null) return "<i>անհայտ</i>";
-	return val + " " + unit;
-}
-
-
-g_state = {};
-g_state.gps = null;
-g_state.running = true;
-
-g_state.toggleRun = function() {
-	var lnk = document.getElementById('run');
-	lnk.innerHTML = g_state.running ? "Սկսել հաշվարկը" : "Դադարացնել հաշվարկը";
-	g_state.running = !g_state.running;
-}
-
-g_state.toggleRun();
-
-g_state.update = function(gps) {
-	if(this.running) {
-		if(gps.coords.altitude < this.minAlt || this.minAlt == undefined) {
-			this.minAlt = gps.coords.altitude;
-			document.getElementById("minaltitude").innerHTML = value(this.minAlt, "մ");
-		}
-		if(gps.coords.altitude > this.maxAlt || this.maxAlt == undefined) {
-			this.maxAlt = gps.coords.altitude;
-			document.getElementById("maxaltitude").innerHTML = value(this.maxAlt, "մ");
-		}
-		if(this.gps != null) {
-			var Δt = (gps.timestamp - this.gps.timestamp);
-			var Δl = dist(this.gps.coords.latitude, this.gps.coords.longitude, gps.coords.latitude, gps.coords.longitude);
-			this.countTime += Δt;
-			document.getElementById("msrduration").innerHTML = value(this.countTime/60000, "ր");
-			var speed = null;
-			if(Δl > gps.coords.accuracy / 3) {
-				speed = 1000 * Δl / Δt;
-				document.getElementById("speed1").innerHTML = value(speed * 3.6, "կմ/ժ");
-				this.moveTime += Δt;
-				document.getElementById("movduration").innerHTML = value(this.moveTime/60000, "ր");
-				this.dist += Δl;
-				document.getElementById("distance").innerHTML = value(this.dist / 1000.0, "կմ");
-				document.getElementById("avgspeed").innerHTML = value(3600.0 * this.dist / this.countTime, "կմ/ժ");
-				document.getElementById("avgmovespeed").innerHTML = value(3600.0 * this.dist / this.moveTime, "կմ/ժ");
-				if(speed > this.maxSpeed) {
-					this.maxSpeed = speed;
-					document.getElementById("maxspeed").innerHTML = value(this.maxSpeed * 3.6, "կմ/ժ");
-				}
-			}
-		}
+	window.onresize = function() {
+		cs.width = window.innerWidth;
+		cs.height = window.innerHeight;
+		update();
 	}
-	this.gps = gps;
-}
-
-g_state.reset = function() {
-	this.countTime = 0;
-	this.moveTime = 0;
-	this.dist = 0;
-	this.maxSpeed = 0;
-	this.maxAlt = undefined;
-	this.minAlt = undefined;
-	document.getElementById("speed1").innerHTML = "<i>անհայտ</i>";
-	document.getElementById("distance").innerHTML = "0 կմ";
-	document.getElementById("avgspeed").innerHTML = "0 կմ/ժ";
-	document.getElementById("avgmovespeed").innerHTML = "0 կմ/ժ";
-	document.getElementById("maxspeed").innerHTML = "0 կմ/ժ";
-	document.getElementById("maxaltitude").innerHTML = "<i>անհայտ</i>";
-	document.getElementById("minaltitude").innerHTML = "<i>անհայտ</i>";
-	document.getElementById("msrduration").innerHTML = "0 ր";
-	document.getElementById("movduration").innerHTML = "0 ր";
-}
-
-g_state.reset();
-
-g_state.clearAllSaved = function() {
-	localStorage.positionArray = "[]";
-	document.getElementById('clear').update();
-	document.getElementById("save").setMode(true);
-}
-
-g_state.save = function() {
-	if(this.gps == null) return;
-	if(localStorage.positionArray == undefined) localStorage.positionArray = "[]";
-	var arr = JSON.parse(localStorage.positionArray);
-	arr.push(this.gps);
-	localStorage.positionArray = JSON.stringify(arr);
-	document.getElementById("save").setMode(false);
-	document.getElementById('clear').update();
-}
-
-document.getElementById("clear").update = function() {
-	var ss = "Հիշված դիրքեր չկան";
-	if(localStorage.positionArray != undefined && localStorage.positionArray != "[]")
-		ss = "<a style=\"color:red;\" href=\'javascript:g_state.clearAllSaved();\'>Ջնջել Բոլոր Հիշված Դիրքերը</a>";
-	this.innerHTML = ss;
-}
-
-
-window.onload=function() {
-	document.getElementById('clear').update();
-	if(navigator.geolocation) {
-		var dt = new Date();
-		navigator.geolocation.watchPosition(
-			function(gps) {
-				g_state.update(gps);
-				document.getElementById("save").setMode(true);
-				dt.setTime(gps.timestamp);
-				document.getElementById("timestamp").innerHTML = dt.toString();
-				document.getElementById("latitude").innerHTML = value(gps.coords.latitude, "&deg;");
-				document.getElementById("longitude").innerHTML = value(gps.coords.longitude, "&deg;");
-				document.getElementById("altitude").innerHTML = value(gps.coords.altitude, "մ");
-				document.getElementById("accuracy").innerHTML = value(gps.coords.accuracy, "մ");
-				document.getElementById("altaccuracy").innerHTML = value(gps.coords.altitudeAccuracy,  "մ");
-				document.getElementById("heading").innerHTML = value(gps.coords.heading, "&deg");
-				document.getElementById("speed").innerHTML = value(gps.coords.speed * 3.6, "կմ/ժ");
-				document.getElementById("gmaps").innerHTML = "<a href=http://maps.google.com/maps?q=" +
-					gps.coords.latitude + "," +
-					gps.coords.longitude +
-					">Google Maps -ով բացել</a>";
-			},
-			function(error) {
-				var err = "Անհայտ սխալ է տեղի ունեցել";
-				switch(error.code) {
-					case error.PERMISSION_DENIED:
-						err = "Դուք մերժել եք տեղակայման մասին տվյալների ստացումը"
-						break;
-					case error.POSITION_UNAVAILABLE:
-						err = "Տեղակայման տվյալները անհասանելի են"
-						break;
-					case error.TIMEOUT:
-						err = "Տեղակայման տվյալներին սպասելու առավելագույն թույլատրելի ժամանակը գերազանցված է"
-						break;
-				}
-				document.getElementById("timestamp").innerHTML = err;
-			},
-			{ enableHighAccuracy: true }
-		);
-	} else { 
-		document.getElementById("timestamp").innerHTML = "<h2>Դիրքի հայտնաբերումը ձեր ծրագրով անհնար է։</h2>";
+	window.onload = function() {
+		cs = document.getElementById("cs");
+		this.onresize();
+		ctx = cs.getContext("2d");
+		update();
 	}
-};
-
-
 </script>
-
-</body>
+</head>
+<body><canvas id="cs"></canvas></body>
 </html>
-
