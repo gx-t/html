@@ -19,8 +19,8 @@
 	<tr><td>Բարձ․ Ճշգրտությունը`</td><td id='altaccuracy'></td></tr>
 	<tr><td>Շարժ․ Ուղղությունը`</td><td id='heading'></td></tr>
 	<tr><td>Արագությունը`</td><td id='speed'></td></tr>
-	<tr><td>Հաշվարկված արագությունը`</td><td id='speed1'></td></tr>
 </table>
+<font size=32><p align='center' id='speed1' style='color:red'>0 կմ/ժ</p></font>
 <p id='save'></p><hr>
 <table>
 	<tr><td>Անցած ճանապարհը`</td><td id='distance'></td></tr>
@@ -82,6 +82,7 @@ g_state.toggleRun = function() {
 g_state.toggleRun();
 
 g_state.update = function(gps) {
+	var speed = 0;
 	if(this.running) {
 		if(gps.coords.altitude < this.minAlt || this.minAlt == undefined) {
 			this.minAlt = gps.coords.altitude;
@@ -99,7 +100,7 @@ g_state.update = function(gps) {
 			var speed = null;
 			if(Δl > gps.coords.accuracy / 3) {
 				speed = 1000 * Δl / Δt;
-				document.getElementById("speed1").innerHTML = value(speed * 3.6, "կմ/ժ");
+				document.getElementById("speed1").innerHTML = value(Math.round(speed * 3.6), "կմ/ժ");
 				this.moveTime += Δt;
 				document.getElementById("movduration").innerHTML = value(this.moveTime/60000, "ր");
 				this.dist += Δl;
@@ -123,7 +124,7 @@ g_state.reset = function() {
 	this.maxSpeed = 0;
 	this.maxAlt = undefined;
 	this.minAlt = undefined;
-	document.getElementById("speed1").innerHTML = "<i>անհայտ</i>";
+	document.getElementById("speed1").innerHTML = "0 կմ/ժ";
 	document.getElementById("distance").innerHTML = "0 կմ";
 	document.getElementById("avgspeed").innerHTML = "0 կմ/ժ";
 	document.getElementById("avgmovespeed").innerHTML = "0 կմ/ժ";
