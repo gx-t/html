@@ -17,6 +17,9 @@
 	var normalDraw = function() {
 		ctx.fillRect(0, 0, cs.width, cs.height);
 	}
+	var nightDraw = function() {
+		ctx.fillRect(0, 0, cs.width, cs.height);
+	}
 	var draw = normalDraw;
 	var update = function() {
 		window.requestAnimationFrame(draw);
