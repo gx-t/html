@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Javascript: Genetic algorythm based quadratic equation solver</title>
+	<script>
+		"use strict";
+		function cmd_evol() {
+				var a = parseFloat(ed_a.value);
+				var b = parseFloat(ed_b.value);
+				var c = parseFloat(ed_c.value);
+				var gen_count = parseInt(ed_gen_count.value);
+				var pop_count = parseInt(ed_pop_count.value);
+				var min = parseFloat(ed_min.value);
+				var max = parseFloat(ed_max.value);
+				var mut = parseFloat(ed_mut.value);
+				var pop = [];
+
+				var check_inputs = function() {
+					ed_a.value = a;
+					ed_b.value = b;
+					ed_c.value = c;
+					ed_gen_count.value = gen_count;
+					ed_pop_count.value = pop_count;
+					ed_min.value = min;
+					ed_max.value = max;
+					ed_mut.value = mut;
+					return true;
+				}
+
+				var set_calc = function(p, x) {
+					p.x = x;
+					p.val = x * x * a + x * b + c;
+					p.val *= p.val;
+				}
+
+				var fill = function() {
+					pop.length = pop_count * 2;
+					
+					var step = (max - min) / pop_count;
+					var x = min + step / 2;
+					for(var i = 0; i < 2 * pop_count; i ++, x += step) {
+						pop[i] = {x: 0.0, val: 0.0};
+						set_calc(pop[i], x);
+					}
+				}
+
+				var reproduce_mutate = function() {
+					for(var i = 0; i < pop_count; i ++) {
+						set_calc(pop[i + pop_count], pop[i].x - mut + mut * 2.0 * Math.random());
+					}
+				}
+
+				var sort_select = function() {
+					pop.sort(function(p1, p2) {if(p1.val < p2.val) return -1; if(p1.val > p2.val) return 1; return 0;});
+				}
+
+				var run = function() {
+					for(var i = 0; i < gen_count; i ++) {
+						reproduce_mutate();
+						sort_select();
+					}
+				}
+
+				var print_inputs = function() {
+					output.innerText = 
+						"--------------------------------\n" +
+						"Quadratic Equation Solution\n" +
+						"a=" + a + " b=" + b + " c=" + c + "\n" +
+						"Generation Count: " + gen_count + "\n" +
+						"Population Count: " + pop_count + "\n" +
+						"Minimum Value: " + min + "\n" +
+						"Maximum Value: " + max + "\n" +
+						"Maximum Mutation: " + mut + "\n" +
+						"----------------------------------------------------------------\n";
+				}
+
+				var print_outputs = function() {
+					var ss = "";
+					for(var i = 0; i < pop_count; i ++) {
+						ss += i + "\t" + pop[i].x + "\t\t(" + pop[i].val + ")\n";
+					}
+					ss += "---------------------------------------------------------------\n";
+					output.innerText += ss;
+				}
+			
+			if(!check_inputs())
+				return;
+
+			print_inputs();
+			fill();
+
+			var t0 = new Date();
+			run();
+			var t1 = new Date();
+
+			print_outputs();
+			output.innerText += "TIME SPENT: " + (t1 - t0) + " ms\n";
+		}
+	</script>
+</head>
+<body>
+	<h3>Quadratic equation client side solver based on evolutional algorythm with static mutation</h3>
+	<table>
+		<tr><td>a</td><td><input id='ed_a' type='number' min='-1000' max='1000' step='0.001' value='2'></td><td>Floating point from -1000 to 1000 step 0.001</td></tr>
+		<tr><td>b</td><td><input id='ed_b' type='number' min='-1000' max='1000' step='0.001' value='-4'></td><td>Floating point from -1000 to 1000 step 0.001</td></tr>
+		<tr><td>c</td><td><input id='ed_c' type='number' min='-1000' max='1000' step='0.001' value='-2'></td><td>Floating point from -1000 to 1000 step 0.001</td></tr>
+		<tr><td>Generation count</td><td><input id='ed_gen_count' type='number' min='1' max='2000' step='1' value='100'></td><td>Positive integer from 1 to 2000</td></tr>
+		<tr><td>Population count</td><td><input id='ed_pop_count' type='number' min='1' max='2000' step='1' value='100'></td><td>Positive integer from 1 to 2000</td></tr>
+		<tr><td>Minimum value</td><td><input id='ed_min' type='number' min='-1000000' max='1000000' step='0.001' value='-100'></td><td>Floating point from -1000000 to 1000000 step 0.001</td></tr>
+		<tr><td>Maximum value</td><td><input id='ed_max' type='number' min='-1000000' max='1000000' step='0.001' value='100'></td><td>Floating point from -1000000 to 1000000 step 0.001</td></tr>
+		<tr><td>Maximum mutation (+/-)</td><td><input id='ed_mut' type='number' min='0.001' max='100' step='0.001' value='1'></td><td>Positive floating point from 0.001 to 100 step 0.001</td></tr>
+
+		<tr><td colspan='2'><i><b>The out of range values will be automatically changed to default values</b></i></td><td align='center'><a href='javascript:cmd_evol();'>Start Calculation</a></td></tr>
+	</table>
+	<hr>
+	<pre id="output">
+	</pre>
+</body>
+</html>

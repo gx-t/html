@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>CGI: Genetic algorythm based quadratic equation solver</title>
+	<script>
+		function cmd_evol() {
+			var ss="quadratic\n";
+			ss += a.value;
+			ss += " ";
+			ss += b.value;
+			ss += " ";
+			ss += c.value;
+			ss += " ";
+			ss += gen_count.value;
+			ss += " ";
+			ss += pop_count.value;
+			ss += " ";
+			ss += min.value;
+			ss += " ";
+			ss += max.value;
+			ss += " ";
+			ss += mut.value;
+			ss += "\n";
+			try {
+				var http = new XMLHttpRequest();
+				http.onreadystatechange = function() {
+					output.innerText = http.responseText;
+				}
+				http.open("POST", "http://shah32768.sdf.org/cgi-bin/evol.cgi", true);
+				http.send(ss);
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+	</script>
+</head>
+<body>
+	<h3>Quadratic equation server side solver based on evolutional algorythm with static mutation</h3>
+	<table>
+		<tr><td>a</td><td><input id='a' type='number' min='-1000' max='1000' step='0.001' value='2'></td><td>Floating point from -1000 to 1000 step 0.001</td></tr>
+		<tr><td>b</td><td><input id='b' type='number' min='-1000' max='1000' step='0.001' value='-4'></td><td>Floating point from -1000 to 1000 step 0.001</td></tr>
+		<tr><td>c</td><td><input id='c' type='number' min='-1000' max='1000' step='0.001' value='-2'></td><td>Floating point from -1000 to 1000 step 0.001</td></tr>
+		<tr><td>Generation count</td><td><input id='gen_count' type='number' min='1' max='2000' step='1' value='100'></td><td>Positive integer from 1 to 2000</td></tr>
+		<tr><td>Population count</td><td><input id='pop_count' type='number' min='1' max='2000' step='1' value='100'></td><td>Positive integer from 1 to 2000</td></tr>
+		<tr><td>Minimum value</td><td><input id='min' type='number' min='-1000000' max='1000000' step='0.001' value='-100'></td><td>Floating point from -1000000 to 1000000 step 0.001</td></tr>
+		<tr><td>Maximum value</td><td><input id='max' type='number' min='-1000000' max='1000000' step='0.001' value='100'></td><td>Floating point from -1000000 to 1000000 step 0.001</td></tr>
+		<tr><td>Maximum mutation (+/-)</td><td><input id='mut' type='number' min='0.001' max='100' step='0.001' value='1'></td><td>Positive floating point from 0.001 to 100 step 0.001</td></tr>
+
+		<tr><td colspan='2'><i><b>The out of range values will be changed to nearest valid values</b></i></td><td align='center'><a href='javascript:cmd_evol();'>Start Calculation</a></td></tr>
+	</table>
+	<hr>
+	<pre id="output">
+	</pre>
+</body>
+</html>
