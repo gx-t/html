@@ -3,8 +3,36 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Javascript: Genetic algorythm based quadratic equation solver</title>
-    <script src=evol.js></script>
+<script src=evol.js>
+</script>
+<style id="st">
+tr:nth-child(even) {
+background: #CCC;
+}
+tr:nth-child(odd) {
+background: #EEE;
+}
+td {
+    text-align: center;
+}
+</style>
 </head>
 <body>
+<h3>Quadratic equation client side solver based on evolutional algorythm with adaptive mutation</h3>
+<table id="inTbl">
+<tr><th>Constant name</th><th>Value</th><th>Min. value</th><th>Max. value</th><th>Step</th></tr>
+<tr><td>a</td><td><input value=2></input></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>b</td><td><input value=-4></input></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>c</td><td><input value=-2></input></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Generation count</td><td><input value=100></input></td><td>1</td><td>10000</td><td>1</td></tr>
+<tr><td>Population count</td><td><input value=100></input></td><td>1</td><td>1000</td><td>1</td></tr>
+<tr><td>Minimum x</td><td><input value=-100></input></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Maximum x</td><td><input value=100></input></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Initial mutation</td><td><input value=100></input></td><td>-</td><td>-</td><td>-</td></tr>
+<tr><td>Decrease factor</td><td><input value=1.1></input></td><td>1.0001</td><td>2</td><td>-</td></tr>
+<tr><td colspan='2'><i><b>The out of range values will be<br>automatically changed to valid values</b></i></td><td colspan='3' align='center'><a href='javascript:cmd_evol();'>Start Calculation</a></td></tr>
+</table>
+<hr>
+<pre id="out"></pre>
 </body>
 </html>
