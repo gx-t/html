@@ -145,6 +145,8 @@ HTMLInputElement.prototype.norm = function() {
 
 function extendInTbl() {
     inTbl.load = function() {
+        if(!localStorage)
+            return;
         var map = JSON.parse(localStorage.values);
             for(var i in this.rows) {
                 var row = this.rows[i];
@@ -159,6 +161,8 @@ function extendInTbl() {
     }
 
     inTbl.save = function() {
+        if(!localStorage)
+            return;
         var map = {};
             for(var i in this.rows) {
                 var row = this.rows[i];
