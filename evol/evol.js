@@ -29,6 +29,8 @@ HTMLInputElement.prototype.norm = function() {
 }
 
 HTMLTableElement.prototype.load = function() {
+    if(!localStorage)
+        return;
     var map = JSON.parse(localStorage.values);
     for(var i in this.rows) {
         var row = this.rows[i];
@@ -43,6 +45,8 @@ HTMLTableElement.prototype.load = function() {
 }
 
 HTMLTableElement.prototype.save = function() {
+    if(!localStorage)
+        return;
     var map = {};
     for(var i in this.rows) {
         var row = this.rows[i];
