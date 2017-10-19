@@ -35,7 +35,7 @@ HTMLTableElement.prototype.load = function() {
     for(var i in this.rows) {
         var row = this.rows[i];
         try {
-            if(row.cells[1].children[0].type != "text")
+            if(row.cells[1].children[0].tagName != "INPUT")
                 continue;
             var key = row.cells[0].innerText;
             row.cells[1].children[0].value = map[key];
@@ -51,7 +51,7 @@ HTMLTableElement.prototype.save = function() {
     for(var i in this.rows) {
         var row = this.rows[i];
         try {
-            if(row.cells[1].children[0].type != "text")
+            if(row.cells[1].children[0].tagName != "INPUT")
                 continue;
             var key = row.cells[0].innerText;
             var val = row.cells[1].children[0].value;
