@@ -47,13 +47,7 @@ const d_name = [
 ];
 
 id_start_y.onchange = id_start_m.onchange = id_start_d.onchange = id_c.onchange = function() {
-    var x = load();
-    x.start.y = id_start_y.value;
-    x.start.m = id_start_m.value;
-    x.start.d = id_start_d.value;
-    x.c = id_c.value;
-    id_main.calc(x);
-    localStorage.x = JSON.stringify(x);
+    window.location.href = "#" + id_start_y.value + "#" + id_start_m.value + "#" + id_start_d.value + "#" + id_c.value;
 }
 
 id_main.calc =  function(x) {
@@ -75,18 +69,17 @@ id_main.calc =  function(x) {
                     ss += dd[i] + " ";
 
             }
-            res += "<a href='javascript:void(0);' onclick='id_main.edit(" + y + ", " + m + ");'>-- " + y + " " + m_name[m] + "` " + Math.round(d) + " " + ss + "</a>\n";
+            res += "<a href=#" + y + "#" + m + ">-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
         }
     }
     this.innerHTML = res;
 }
 
-id_main.edit = function(y, m) {
+id_main.edit = function(x, y, m) {
     id_start.hidden = true;
     var innerHTML = "";
-    var dt = new Date(y, m + 1, 0);
+    var dt = new Date(y, parseInt(m) + 1, 0);
     var day_count = dt.getDate();
-    var x = load();
 
     for(var d = 1; day_count > 0; d ++, day_count --) {
         dt.setDate(d);
@@ -102,13 +95,11 @@ id_main.edit = function(y, m) {
 
         innerHTML += "<input type='checkbox' " + chk + " value='" + d + "'>" + d + " " + m_name[m] + " " + y + " ( " + d_name[dt.getDay()] + " )</input>\n";
     }
-    innerHTML += "<hr>\n<a href='javascript:void(0);' onclick='id_main.calc(load());'><b>Վերադառնալ ամիսներին</b></a>\n\n<a href='javascript:void(0);' onclick='id_main.save(" + y + ", " + m + ");'><b>Պահպանել և վերահաշվարկել</b></a>\n";
     this.innerHTML = innerHTML;
 }
 
-id_main.save = function(y, m) {
+id_main.save = function(x, y, m) {
     id_start.hidden = false;
-    var x = load();
     if(undefined == x.vacation[y])
         x.vacation[y] = {};
     x.vacation[y][m] = [];
@@ -121,7 +112,6 @@ id_main.save = function(y, m) {
         delete x.vacation[y][m];
     if(0 == Object.keys(x.vacation[y]).length)
         delete x.vacation[y];
-    id_main.calc(x);
     localStorage.x = JSON.stringify(x);
 }
 
@@ -157,6 +147,40 @@ id_c.init = function(init_value) {
     this.value = init_value;
 }
 
+window.onhashchange = function(evt) {
+    var x = load();
+    try {
+        var args = evt.newURL.split("#");
+        if(args[1] < 2020 || args[1] > 2023 || args[2] < 0 || args[2] > m_name.length - 1)
+            throw "Out of range year/month";
+        if(5 == args.length) {
+            id_start_y.value = x.start.y = args[1];
+            id_start_m.value = x.start.m = args[2];
+            id_start_d.value = x.start.d = args[3];
+            if(args[4] < 1 || args[4] > 4)
+                throw "Out of range number or years to show";
+            id_c.value = x.c = args[4];
+
+            var save_args = evt.oldURL.split("#");
+            if(save_args[1] < 2020 || save_args[1] > 2023 || save_args[2] < 0 || save_args[2] > m_name.length - 1)
+                throw "Out of range year/month";
+
+            if(3 == save_args.length) {
+                id_main.save(x, save_args[1], save_args[2]);
+            }
+            id_main.calc(x);
+            return;
+        }
+        if(3 == args.length) {
+            id_main.edit(x, args[1], args[2]);
+            return;
+        }
+    }
+    catch(e) {
+        console.log(e);
+    }
+}
+
 function load() {
     if(undefined == localStorage.x)
         localStorage.x = '{"start":{"y":"2020","m":"10","d":"16"},"c":"2","vacation":{}}';
@@ -170,6 +194,7 @@ function load() {
     id_start_m.init(x.start.m);
     id_start_d.init(x.start.d);
     id_c.init(x.c);
+    window.location.href = "#" + id_start_y.value + "#" + id_start_m.value + "#" + id_start_d.value + "#" + id_c.value;
     id_main.calc(x);
 }());
 
