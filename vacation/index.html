@@ -61,14 +61,11 @@ id_main.calc =  function(x) {
     for(var y = y_start; y < y_end; y ++, m = 0) {
         for(; m < 12; m ++, d += 20/12) {
             var ss = "";
-            var dd = v[y] && v[y][m];
-            if(undefined != dd && 0 != dd.length) {
-                ss = "/ ";
+            try {
+                var dd = v[y][m];
+                ss = JSON.stringify(dd).replaceAll('"', '');
                 d -= dd.length;
-                for(var i in dd)
-                    ss += dd[i] + " ";
-
-            }
+            } catch(e) {}
             res += "<a href=#" + y + "#" + m + ">-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
         }
     }
