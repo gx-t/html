@@ -127,6 +127,8 @@ id_main.save = function(x, y, m) {
         x.vacation[y] = {};
     x.vacation[y][m] = [];
     var chk_arr = id_main.getElementsByTagName("input");
+    if(0 == chk_arr.length)
+        return;
     for(i in chk_arr) {
         if(chk_arr[i].checked)
             x.vacation[y][m].push(chk_arr[i].value);
