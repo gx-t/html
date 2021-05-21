@@ -46,6 +46,21 @@ const d_name = [
     "Շաբաթ",
 ];
 
+const holidays = [
+{ "1": "Ամանոր", "2": "Ամանոր", "6": "Սուրբ Ծնունդ և Հայտնություն", "28": "Բանակի օր"},
+{},
+{"8": "Մարտի ութ"},
+{"24": "Հայոց ցեղասպանության զոհերի հիշատակի օր"},
+{"1": "Աշխատանքի օր", "9": "Շուշիի ազատագրման օր", "28": "Հանրապետության տոն"},
+{},
+{"5": "Սահմանադրության օր, պետական խորհրդանիշների օր"},
+{},
+{"21": "Անկախության տոն"},
+{},
+{},
+{"31": "Ամանոր"},
+];
+
 id_start_y.onchange = id_start_m.onchange = id_start_d.onchange = id_c.onchange = function() {
     window.location.href = "#" + id_start_y.value + "#" + id_start_m.value + "#" + id_start_d.value + "#" + id_c.value;
 }
@@ -74,13 +89,18 @@ id_main.calc =  function(x) {
 
 id_main.edit = function(x, y, m) {
     id_start.hidden = true;
+    m = parseInt(m);
+    y = parseInt(y);
+    var d = null;
     var innerHTML = "";
-    var dt = new Date(y, parseInt(m) + 1, 0);
+    var dt = new Date(y, m + 1, 0);
     var day_count = dt.getDate();
 
-    for(var d = 1; day_count > 0; d ++, day_count --) {
+    for(d = 1; day_count > 0; d ++, day_count --) {
         dt.setDate(d);
         if(0 == dt.getDay() || 6 == dt.getDay())
+            continue;
+        if(undefined != holidays[m][d])
             continue;
         var chk = "";
         try {
@@ -92,6 +112,12 @@ id_main.edit = function(x, y, m) {
 
         innerHTML += "<input type='checkbox' " + chk + " value='" + d + "'>" + d + " " + m_name[m] + " " + y + " ( " + d_name[dt.getDay()] + " )</input>\n";
     }
+    innerHTML += "<hr>" + m_name[m].toUpperCase() + "Ի ՏՈՆԵՐԸ՝\n\n";
+    d = null;
+    for(d in holidays[m])
+        innerHTML += d + "\t" + holidays[m][d] + "\n";
+    if(null == d)
+        innerHTML += "---\n";
     this.innerHTML = innerHTML;
 }
 
