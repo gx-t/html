@@ -74,7 +74,7 @@ function calc() {
     var y_start = parseInt(x.start.y);
     var y_end = y_start + parseInt(x.c);
     var v = x.vacation;
-    res = "Արձակուրդի մնացորդը / օրերը\n\n";
+    innerHTML = "Արձակուրդի մնացորդը / օրերը\n\n";
     for(var y = y_start; y < y_end; y ++, m = 0) {
         for(; m < 12; m ++, d += 20/12) {
             var ss = "";
@@ -83,10 +83,10 @@ function calc() {
                 ss = JSON.stringify(dd).replaceAll('"', '');
                 d -= dd.length;
             } catch(e) {}
-            res += "<a href=#edit(" + y + "," + m + ");>-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
+            innerHTML += "<a href=#edit(" + y + "," + m + ");>-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
         }
     }
-    id_main.innerHTML = res;
+    id_main.innerHTML = innerHTML;
 }
 
 function edit(y, m) {
@@ -106,8 +106,7 @@ function edit(y, m) {
         var chk = "";
         try {
             for(dd in x.vacation[y][m])
-                if(x.vacation[y][m][dd] == d)
-                    chk ="checked";
+                x.vacation[y][m][dd] == d && (chk ="checked");
         }
         catch(e) {}
 
@@ -123,18 +122,18 @@ function edit(y, m) {
 }
 
 function save(y, m) {
-    console.log("onchange");
     var x = JSON.parse(localStorage.x);
 
     x.vacation[y] = x.vacation[y] || {};
     x.vacation[y][m] = [];
     var chk_arr = id_main.getElementsByTagName("input");
+
     if(0 == chk_arr.length)
         return;
-    for(i in chk_arr) {
-        if(chk_arr[i].checked)
-            x.vacation[y][m].push(chk_arr[i].value);
-    }
+
+    for(i in chk_arr)
+        chk_arr[i].checked && x.vacation[y][m].push(chk_arr[i].value);
+
     if(0 == x.vacation[y][m].length)
         delete x.vacation[y][m];
     if(0 == Object.keys(x.vacation[y]).length)
