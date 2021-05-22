@@ -83,7 +83,7 @@ function calc() {
                 ss = JSON.stringify(dd).replaceAll('"', '');
                 d -= dd.length;
             } catch(e) {}
-            innerHTML += "<a href=#edit(" + y + "," + m + ");>-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
+            innerHTML += "<a href=#edit(" + y + "," + m + ")>-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
         }
     }
     id_main.innerHTML = innerHTML;
