@@ -62,7 +62,10 @@ const holidays = [
 ];
 
 id_start_y.onchange = id_start_m.onchange = id_start_d.onchange = id_c.onchange = function() {
-    localStorage.x = JSON.stringify(Object.assign(JSON.parse(localStorage.x), {start: {y: id_start_y.value, m: id_start_m.value, d: id_start_d.value}, c: id_c.value}));
+    var x = JSON.parse(localStorage.x);
+    x.start = {y: id_start_y.value, m: id_start_m.value, d: id_start_d.value};
+    x.c = id_c.value;
+    localStorage.x = JSON.stringify(x);
     calc();
 }
 
@@ -141,14 +144,14 @@ function save(y, m) {
     localStorage.x = JSON.stringify(x);
 }
 
-window.onhashchange = function(evt) {
+window.onhashchange = function() {
     const entry_map = {
         edit: edit,
         calc: calc
     };
 
     try {
-        eval("entry_map." + evt.newURL.split("#")[1]);
+        eval("entry_map." + window.location.href.split("#")[1]);
     }
     catch(e) {}
 }

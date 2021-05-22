@@ -73,120 +73,112 @@ var num = [];
 var ctx = null;
 draw = function() {};
 
-var entryMap = {
+var entry_map = {
 menu:function() {
-		 var itemArr = [
-		 {t:"Բառեր", a:"#words"},
-		 {t:"Տառեր", a:"#letters"},
-		 {t:"Վանկեր", a:"#syllables"},
-		 {t:"Մեծ ու փոքր (1-3)", a:"#comp_1_3"},
-		 {t:"Մեծ ու փոքր (1-5)", a:"#comp_1_5"},
-		 {t:"Մեծ ու փոքր (1-10)", a:"#comp_1_10"},
-		 {t:"խոսող թվեր", a:"#talknumb"}
-		 ];
+         var itemArr = [
+         {t:"Բառեր", a:"#words()"},
+         {t:"Տառեր", a:"#letters()"},
+         {t:"Վանկեր", a:"#syllables()"},
+         {t:"Մեծ ու փոքր (1-3)", a:"#comp(1,3)"},
+         {t:"Մեծ ու փոքր (1-5)", a:"#comp(1,5)"},
+         {t:"Մեծ ու փոքր (1-10)", a:"#comp(1,10)"},
+         {t:"խոսող թվեր", a:"#talknumb()"}
+         ];
 
-		 draw = function() {
-			 var lineHeight = cs.height / itemArr.length;
-			 lib.drawBkground();
-			 var fontHeight = Math.min(cs.width, cs.height) / itemArr.length / 2;
-			 ctx.font = fontHeight + 'pt Calibri';
-			 ctx.fillStyle = 'darkblue';
-			 var x = 0;
-			 var y = lineHeight / 2 + fontHeight / 2;
-			 for(var i in itemArr) {
-				 if(x + ctx.measureText(itemArr[i].t).width >= cs.width) {
-					 x = 0;
-				 }
-				 ctx.fillText(itemArr[i].t, x, y);
-				 y += lineHeight;
-				 x += ctx.measureText(itemArr[i].t).width / 2;
-			 }
-		 }
+         draw = function() {
+             var lineHeight = cs.height / itemArr.length;
+             lib.drawBkground();
+             var fontHeight = Math.min(cs.width, cs.height) / itemArr.length / 2;
+             ctx.font = fontHeight + 'pt Calibri';
+             ctx.fillStyle = 'darkblue';
+             var x = 0;
+             var y = lineHeight / 2 + fontHeight / 2;
+             for(var i in itemArr) {
+                 if(x + ctx.measureText(itemArr[i].t).width >= cs.width) {
+                     x = 0;
+                 }
+                 ctx.fillText(itemArr[i].t, x, y);
+                 y += lineHeight;
+                 x += ctx.measureText(itemArr[i].t).width / 2;
+             }
+         }
 
-		 cs.onmousedown = function(e)
-		 {
-			 var rc = cs.getBoundingClientRect();
-			 var y = e.clientY - rc.top;
-			 window.location.href = itemArr[Math.floor(y * itemArr.length / cs.height)].a;
-		 }
-		 draw();
-	 },
+         cs.onmousedown = function(e)
+         {
+             var rc = cs.getBoundingClientRect();
+             var y = e.clientY - rc.top;
+             window.location.href = itemArr[Math.floor(y * itemArr.length / cs.height)].a;
+         }
+         draw();
+     },
 
 words:function() {
-		  alert("words");
-	  },
+          alert("words");
+      },
 
 letters:function() {
-			alert("letters");
-		},
+            alert("letters");
+        },
 
 syllables:function() {
-			  alert("syllables");
-		  },
+              alert("syllables");
+          },
 
-comp_1_3:function() {
-			 alert("compare 1 to 3");
-		 },
-
-comp_1_5:function() {
-			 alert("compare 1 to 5");
-		 },
-
-comp_1_10:function() {
-			  alert("compare 1 to 10");
-		  },
+comp:function(min, max) {
+         alert("compare " + min + " to " + max);
+     },
 
 talknumb:function() {
-			 alert("talking numbers");
-		 },
+             alert("talking numbers");
+         },
 };
 
 var lib = {
 drawBkground:function() {
-				 var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
-				 grd.addColorStop(0, "yellow");
-				 grd.addColorStop(1, "green");
-				 // Fill with gradient
-				 ctx.fillStyle = grd;
-				 ctx.fillRect(0, 0, cs.width, cs.height);
-			 },
+                 var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+                 grd.addColorStop(0, "yellow");
+                 grd.addColorStop(1, "green");
+                 // Fill with gradient
+                 ctx.fillStyle = grd;
+                 ctx.fillRect(0, 0, cs.width, cs.height);
+             },
 };
 
 window.onresize = function() {
-  cs.width = cs.parentNode.parentNode.clientWidth - 30;
-  cs.height = cs.parentNode.parentNode.clientHeight - 30;
-  draw();
+    cs.width = cs.parentNode.parentNode.clientWidth - 30;
+    cs.height = cs.parentNode.parentNode.clientHeight - 30;
+    draw();
 }
 
 window.onload = function() {
-	ctx = cs.getContext("2d");
-	no.src = "img/no.png";
-	for(var i in vocab) {
-		var img = new Image();
-		img.src = "img/" + vocab[i].p;
-		vocab[i].p = img;
-		if(vocab[i].v) {
-			var snd = new Audio("sound/" + vocab[i].v);
-			snd.preload = "auto";
-			vocab[i].v = snd;
-		}
-	}
-	for(var i = 1; i < 11; i ++) {
-		var snd = new Audio("sound/" + i + ".ogg");
-		snd.preload = "auto";
-		num.push(snd);
-	}
-	window.onresize();
-	window.onhashchange();
+    ctx = cs.getContext("2d");
+    no.src = "img/no.png";
+    for(var i in vocab) {
+        var img = new Image();
+        img.src = "img/" + vocab[i].p;
+        vocab[i].p = img;
+        if(vocab[i].v) {
+            var snd = new Audio("sound/" + vocab[i].v);
+            snd.preload = "auto";
+            vocab[i].v = snd;
+        }
+    }
+    for(var i = 1; i < 11; i ++) {
+        var snd = new Audio("sound/" + i + ".ogg");
+        snd.preload = "auto";
+        num.push(snd);
+    }
+    window.onresize();
+    window.onhashchange();
 }
 
-window.onhashchange = function() {
-	try {
-		entryMap[document.URL.split("#")[1]]();
-	}
-	catch(e) {
-		entryMap.menu();
-	}
+window.onhashchange = function(evt) {
+    try {
+        eval("entry_map." + evt.newURL.split("#")[1]);
+    }
+    catch(e) {
+        entry_map.menu();
+    }
 }
 
 </script>
@@ -194,6 +186,6 @@ window.onhashchange = function() {
 <body>
 <canvas id="cs" style="border:1px solid #000000">
 Ձեր ծրագիրը շատ հին է :(
-</canvas>
-</body>
-</html>
+        </canvas>
+        </body>
+        </html>
