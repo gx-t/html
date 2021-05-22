@@ -151,7 +151,7 @@ window.onhashchange = function() {
     };
 
     try {
-        eval("entry_map." + window.location.href.split("#")[1]);
+        eval("entry_map." + document.URL.split("#")[1]);
     }
     catch(e) {}
 }

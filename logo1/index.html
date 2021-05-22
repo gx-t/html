@@ -172,9 +172,9 @@ window.onload = function() {
     window.onhashchange();
 }
 
-window.onhashchange = function(evt) {
+window.onhashchange = function() {
     try {
-        eval("entry_map." + evt.newURL.split("#")[1]);
+        eval("entry_map." + document.URL.split("#")[1]);
     }
     catch(e) {
         entry_map.menu();
