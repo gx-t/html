@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html manifest="logo.appcache">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" href="img/pencil.jpeg">
+<title>Լոգո-խաղեր</title>
+<script>
+
+var vocab = [
+{t:"խնձոր",s:["խն","ձոր"],p:"apple.jpeg",v:"apple.ogg"},
+{t:"ծիրան",s:["ծի","րան"],p:"apricot.jpeg",v:"apricot.ogg"},
+{t:"բանան",s:["բա","նան"],p:"banana.jpeg",v:"banana.ogg"},
+{t:"մեղու",s:["մե","ղու"],p:"bee.jpeg",v:"bee.ogg"},
+{t:"գիրք",p:"book.jpeg",v:"book.ogg"},
+{t:"տորթ",p:"cake.jpeg",v:"cake.ogg"},
+{t:"գլխարկ",s:["գլ","խարկ"],p:"cap.jpeg",v:"cap.ogg"},
+{t:"մեքենա",s:["մե","քե","նա"],p:"car.jpeg",v:"car.ogg"},
+{t:"կատու",s:["կա","տու"],p:"cat.jpeg",v:"cat.ogg"},
+{t:"աթոռ",s:["ա","թոռ"],p:"chear.jpeg",v:"chear.ogg"},
+{t:"պանիր",s:["պա","նիր"],p:"cheese.jpeg",v:"cheese.ogg"},
+{t:"ամպ",p:"cloud.jpeg",v:"cloud.ogg"},
+{t:"կով",p:"cow.jpeg",v:"cow.ogg"},
+{t:"շուն",p:"dog.jpeg",v:"dog.ogg"},
+{t:"բադ",p:"duck.jpeg",v:"duck.ogg"},
+{t:"ձու",p:"egg.jpeg",v:"egg.ogg"},
+{t:"մասուր",s:["մա","սուր"],p:"eglantine.jpeg",v:"eglantine.ogg"},
+{t:"փիղ",p:"elephant.jpeg",v:"elephant.ogg"},
+{t:"ձուկ",p:"fish.jpeg",v:"fish.ogg"},
+{t:"ծաղիկ",s:["ծա","ղիկ"],p:"flower.jpeg",v:"flower.ogg"},
+{t:"աղվես",s:["աղ","վես"],p:"fox.jpeg",v:"fox.ogg"},
+{t:"միրգ",p:"fruits.jpeg",v:"fruits.ogg"},
+{t:"այծ",p:"goat.jpeg",v:"goat.ogg"},
+{t:"զատիկ",s:["զա","տիկ"],p:"ladybird.jpeg",v:"ladybird.ogg"},
+{t:"կիթառ",s:["կի","թառ"],p:"guitar.jpeg",v:"guitar.ogg"},
+{t:"մուրճ",p:"hammer.jpeg",v:"hammer.ogg"},
+{t:"ձի",p:"horse.jpeg",v:"horse.ogg"},
+{t:"պաղպաղակ",s:["պաղ","պա","ղակ"],p:"icecream.jpeg",v:"icecream.ogg"},
+{t:"լամպ",p:"lamp.jpeg",v:"lamp.ogg"},
+{t:"կիտրոն",s:["կիտ","րոն"],p:"lemon.jpeg",v:"lemon.ogg"},
+{t:"դեղ",p:"medicine.jpeg",v:"drugs.ogg"},
+{t:"լուսին",s:["լու","սին"],p:"moon.jpeg",v:"moon.ogg"},
+{t:"սար",p:"mountain.jpeg",v:"mountain.ogg"},
+{t:"մուկ",p:"mouse.jpeg",v:"mouse.ogg"},
+{t:"դեղձ",p:"peach.jpeg",v:"peach.ogg"},
+{t:"տանձ",p:"pear.jpeg",v:"pear.ogg"},
+{t:"մատիտ",s:["մա","տիտ"],p:"pencil.jpeg",v:"pencil.ogg"},
+{t:"նկար",s:["ն","կար"],p:"picture.jpeg",v:"picture.ogg"},
+{t:"խոզ",p:"pig.jpeg",v:"pig.ogg"},
+{t:"պարան",s:["պա","րան"],p:"rope.jpeg",v:"rope.ogg"},
+{t:"ոչխար",s:["ոչ","խար"],p:"sheep.jpeg",v:"sheep.ogg"},
+{t:"նավ",p:"ship.jpeg",v:"ship.ogg"},
+{t:"կոշիկ",s:["կո","շիկ"],p:"shoes.jpeg",v:"shoes.ogg"},
+{t:"ելակ",s:["ե","լակ"],p:"strawberry.jpeg",v:"strawberry.ogg"},
+{t:"սեղան",s:["սե","ղան"],p:"table.jpeg",v:"table.ogg"},
+{t:"թեյ",p:"tea.jpeg",v:"tea.ogg"},
+{t:"ծառ",p:"tree.jpeg",v:"tree.ogg"},
+{t:"շապիկ",s:["շա","պիկ"],p:"tshirt.jpeg",v:"tshirt.ogg"},
+{t:"ջութակ",s:["ջու","թակ"],p:"violin.jpeg",v:"violin.ogg"},
+{t:"պատ",p:"wall.jpeg",v:"wall.ogg"},
+{t:"գայլ",p:"wolf.jpeg",v:"wolf.ogg"},
+{t:"կարապ",s:["կա","րապ"],p:"swan.jpeg",v:"swan.ogg"},
+{t:"Սիրան",s:["Սի","րան"],p:"siran.jpeg",v:"siran.ogg"},
+{t:"կարաս",s:["կա","րաս"],p:"karas.jpeg",v:"karas.ogg"},
+{t:"Արամ",s:["Ա","րամ"],p:"aram.jpeg",v:"aram.ogg"},
+{t:"Արա",s:["Ա","րա"],p:"ara.jpeg",v:"ara.ogg"},
+{t:"Աննա",s:["Ան","նա"],p:"anna.jpeg",v:"anna.ogg"},
+{t:"Անի",s:["Ա","նի"],p:"ani.jpeg",v:"ani.ogg"}
+];
+var no = new Image();
+var num = [];
+var ctx = null;
+draw = function() {};
+
+var entryMap = {
+menu:function() {
+		 var itemArr = [
+		 {t:"Բառեր", a:"#words"},
+		 {t:"Տառեր", a:"#letters"},
+		 {t:"Վանկեր", a:"#syllables"},
+		 {t:"Մեծ ու փոքր (1-3)", a:"#comp_1_3"},
+		 {t:"Մեծ ու փոքր (1-5)", a:"#comp_1_5"},
+		 {t:"Մեծ ու փոքր (1-10)", a:"#comp_1_10"},
+		 {t:"խոսող թվեր", a:"#talknumb"}
+		 ];
+
+		 draw = function() {
+			 var lineHeight = cs.height / itemArr.length;
+			 lib.drawBkground();
+			 var fontHeight = Math.min(cs.width, cs.height) / itemArr.length / 2;
+			 ctx.font = fontHeight + 'pt Calibri';
+			 ctx.fillStyle = 'darkblue';
+			 var x = 0;
+			 var y = lineHeight / 2 + fontHeight / 2;
+			 for(var i in itemArr) {
+				 if(x + ctx.measureText(itemArr[i].t).width >= cs.width) {
+					 x = 0;
+				 }
+				 ctx.fillText(itemArr[i].t, x, y);
+				 y += lineHeight;
+				 x += ctx.measureText(itemArr[i].t).width / 2;
+			 }
+		 }
+
+		 cs.onmousedown = function(e)
+		 {
+			 var rc = cs.getBoundingClientRect();
+			 var y = e.clientY - rc.top;
+			 window.location.href = itemArr[Math.floor(y * itemArr.length / cs.height)].a;
+		 }
+		 draw();
+	 },
+
+words:function() {
+		  alert("words");
+	  },
+
+letters:function() {
+			alert("letters");
+		},
+
+syllables:function() {
+			  alert("syllables");
+		  },
+
+comp_1_3:function() {
+			 alert("compare 1 to 3");
+		 },
+
+comp_1_5:function() {
+			 alert("compare 1 to 5");
+		 },
+
+comp_1_10:function() {
+			  alert("compare 1 to 10");
+		  },
+
+talknumb:function() {
+			 alert("talking numbers");
+		 },
+};
+
+var lib = {
+drawBkground:function() {
+				 var grd = ctx.createLinearGradient(0,0,cs.width,cs.height);
+				 grd.addColorStop(0, "yellow");
+				 grd.addColorStop(1, "green");
+				 // Fill with gradient
+				 ctx.fillStyle = grd;
+				 ctx.fillRect(0, 0, cs.width, cs.height);
+			 },
+};
+
+window.onresize = function() {
+  cs.width = cs.parentNode.parentNode.clientWidth - 30;
+  cs.height = cs.parentNode.parentNode.clientHeight - 30;
+  draw();
+}
+
+window.onload = function() {
+	ctx = cs.getContext("2d");
+	no.src = "img/no.png";
+	for(var i in vocab) {
+		var img = new Image();
+		img.src = "img/" + vocab[i].p;
+		vocab[i].p = img;
+		if(vocab[i].v) {
+			var snd = new Audio("sound/" + vocab[i].v);
+			snd.preload = "auto";
+			vocab[i].v = snd;
+		}
+	}
+	for(var i = 1; i < 11; i ++) {
+		var snd = new Audio("sound/" + i + ".ogg");
+		snd.preload = "auto";
+		num.push(snd);
+	}
+	window.onresize();
+	window.onhashchange();
+}
+
+window.onhashchange = function() {
+	try {
+		entryMap[document.URL.split("#")[1]]();
+	}
+	catch(e) {
+		entryMap.menu();
+	}
+}
+
+</script>
+</head>
+<body>
+<canvas id="cs" style="border:1px solid #000000">
+Ձեր ծրագիրը շատ հին է :(
+</canvas>
+</body>
+</html>
