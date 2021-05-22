@@ -62,10 +62,12 @@ const holidays = [
 ];
 
 id_start_y.onchange = id_start_m.onchange = id_start_d.onchange = id_c.onchange = function() {
-    window.location.href = "#" + id_start_y.value + "#" + id_start_m.value + "#" + id_start_d.value + "#" + id_c.value;
+    localStorage.x = JSON.stringify(Object.assign(JSON.parse(localStorage.x), {start: {y: id_start_y.value, m: id_start_m.value, d: id_start_d.value}, c: id_c.value}));
+    calc();
 }
 
-id_main.calc =  function(x) {
+function calc() {
+    var x = JSON.parse(localStorage.x);
     id_start.hidden = false;
     var m = parseInt(x.start.m);
     var d = parseInt(x.start.d);
@@ -81,16 +83,15 @@ id_main.calc =  function(x) {
                 ss = JSON.stringify(dd).replaceAll('"', '');
                 d -= dd.length;
             } catch(e) {}
-            res += "<a href=#" + y + "#" + m + ">-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
+            res += "<a href=#edit(" + y + "," + m + ");>-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
         }
     }
-    this.innerHTML = res;
+    id_main.innerHTML = res;
 }
 
-id_main.edit = function(x, y, m) {
+function edit(y, m) {
+    var x = JSON.parse(localStorage.x);
     id_start.hidden = true;
-    m = parseInt(m);
-    y = parseInt(y);
     var d = null;
     var innerHTML = "";
     var dt = new Date(y, m + 1, 0);
@@ -110,7 +111,7 @@ id_main.edit = function(x, y, m) {
         }
         catch(e) {}
 
-        innerHTML += "<input type='checkbox' " + chk + " value='" + d + "'>" + d + " " + m_name[m] + " " + y + " ( " + d_name[dt.getDay()] + " )</input>\n";
+        innerHTML += "<input type='checkbox' " + chk + " value='" + d + "' onchange='save(" + y + "," + m + ");'>" + d + " " + m_name[m] + " " + y + " ( " + d_name[dt.getDay()] + " )</input>\n";
     }
     innerHTML += "<hr>" + m_name[m].toUpperCase() + "Ի ՏՈՆԵՐԸ՝\n\n";
     d = null;
@@ -118,13 +119,14 @@ id_main.edit = function(x, y, m) {
         innerHTML += d + "\t" + holidays[m][d] + "\n";
     if(null == d)
         innerHTML += "---\n";
-    this.innerHTML = innerHTML;
+    id_main.innerHTML = innerHTML;
 }
 
-id_main.save = function(x, y, m) {
-    id_start.hidden = false;
-    if(undefined == x.vacation[y])
-        x.vacation[y] = {};
+function save(y, m) {
+    console.log("onchange");
+    var x = JSON.parse(localStorage.x);
+
+    x.vacation[y] = x.vacation[y] || {};
     x.vacation[y][m] = [];
     var chk_arr = id_main.getElementsByTagName("input");
     if(0 == chk_arr.length)
@@ -140,70 +142,11 @@ id_main.save = function(x, y, m) {
     localStorage.x = JSON.stringify(x);
 }
 
-id_start_y.init = function(init_value) {
-    var innerHTML = "";
-    for(var i = 0; i < 4; i ++)
-        innerHTML += "<option value=" + (2020 + i) + ">" + (2020 + i) + "</option>\n";
-    this.innerHTML = innerHTML;
-    this.value = init_value;
-}
-
-id_start_m.init = function(init_value) {
-    var innerHTML = "";
-    for(var i = 0; i < m_name.length; i ++)
-        innerHTML += "<option value=" + i + ">" + m_name[i] + "</option>\n";
-    this.innerHTML = innerHTML;
-    this.value = init_value;
-}
-
-id_start_d.init = function(init_value) {
-    var innerHTML = "";
-    for(var i = 0; i < 31; i ++)
-        innerHTML += "<option value=" + i + ">" + i + "</option>\n";
-    this.innerHTML = innerHTML;
-    this.value = init_value;
-}
-
-id_c.init = function(init_value) {
-    var innerHTML = "";
-    for(var i = 1; i < 5; i ++)
-        innerHTML += "<option value=" + i + ">" + i + "</option>\n";
-    this.innerHTML = innerHTML;
-    this.value = init_value;
-}
-
 window.onhashchange = function(evt) {
-    var x = load();
     try {
-        var args = evt.newURL.split("#");
-        if(args[1] < 2020 || args[1] > 2023 || args[2] < 0 || args[2] > m_name.length - 1)
-            throw "Out of range year/month";
-        if(5 == args.length) {
-            id_start_y.value = x.start.y = args[1];
-            id_start_m.value = x.start.m = args[2];
-            id_start_d.value = x.start.d = args[3];
-            if(args[4] < 1 || args[4] > 4)
-                throw "Out of range number or years to show";
-            id_c.value = x.c = args[4];
-
-            var save_args = evt.oldURL.split("#");
-            if(save_args[1] < 2020 || save_args[1] > 2023 || save_args[2] < 0 || save_args[2] > m_name.length - 1)
-                throw "Out of range year/month";
-
-            if(3 == save_args.length) {
-                id_main.save(x, save_args[1], save_args[2]);
-            }
-            id_main.calc(x);
-            return;
-        }
-        if(3 == args.length) {
-            id_main.edit(x, args[1], args[2]);
-            return;
-        }
+        eval(evt.newURL.split("#")[1]);
     }
-    catch(e) {
-        console.log(e);
-    }
+    catch(e) {}
 }
 
 function load() {
@@ -214,13 +157,39 @@ function load() {
 }
 
 (function() {
-    var x = load();
-    id_start_y.init(x.start.y);
-    id_start_m.init(x.start.m);
-    id_start_d.init(x.start.d);
-    id_c.init(x.c);
-    window.location.href = "#" + id_start_y.value + "#" + id_start_m.value + "#" + id_start_d.value + "#" + id_c.value;
-    id_main.calc(x);
+    var x = {start:{y:2020,m:10,d:16},c:2,vacation:{}};
+    if(undefined != localStorage.x)
+        x = JSON.parse(localStorage.x);
+
+    localStorage.x = JSON.stringify(x);
+
+    var i = 0;
+    var innerHTML = "";
+    for(i = 0; i < 4; i ++)
+        innerHTML += "<option value=" + (2020 + i) + ">" + (2020 + i) + "</option>\n";
+    id_start_y.innerHTML = innerHTML;
+    id_start_y.value = x.start.y;
+
+    innerHTML = "";
+    for(i = 0; i < m_name.length; i ++)
+        innerHTML += "<option value=" + i + ">" + m_name[i] + "</option>\n";
+    id_start_m.innerHTML = innerHTML;
+    id_start_m.value = x.start.m;
+
+    innerHTML = "";
+    for(i = 0; i < 31; i ++)
+        innerHTML += "<option value=" + i + ">" + i + "</option>\n";
+    id_start_d.innerHTML = innerHTML;
+    id_start_d.value = x.start.d;
+
+    innerHTML = "";
+    for(i = 1; i < 5; i ++)
+        innerHTML += "<option value=" + i + ">" + i + "</option>\n";
+    id_c.innerHTML = innerHTML;
+    id_c.value = x.c;
+
+    window.location.href = "#";
+    window.location.href = "#calc()";
 }());
 
 </script>
