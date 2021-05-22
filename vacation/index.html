@@ -142,8 +142,13 @@ function save(y, m) {
 }
 
 window.onhashchange = function(evt) {
+    const entry_map = {
+        edit: edit,
+        calc: calc
+    };
+
     try {
-        eval(evt.newURL.split("#")[1]);
+        eval("entry_map." + evt.newURL.split("#")[1]);
     }
     catch(e) {}
 }
