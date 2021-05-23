@@ -83,10 +83,10 @@ function calc() {
             var ss = "";
             try {
                 var dd = v[y][m];
-                ss = JSON.stringify(dd).replaceAll('"', '');
+                ss = " / " + dd.toString();
                 d -= dd.length;
             } catch(e) {}
-            innerHTML += "<a href=#edit(" + y + "," + m + ")>-- " + y + " " + m_name[m] + " " + Math.round(d) + " " + ss + "</a>\n";
+            innerHTML += "<a href=#edit(" + y + "," + m + ")>-- " + y + " " + m_name[m] + " " + Math.round(d) + ss + "</a>\n";
         }
     }
     id_main.innerHTML = innerHTML;
