@@ -71,7 +71,7 @@ id_start_y.onchange = id_start_m.onchange = id_start_d.onchange = id_c.onchange 
 
 function calc() {
     var x = JSON.parse(localStorage.x);
-    id_start.hidden = false;
+    id_start.style.display = "block";
     var m = parseInt(x.start.m);
     var d = parseInt(x.start.d);
     var y_start = parseInt(x.start.y);
@@ -94,7 +94,7 @@ function calc() {
 
 function edit(y, m) {
     var x = JSON.parse(localStorage.x);
-    id_start.hidden = true;
+    id_start.style.display = "none";
     var d = null;
     var innerHTML = "";
     var dt = new Date(y, m + 1, 0);
