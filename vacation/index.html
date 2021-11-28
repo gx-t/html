@@ -79,15 +79,18 @@ function calc() {
     var v = x.vacation;
     innerHTML = "Արձակուրդի մնացորդը / օրերը\n\n";
     for(var y = y_start; y < y_end; y ++, m = 0) {
+        var sum = 0;
         for(; m < 12; m ++, d += 20/12) {
             var ss = "";
             try {
                 var dd = v[y][m];
                 ss = " / " + dd.toString();
                 d -= dd.length;
+                sum += dd.length;
             } catch(e) {}
             innerHTML += "<a href=#edit(" + y + "," + m + ")>-- " + y + " " + m_name[m] + " " + Math.round(d) + ss + "</a>\n";
         }
+        innerHTML += "<hr>\n-- " + y + " -- " + sum + " օր<hr>\n";
     }
     id_main.innerHTML = innerHTML;
 }
