@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="key-64.png">
+<title>pki tool</title>
+
+<style type="text/css">
+.popup-menu {
+    position: absolute;
+    background: ghostwhite;
+    color: black;
+    border: 1px solid black;
+}
+
+.popup-menu a {
+    text-align: left;
+    text-decoration: none;
+    color: black;
+    border: none;
+    margin: 0 1rem;
+}
+
+.popup-menu a:hover {
+    background: ghostwhite;
+    color: black;
+    font-weight: bold;
+}
+
+table {
+    border: 1px solid black;
+}
+
+tr td {
+    padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+}
+
+</style>
+
+</head>
+<body>
+<h2>PKI tool</h2>
+<img src="key-64.png"><br>
+<hr>
+<table class='grpup'>
+    <tr><td colspan=3><h3>RSA</h3></td></tr>
+    <tr><td>p</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup_menu(prime_menu, event);'>...</a></td></tr>
+    <tr><td>q</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup_menu(prime_menu, event);'>...</a></td></tr>
+    <tr><td>e</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup_menu(prime_menu, event);'>...</a></td></tr>
+</table>
+
+    <div id="prime_menu" class="popup-menu" style="display:none">
+        <a href='javascript:void(0);' onclick='popup_menu(rsa_gen_menu, event);'>Generate RSA ...</a><br>
+        <hr>
+        <a href='javascript:void(0);'>Generate prime ...</a><br>
+        <a href='javascript:void(0);'>Copy as hex ...</a><br>
+        <a href='javascript:void(0);'>Copy as C string...</a><br>
+        <a href='javascript:void(0);'>Copy as LV...</a><br>
+        <a href='javascript:void(0);'>Copy as C string LV...</a><br>
+    </div>
+
+    <div id="rsa_gen_menu" class="popup-menu"
+        style="display:none">
+        <a href='javascript:void(0);'>512 bit</a><br>
+        <a href='javascript:void(0);'>1024 bit</a><br>
+        <a href='javascript:void(0);'>2048 bit</a><br>
+        <a href='javascript:void(0);'>4096 bit</a><br>
+    </div>
+
+<script>
+
+document.onclick = function() {
+    prime_menu.style.display = "none";
+    rsa_gen_menu.style.display = "none";
+}
+
+function popup_menu(menu, e) {
+    e.preventDefault();
+    if (menu.style.display == "block")
+        return;
+
+    setTimeout(function() {
+            menu.style.display = 'block';
+            let x = e.pageX;
+            let y = e.pageY;
+            if(x + menu.offsetWidth >= window.innerWidth)
+                x -= menu.offsetWidth;
+            if(y + menu.offsetHeight >= window.innerHeight)
+                y -= menu.offsetHeight;
+            menu.style.left = x + "px";
+            menu.style.top = y + "px";
+            }, 100);
+}
+
+</script>
+</body>
+</html>
