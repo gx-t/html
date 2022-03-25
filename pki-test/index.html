@@ -6,22 +6,65 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="key-64.png">
-<title>pki tool</title>
+<title>pki test</title>
 
 <style type="text/css">
-.popup-menu {
+.popup {
+    display: none;
     position: absolute;
     background: white;
     color: black;
     border: 1px solid black;
+    z-index: 1;
 }
 
-.popup-menu a {
+.popup a {
     margin: 0 1rem;
+}
+
+.modal-background {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 200px;
+}
+
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 table {
     border: 1px solid black;
+    padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+    margin: 0.2rem;
+    height: 100%;
+    text-align: right;
 }
 
 tr td {
@@ -32,42 +75,186 @@ tr td {
 
 </head>
 <body>
-<h2>PKI tool</h2>
+<h2>PKI test</h2>
 <img src="key-64.png"><br>
 <hr>
-<table class='grpup'>
-    <tr><td colspan=3><h3>RSA</h3></td></tr>
-    <tr><td>p</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup_menu(prime_menu, event);'>...</a></td></tr>
-    <tr><td>q</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup_menu(prime_menu, event);'>...</a></td></tr>
-    <tr><td>e</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup_menu(prime_menu, event);'>...</a></td></tr>
+<table class = 'group'><tr><td colspan=3><h3>RSA</h3></td></tr>
+
+<tr>
+<td><table class='grpup'>
+    <tr><td>p</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>q</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>e</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td colspan=3><hr></td></tr>
+    <tr><td>n</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>d</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>dp</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>dq</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>qinv</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td colspan=3><hr></td></tr>
+    <tr><td>Public key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>Private key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td colspan=3><hr></td></tr>
+</table></td>
+
+<td><table class='group'>
+    <tr><td><h4>RSA encrypt/decrypt</h4></td></tr>
+    <tr><td><br></td></tr>
+    <tr><td>Clear message</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+    <tr><td><a href='javacript:void(0);'>encrypt/decrypt</a></td></tr>
+    <tr><td>Encrypted message</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+</table></td>
+
+<td><table class='group'>
+    <tr><td><h4>OAEP encrypt/decrypt</h4></td></tr>
+    <tr><td><select>
+        <option>SHA-1</option>
+        <option>SHA-224</option>
+        <option>SHA-256</option>
+        <option>SHA-384</option>
+        <option>SHA-512</option>
+    </select></td></tr>
+
+    <tr><td>Clear message</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+    <tr><td><a href='javacript:void(0);'>encrypt/decrypt</a></td></tr>
+    <tr><td>Encrypted message</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+</table></td>
+
+<td><table class='group'>
+    <tr><td><h4>Sign/verify</h4></td></tr>
+    <tr><td><select>
+        <option>SHA-1</option>
+        <option>SHA-224</option>
+        <option>SHA-256</option>
+        <option>SHA-384</option>
+        <option>SHA-512</option>
+    </select></td></tr>
+
+    <tr><td>Message</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+    <tr><td><a href='javacript:void(0);'>sign/verify</a></td></tr>
+    <tr><td>Signature</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+</table></td>
+
+</tr>
 </table>
 
-    <div id="prime_menu" class="popup-menu" style="display:none">
-        <a href='javascript:void(0);' onclick='popup_menu(rsa_gen_menu, event);'>Generate RSA ...</a><br>
-        <hr>
-        <a href='javascript:void(0);'>Generate prime ...</a><br>
-        <a href='javascript:void(0);'>Copy as hex ...</a><br>
-        <a href='javascript:void(0);'>Copy as C string...</a><br>
-        <a href='javascript:void(0);'>Copy as LV...</a><br>
-        <a href='javascript:void(0);'>Copy as C string LV...</a><br>
-    </div>
+<br>
+<hr>
 
-    <div id="rsa_gen_menu" class="popup-menu"
-        style="display:none">
-        <a href='javascript:void(0);'>512 bit</a><br>
-        <a href='javascript:void(0);'>1024 bit</a><br>
-        <a href='javascript:void(0);'>2048 bit</a><br>
-        <a href='javascript:void(0);'>4096 bit</a><br>
-    </div>
+<table class = 'group'><tr><td colspan=3><h3>NIST</h3></td></tr>
+
+<tr>
+<td><table class='grpup'>
+    <tr><td>Private key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>Public key X</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>Public key Y</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+</table></td>
+
+<td><table class='group'>
+    <tr><td><h4>Sign/verify</h4></td></tr>
+    <tr><td><select>
+        <option>SHA-1</option>
+        <option>SHA-224</option>
+        <option>SHA-256</option>
+        <option>SHA-384</option>
+        <option>SHA-512</option>
+    </select></td></tr>
+
+    <tr><td>Message</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+    <tr><td><a href='javacript:void(0);'>sign/verify</a></td></tr>
+    <tr><td>Signature</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+</table></td>
+
+</tr>
+</table>
+
+<br>
+<hr>
+
+<table class = 'group'><tr><td colspan=3><h3>Ed26619</h3></td></tr>
+
+<tr>
+<td><table class='grpup'>
+    <tr><td>Private key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>Public key X</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>Public key Y</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+    <tr><td>Public key compressed</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
+</table></td>
+
+<td><table class='group'>
+    <tr><td><h4>Sign/verify</h4></td></tr>
+    <tr><td><select>
+        <option>SHA-1</option>
+        <option>SHA-224</option>
+        <option>SHA-256</option>
+        <option>SHA-384</option>
+        <option>SHA-512</option>
+    </select></td></tr>
+
+    <tr><td>Message</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+    <tr><td><a href='javacript:void(0);'>sign/verify</a></td></tr>
+    <tr><td>Signature</td></tr>
+    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
+</table></td>
+
+</tr>
+</table>
+
+
+
+<div id="rsa_main_menu" class="popup">
+    <a href='javascript:void(0);' onclick='popup(rsa_gen_menu, event);'>Generate RSA ...</a><br>
+    <hr>
+    <a href='javascript:void(0);' onclick='popup(prime_gen_menu, event);'>Generate prime ...</a><br>
+    <a href='javascript:void(0);'>Copy as hex</a><br>
+    <a href='javascript:void(0);'>Copy as C string</a><br>
+    <a href='javascript:void(0);'>Copy as LV</a><br>
+    <a href='javascript:void(0);'>Copy as C string LV</a><br>
+</div>
+
+<div id="rsa_gen_menu" class="popup">
+    <a href='javascript:void(0);'>512 bit</a><br>
+    <a href='javascript:void(0);'>1024 bit</a><br>
+    <a href='javascript:void(0);'>2048 bit</a><br>
+    <a href='javascript:void(0);'>4096 bit</a><br>
+    <hr>
+    <a href='javascript:void(0)' onclick='rsa_len_dlg.style.display="block";'>Other ...</a><br>
+</div>
+
+<div id="prime_gen_menu" class="popup">
+    <a href='javascript:void(0);'>256 bit -- for 512 bit RSA</a><br>
+    <a href='javascript:void(0);'>512 bit -- for 1024 bit RSA</a><br>
+    <a href='javascript:void(0);'>1024 bit -- for 2048 bit RSA</a><br>
+    <a href='javascript:void(0);'>2048 bit -- for 4096 bit RSA</a><br>
+</div>
+
+<div id='rsa_len_dlg' class='modal-background'>_
+<div class='modal-content'>
+    <span class='close' onclick='rsa_len_dlg.style.display="none";'>&times;</span>
+    <h3>RSA custom length</h3>
+    <input></input><br>
+    <a href='javascript:void(0);' onclick='rsa_len_dlg.style.display="none";'>Generate</a>
+</div>
+</div>
 
 <script>
 
 document.onclick = function() {
-    prime_menu.style.display = "none";
+    rsa_main_menu.style.display = "none";
     rsa_gen_menu.style.display = "none";
+    prime_gen_menu.style.display = "none";
 }
 
-function popup_menu(menu, e) {
+function popup(menu, e) {
     e.preventDefault();
     if (menu.style.display == "block")
         return;
