@@ -9,18 +9,6 @@
 <title>pki test</title>
 
 <style type="text/css">
-.popup {
-    display: none;
-    position: absolute;
-    background: white;
-    color: black;
-    border: 1px solid black;
-    z-index: 1;
-}
-
-.popup a {
-    margin: 0 1rem;
-}
 
 .modal-background {
     display: none;
@@ -32,23 +20,22 @@
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
 }
 
 .modal-content {
     background-color: #fefefe;
     margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 200px;
+    padding: 1rem;
+    border: 0.2rem solid grey;
+    max-width: 15rem;
+    background-color: rgba(255,255,255,0.9);
 }
 
 .close {
     color: #aaaaaa;
     float: right;
-    font-size: 28px;
+    font-size: 22px;
     font-weight: bold;
 }
 
@@ -59,16 +46,14 @@
     cursor: pointer;
 }
 
-table {
-    border: 1px solid black;
-    padding: 0.2rem 0.2rem 0.2rem 0.2rem;
-    margin: 0.2rem;
-    height: 100%;
-    text-align: right;
+input {
+    font-family: monospace;
+    width: 90%;
 }
 
-tr td {
-    padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+textarea {
+    font-family: monospace;
+    width: 100%;
 }
 
 </style>
@@ -78,163 +63,84 @@ tr td {
 <h2>PKI test</h2>
 <img src="key-64.png"><br>
 <hr>
-<table class = 'group'><tr><td colspan=3><h3>RSA</h3></td></tr>
-
-<tr>
-<td><table class='grpup'>
-    <tr><td>p</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>q</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>e</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td colspan=3><hr></td></tr>
-    <tr><td>n</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>d</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>dp</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>dq</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>qinv</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td colspan=3><hr></td></tr>
-    <tr><td>Public key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>Private key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td colspan=3><hr></td></tr>
-</table></td>
-
-<td><table class='group'>
-    <tr><td><h4>RSA encrypt/decrypt</h4></td></tr>
-    <tr><td><br></td></tr>
-    <tr><td>Clear message</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-    <tr><td><a href='javacript:void(0);'>encrypt/decrypt</a></td></tr>
-    <tr><td>Encrypted message</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-</table></td>
-
-<td><table class='group'>
-    <tr><td><h4>OAEP encrypt/decrypt</h4></td></tr>
-    <tr><td><select>
-        <option>SHA-1</option>
-        <option>SHA-224</option>
-        <option>SHA-256</option>
-        <option>SHA-384</option>
-        <option>SHA-512</option>
-    </select></td></tr>
-
-    <tr><td>Clear message</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-    <tr><td><a href='javacript:void(0);'>encrypt/decrypt</a></td></tr>
-    <tr><td>Encrypted message</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-</table></td>
-
-<td><table class='group'>
-    <tr><td><h4>Sign/verify</h4></td></tr>
-    <tr><td><select>
-        <option>SHA-1</option>
-        <option>SHA-224</option>
-        <option>SHA-256</option>
-        <option>SHA-384</option>
-        <option>SHA-512</option>
-    </select></td></tr>
-
-    <tr><td>Message</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-    <tr><td><a href='javacript:void(0);'>sign/verify</a></td></tr>
-    <tr><td>Signature</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-</table></td>
-
-</tr>
-</table>
-
-<br>
+<h3>RSA</h3>
+<a href='javascript:popup_rsa();'>p (prime 1) ...</a><br>
+<a href='javascript:popup_rsa();'>p (prime 2) ...</a><br>
+<a href='javascript:popup_rsa();'>e (public exponent) ...</a><br>
+<hr>
+<a href='javascript:popup_crt("n");'>n (modulus) ...</a><br>
+<a href='javascript:popup_crt("d");'>d (private exponent) ...</a><br>
+<a href='javascript:popup_crt("dp");'>dp (exponent p) ...</a><br>
+<a href='javascript:popup_crt("dq");'>dq (exponent q) ...</a><br>
+<a href='javascript:popup_crt("qinv");'>qinv (coefficient) ...</a><br>
+<hr>
+<a href='javascript:popup_rsa_pub();'>Public key ...</a><br>
+<a href='javascript:popup_rsa_prv();'>Private key ...</a><br>
+<a href='javascript:popup_rsa_key();'>Whole key ...</a><br>
+<hr>
+<a href='javascript:void(0)'>Encrypt/decrypt</a><br>
+<a href='javascript:void(0)'>Encrypt/decrypt OAEP</a><br>
+<hr>
+<a href='javascript:void(0)'>Sign/verify</a><br>
+<hr>
+<h3>NIST</h3>
+<a href='javascript:void(0)'>Private key ...</a><br>
+<a href='javascript:void(0)'>Public key ...</a><br>
+<a href='javascript:void(0)'>Public key X ...</a><br>
+<a href='javascript:void(0)'>Public key Y ...</a><br>
+<a href='javascript:void(0)'>Whole key ...</a><br>
+<hr>
+<a href='javascript:void(0)'>Sign/verify</a><br>
+<h3>Ed25519</h3>
+<a href='javascript:void(0)'>Private key ...</a><br>
+<a href='javascript:void(0)'>Public key compressed...</a><br>
+<a href='javascript:void(0)'>Public key X ...</a><br>
+<a href='javascript:void(0)'>Public key Y ...</a><br>
+<a href='javascript:void(0)'>Whole key ...</a><br>
+<hr>
+<a href='javascript:void(0)'>Sign/verify</a><br>
 <hr>
 
-<table class = 'group'><tr><td colspan=3><h3>NIST</h3></td></tr>
-
-<tr>
-<td><table class='grpup'>
-    <tr><td>Private key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>Public key X</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>Public key Y</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-</table></td>
-
-<td><table class='group'>
-    <tr><td><h4>Sign/verify</h4></td></tr>
-    <tr><td><select>
-        <option>SHA-1</option>
-        <option>SHA-224</option>
-        <option>SHA-256</option>
-        <option>SHA-384</option>
-        <option>SHA-512</option>
-    </select></td></tr>
-
-    <tr><td>Message</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-    <tr><td><a href='javacript:void(0);'>sign/verify</a></td></tr>
-    <tr><td>Signature</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-</table></td>
-
-</tr>
-</table>
-
-<br>
-<hr>
-
-<table class = 'group'><tr><td colspan=3><h3>Ed26619</h3></td></tr>
-
-<tr>
-<td><table class='grpup'>
-    <tr><td>Private key</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>Public key X</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>Public key Y</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-    <tr><td>Public key compressed</td><td><input></input><td><td><a href='javascript:void(0)' onclick='popup(rsa_main_menu, event);'>...</a></td></tr>
-</table></td>
-
-<td><table class='group'>
-    <tr><td><h4>Sign/verify</h4></td></tr>
-    <tr><td><select>
-        <option>SHA-1</option>
-        <option>SHA-224</option>
-        <option>SHA-256</option>
-        <option>SHA-384</option>
-        <option>SHA-512</option>
-    </select></td></tr>
-
-    <tr><td>Message</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-    <tr><td><a href='javacript:void(0);'>sign/verify</a></td></tr>
-    <tr><td>Signature</td></tr>
-    <tr><td><textarea rows='10' style='width:100%'></textarea></td></tr>
-</table></td>
-
-</tr>
-</table>
-
-
-
-<div id="rsa_main_menu" class="popup">
-    <a href='javascript:void(0);' onclick='popup(rsa_gen_menu, event);'>Generate RSA ...</a><br>
+<div id='rsa_comp_dlg' class='modal-background'>_
+<div class='modal-content'>
+    <span class='close' onclick='rsa_comp_dlg.style.display="none";'>&times;</span>
     <hr>
-    <a href='javascript:void(0);' onclick='popup(prime_gen_menu, event);'>Generate prime ...</a><br>
-    <a href='javascript:void(0);'>Copy as hex</a><br>
-    <a href='javascript:void(0);'>Copy as C string</a><br>
-    <a href='javascript:void(0);'>Copy as LV</a><br>
-    <a href='javascript:void(0);'>Copy as C string LV</a><br>
+    <h3>Generate/edit RSA key</h3>
+    p (prime 1):<br><input></input><a href='javascript:popup_rsa_comp("prime_dlg", "p");'>...</a><br>
+    p (prime 2):<br><input></input><a href='javascript:popup_rsa_comp("prime_dlg", "p");'>...</a><br>
+    e (public exponent):<br><input></input><a href='javascript:popup_rsa_comp("pub_exp_dlg", "e");'>...</a><br>
+    <a href='javascript:void(0);' onclick='rsa_comp_dlg.style.display="none";'>Check and genarate RSA</a>
+    <hr>
+    <select>
+        <option value='512'>512 bit</option>
+        <option value='1024'>1024 bit</option>
+        <option value='2048'>2048 bit</option>
+        <option value='4096'>4096 bit</option>
+    </select>
+    <a href='javascript:void(0);'>Generate and fill the fields</a>
+</div>
 </div>
 
-<div id="rsa_gen_menu" class="popup">
-    <a href='javascript:void(0);'>512 bit</a><br>
-    <a href='javascript:void(0);'>1024 bit</a><br>
-    <a href='javascript:void(0);'>2048 bit</a><br>
-    <a href='javascript:void(0);'>4096 bit</a><br>
+<div id='prime_dlg' class='modal-background'>
+<div class='modal-content' style='max-width: 10rem'>
+    <span class='close' onclick='prime_dlg.style.display="none";'>&times;</span>
+    <h3></h3>
+    <a href='javascript:void(0);' onclick='prime_dlg.style.display="none";'>Hex strring</a><br>
+    <a href='javascript:void(0);' onclick='prime_dlg.style.display="none";'>C strring</a><br>
+    <a href='javascript:void(0);' onclick='prime_dlg.style.display="none";'>C array</a><br>
+    <a href='javascript:void(0);' onclick='prime_dlg.style.display="none";'>Base64 encoded string</a>
     <hr>
-    <a href='javascript:void(0)' onclick='rsa_len_dlg.style.display="block";'>Other ...</a><br>
+    <a href='javascript:void(0);' onclick='prime_dlg.style.display="none";'>Paste</a>
+</div>
 </div>
 
-<div id="prime_gen_menu" class="popup">
-    <a href='javascript:void(0);'>256 bit -- for 512 bit RSA</a><br>
-    <a href='javascript:void(0);'>512 bit -- for 1024 bit RSA</a><br>
-    <a href='javascript:void(0);'>1024 bit -- for 2048 bit RSA</a><br>
-    <a href='javascript:void(0);'>2048 bit -- for 4096 bit RSA</a><br>
+<div id='pub_exp_dlg' class='modal-background'>
+<div class='modal-content' style='max-width: 10rem'>
+    <span class='close' onclick='pub_exp_dlg.style.display="none";'>&times;</span>
+    <h3></h3>
+    <a href='javascript:void(0);' onclick='pub_exp_dlg.style.display="none";'>As hex value</a><br>
+    <a href='javascript:void(0);' onclick='pub_exp_dlg.style.display="none";'>As decimal value</a><br>
+</div>
 </div>
 
 <div id='rsa_len_dlg' class='modal-background'>_
@@ -246,30 +152,96 @@ tr td {
 </div>
 </div>
 
+<div id='crt_dlg' class='modal-background'>
+<div class='modal-content' style='max-width: 15rem'>
+    <span class='close' onclick='crt_dlg.style.display="none";'>&times;</span>
+    <h3></h3>
+    <a href='javascript:void(0);' onclick='crt_dlg.style.display="none";'>Hex strring</a><br>
+    <a href='javascript:void(0);' onclick='crt_dlg.style.display="none";'>C strring</a><br>
+    <a href='javascript:void(0);' onclick='crt_dlg.style.display="none";'>C array</a><br>
+    <a href='javascript:void(0);' onclick='crt_dlg.style.display="none";'>Base64 encoded string</a>
+    <hr>
+    <textarea readonly rows='8'></textarea>
+</div>
+</div>
+
+<div id='rsa_pub_dlg' class='modal-background'>
+<div class='modal-content' style='max-width: 15rem'>
+    <span class='close' onclick='rsa_pub_dlg.style.display="none";'>&times;</span>
+    <h3>Copy pubic key in X.509 format as:</h3>
+    <a href='javascript:void(0);' onclick='rsa_pub_dlg.style.display="none";'>Hex strring</a><br>
+    <a href='javascript:void(0);' onclick='rsa_pub_dlg.style.display="none";'>C strring</a><br>
+    <a href='javascript:void(0);' onclick='rsa_pub_dlg.style.display="none";'>C array</a><br>
+    <a href='javascript:void(0);' onclick='rsa_pub_dlg.style.display="none";'>Base64 encoded string</a>
+    <hr>
+    <textarea readonly rows='8'></textarea>
+    <hr>
+    <h3>Save pubic key as:</h3>
+    <a href='javascript:void(0);' onclick='rsa_pub_dlg.style.display="none";'>PEM file</a><br>
+    <a href='javascript:void(0);' onclick='rsa_pub_dlg.style.display="none";'>DER file</a><br>
+    <a href='javascript:void(0);' onclick='rsa_pub_dlg.style.display="none";'>CER file - self signed sertificate</a><br>
+</div>
+</div>
+
+<div id='rsa_prv_dlg' class='modal-background'>
+<div class='modal-content' style='max-width: 15rem'>
+    <span class='close' onclick='rsa_prv_dlg.style.display="none";'>&times;</span>
+    <h3>Copy private key in PKCS#8 format as:</h3>
+    <a href='javascript:void(0);' onclick='rsa_prv_dlg.style.display="none";'>Hex strring</a><br>
+    <a href='javascript:void(0);' onclick='rsa_prv_dlg.style.display="none";'>C strring</a><br>
+    <a href='javascript:void(0);' onclick='rsa_prv_dlg.style.display="none";'>C array</a><br>
+    <a href='javascript:void(0);' onclick='rsa_prv_dlg.style.display="none";'>Base64 encoded string</a>
+    <hr>
+    <textarea readonly rows='8'></textarea>
+    <hr>
+    <h3>Save private key as:</h3>
+    <a href='javascript:void(0);' onclick='rsa_prv_dlg.style.display="none";'>PEM file</a><br>
+    <a href='javascript:void(0);' onclick='rsa_prv_dlg.style.display="none";'>PKCS#12 file</a><br>
+</div>
+</div>
+
+<div id='rsa_key_dlg' class='modal-background'>
+<div class='modal-content' style='max-width: 15rem'>
+    <span class='close' onclick='rsa_key_dlg.style.display="none";'>&times;</span>
+    <h3>Copy whole key as:</h3>
+    <a href='javascript:void(0);' onclick='rsa_key_dlg.style.display="none";'>Hex string TLVs</a><br>
+    <a href='javascript:void(0);' onclick='rsa_key_dlg.style.display="none";'>Hex string LVs</a>
+    <a href='javascript:void(0);' onclick='rsa_key_dlg.style.display="none";'>C string TLVs</a><br>
+    <a href='javascript:void(0);' onclick='rsa_key_dlg.style.display="none";'>C string LVs</a><br>
+    <a href='javascript:void(0);' onclick='rsa_key_dlg.style.display="none";'>C array TLVs</a><br>
+    <a href='javascript:void(0);' onclick='rsa_key_dlg.style.display="none";'>C array LVs</a><br>
+    <hr>
+    <textarea readonly rows='8'></textarea>
+</div>
+</div>
+
 <script>
 
-document.onclick = function() {
-    rsa_main_menu.style.display = "none";
-    rsa_gen_menu.style.display = "none";
-    prime_gen_menu.style.display = "none";
+function popup_rsa() {
+    rsa_comp_dlg.style.display="block";
 }
 
-function popup(menu, e) {
-    e.preventDefault();
-    if (menu.style.display == "block")
-        return;
+function popup_rsa_comp(id, name) {
+    let comp = document.getElementById(id);
+    comp.children[0].children[1].innerText = "Copy " + name + " as:";
+    comp.style.display="block";
+}
 
-    setTimeout(function() {
-            menu.style.display = 'block';
-            let x = e.pageX;
-            let y = e.pageY;
-            if(x + menu.offsetWidth >= window.innerWidth)
-                x -= menu.offsetWidth;
-            if(y + menu.offsetHeight >= window.innerHeight)
-                y -= menu.offsetHeight;
-            menu.style.left = x + "px";
-            menu.style.top = y + "px";
-            }, 100);
+function popup_crt(name) {
+    crt_dlg.children[0].children[1].innerText = "Copy " + name + " as:";
+    crt_dlg.style.display="block";
+}
+
+function popup_rsa_pub() {
+    rsa_pub_dlg.style.display="block";
+}
+
+function popup_rsa_prv() {
+    rsa_prv_dlg.style.display="block";
+}
+
+function popup_rsa_key() {
+    rsa_key_dlg.style.display="block";
 }
 
 </script>
