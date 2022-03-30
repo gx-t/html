@@ -65,9 +65,9 @@ textarea {
 <img src="key-64.png"><br>
 <hr>
 <h3>RSA</h3>
-<a href='javascript:popup_rsa();'>p (prime 1) ...</a><br>
-<a href='javascript:popup_rsa();'>q (prime 2) ...</a><br>
-<a href='javascript:popup_rsa();'>e (public exponent) ...</a><br>
+<a href='javascript:rsa_comp_dlg.popup();'>p (prime 1) ...</a><br>
+<a href='javascript:rsa_comp_dlg.popup();'>q (prime 2) ...</a><br>
+<a href='javascript:rsa_comp_dlg.popup();'>e (public exponent) ...</a><br>
 <hr>
 <a href='javascript:popup_crt("n (modulus)", g_rsa.n);'>n (modulus) ...</a><br>
 <a href='javascript:popup_crt("d (private exponent)", g_rsa.d);'>d (private exponent) ...</a><br>
@@ -242,8 +242,15 @@ var g_rsa = {
     len: "", p: "", q: "", e: "", n: "", d: "", dp: "", dq: "", qinv: ""
 };
 
-function popup_rsa() {
-    rsa_comp_dlg.style.display="block";
+rsa_comp_dlg.set_values = function() {
+    rsa_p.value = g_rsa.p;
+    rsa_q.value = g_rsa.q;
+    rsa_e.value = parseInt(g_rsa.e, 16);
+}
+
+rsa_comp_dlg.popup = function() {
+    this.set_values();
+    this.style.display="block";
 }
 
 function popup_rsa_prime(name, val) {
