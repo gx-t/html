@@ -64,20 +64,20 @@ textarea {
 <h2>PKI test</h2>
 <img src="key-64.png"><br>
 <hr>
-<h3>RSA</h3>
+<h3 id='rsa_title'>RSA</h3>
 <a href='javascript:rsa_comp_dlg.popup();'>p (prime 1) ...</a><br>
 <a href='javascript:rsa_comp_dlg.popup();'>q (prime 2) ...</a><br>
 <a href='javascript:rsa_comp_dlg.popup();'>e (public exponent) ...</a><br>
 <hr>
-<a href='javascript:popup_crt("n (modulus)", g_rsa.n);'>n (modulus) ...</a><br>
-<a href='javascript:popup_crt("d (private exponent)", g_rsa.d);'>d (private exponent) ...</a><br>
-<a href='javascript:popup_crt("dp (exponent p)", g_rsa.dp);'>dp (exponent p) ...</a><br>
-<a href='javascript:popup_crt("dq (exponent q)", g_rsa.dq);'>dq (exponent q) ...</a><br>
-<a href='javascript:popup_crt("qinv (coefficient)", g_rsa.qinv);'>qinv (coefficient) ...</a><br>
+<a href='javascript:rsa_crt_dlg.popup("n (modulus)", g_rsa.n);'>n (modulus) ...</a><br>
+<a href='javascript:rsa_crt_dlg.popup("d (private exponent)", g_rsa.d);'>d (private exponent) ...</a><br>
+<a href='javascript:rsa_crt_dlg.popup("dp (exponent p)", g_rsa.dp);'>dp (exponent p) ...</a><br>
+<a href='javascript:rsa_crt_dlg.popup("dq (exponent q)", g_rsa.dq);'>dq (exponent q) ...</a><br>
+<a href='javascript:rsa_crt_dlg.popup("qinv (coefficient)", g_rsa.qinv);'>qinv (coefficient) ...</a><br>
 <hr>
-<a href='javascript:popup_rsa_pub();'>Public key ...</a><br>
-<a href='javascript:popup_rsa_prv();'>Private key ...</a><br>
-<a href='javascript:popup_rsa_key();'>Whole key ...</a><br>
+<a href='javascript:rsa_pub_dlg.popup();'>Public key ...</a><br>
+<a href='javascript:rsa_prv_dlg.popup();'>Private key ...</a><br>
+<a href='javascript:rsa_key_dlg.popup();'>Whole key ...</a><br>
 <hr>
 <a href='javascript:void(0)'>Encrypt/decrypt</a><br>
 <a href='javascript:void(0)'>Encrypt/decrypt OAEP</a><br>
@@ -107,12 +107,12 @@ textarea {
     <span class='close' onclick='rsa_comp_dlg.style.display="none";'>&times;</span>
     <hr>
     <h3>Generate/edit RSA key</h3>
-    p (prime 1):<br><input id='rsa_p'></input><a href='javascript:popup_rsa_prime("p (prime 1)", g_rsa.p);'>...</a><br>
-    q (prime 2):<br><input id='rsa_q'></input><a href='javascript:popup_rsa_prime("q (prime 2)", g_rsa.q);'>...</a><br>
-    e (public exponent):<br><input id='rsa_e'></input><a href='javascript:popup_rsa_exp("e (public exponent)");'>...</a><br>
+    p (prime 1):<br><input id='rsa_p'></input><a href='javascript:rsa_prime_dlg.popup("p (prime 1)", g_rsa.p);'>...</a><br>
+    q (prime 2):<br><input id='rsa_q'></input><a href='javascript:rsa_prime_dlg.popup("q (prime 2)", g_rsa.q);'>...</a><br>
+    e (public exponent):<br><input id='rsa_e'></input><a href='javascript:rsa_pub_exp_dlg.popup("e (public exponent)");'>...</a><br>
     <a href='javascript:void(0);' onclick='rsa_comp_dlg.style.display="none";'>Check and genarate RSA</a>
     <hr>
-    <select>
+    <select id="rsa_len">
         <option value='512'>512 bit</option>
         <option value='1024'>1024 bit</option>
         <option value='2048'>2048 bit</option>
@@ -227,14 +227,12 @@ function cgi_gen_rsa() {
     req.addEventListener("progress", function(e) {console.log(e.lengthComputable + " " + e.loaded + " " + e.total);});
     req.addEventListener("load", function(e) {
             g_rsa = JSON.parse(this.responseText);
-            console.log("e = " + g_rsa.e);
-            rsa_p.value = g_rsa.p;
-            rsa_q.value = g_rsa.q;
-            rsa_e.value = parseInt(g_rsa.e, 16);
+            rsa_title.innerText = "RSA ( " + g_rsa.len + " bit )";
+            rsa_comp_dlg.set_values();
             });
     req.addEventListener("error", function(e) {console.log("error");});
     req.addEventListener("abort", function(e) {console.log("abort");});
-    req.open("GET", "/cgi-bin/25-pki-test.cgi");
+    req.open("GET", "/cgi-bin/25-pki-test.cgi?rsagen&" + rsa_len.value + "&" + rsa_e.value);
     req.send();
 }
 
@@ -243,9 +241,12 @@ var g_rsa = {
 };
 
 rsa_comp_dlg.set_values = function() {
+    rsa_len.value = g_rsa.len;
     rsa_p.value = g_rsa.p;
     rsa_q.value = g_rsa.q;
     rsa_e.value = parseInt(g_rsa.e, 16);
+    if("NaN" == rsa_e.value)
+        rsa_e.value = "65537";
 }
 
 rsa_comp_dlg.popup = function() {
@@ -253,33 +254,33 @@ rsa_comp_dlg.popup = function() {
     this.style.display="block";
 }
 
-function popup_rsa_prime(name, val) {
-    rsa_prime_dlg.children[0].children[1].innerText = "Copy " + name + " as:";
-    rsa_prime_dlg.style.display="block";
+rsa_prime_dlg.popup = function(name, val) {
+    this.children[0].children[1].innerText = "Copy " + name + " as:";
+    this.style.display="block";
     rsa_prime_val.value = val;
 }
 
-function popup_rsa_exp(name, val) {
-    rsa_pub_exp_dlg.children[0].children[1].innerText = "Copy " + name + " as:";
-    rsa_pub_exp_dlg.style.display="block";
+rsa_pub_exp_dlg.popup = function(name, val) {
+    this.children[0].children[1].innerText = "Copy " + name + " as:";
+    this.style.display="block";
 }
 
-function popup_crt(name, val) {
-    rsa_crt_dlg.children[0].children[1].innerText = "Copy " + name + " as:";
-    rsa_crt_dlg.style.display="block";
+rsa_crt_dlg.popup = function(name, val) {
+    this.children[0].children[1].innerText = "Copy " + name + " as:";
+    this.style.display="block";
     rsa_crt_val.value = val;
 }
 
-function popup_rsa_pub() {
-    rsa_pub_dlg.style.display="block";
+rsa_pub_dlg.popup = function() {
+    this.style.display="block";
 }
 
-function popup_rsa_prv() {
-    rsa_prv_dlg.style.display="block";
+rsa_prv_dlg.popup = function() {
+    this.style.display="block";
 }
 
-function popup_rsa_key() {
-    rsa_key_dlg.style.display="block";
+rsa_key_dlg.popup = function() {
+    this.style.display="block";
 }
 
 </script>
