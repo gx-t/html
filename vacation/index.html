@@ -118,7 +118,7 @@ function edit(y, m) {
 
         innerHTML += "<input type='checkbox' " + chk + " value='" + d + "' onchange='save(" + y + "," + m + ");'>" + d + " " + m_name[m] + " " + y + " ( " + d_name[dt.getDay()] + " )</input>\n";
     }
-    innerHTML += "<hr>" + m_name[m].toUpperCase() + "Ի ՏՈՆԵՐԸ՝\n\n";
+    innerHTML += "<hr>" + m_name[m].toUpperCase() + "Ի ՈՉ ԱՇԽԱՏԱՆՔԱՅԻՆ ՕՐԵՐԸ՝\n\n";
     d = null;
     for(d in holidays[m])
         innerHTML += d + "\t" + holidays[m][d] + "\n";
@@ -193,7 +193,7 @@ function load() {
     id_start_d.value = x.start.d;
 
     innerHTML = "";
-    for(i = 1; i < 5; i ++)
+    for(i = 1; i < 6; i ++)
         innerHTML += "<option value=" + i + ">" + i + "</option>\n";
     id_c.innerHTML = innerHTML;
     id_c.value = x.c;
