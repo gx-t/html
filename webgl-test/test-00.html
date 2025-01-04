@@ -7,45 +7,56 @@ canvas {border: 1px solid #CCC
 <script id="vs" type="x-shader/x-vertex">#version 300 es
 precision mediump float;
 
-uniform float uPointSize;
+uniform vec2 u_resolution;
 void main()
 {
-    gl_PointSize = uPointSize;
+    gl_PointSize = u_resolution.x;
     gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
 }
 </script>
 <script id="fs" type="x-shader/x-fragment">#version 300 es
 precision mediump float;
 
+struct BALL
+{
+    float r;
+    vec2 xy;
+    vec2 v;
+    vec4 rgb;
+};
+
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec2 u_mouse_pos;
+
+uniform BALL u_ball;
+
 out vec4 fragColor;
 
-uniform float uPointSize;
-uniform float uTime;
-uniform vec2 uMousePos;
-vec4 colors[6] = vec4[6](
-        vec4(1.0, 0.0, 0.0, 1.0),
-        vec4(1.0, 1.0, 0.0, 1.0),
-        vec4(0.0, 1.0, 0.0, 1.0),
-        vec4(0.0, 1.0, 1.0, 1.0),
-        vec4(0.0, 0.0, 1.0, 1.0),
-        vec4(1.0, 1.0, 1.0, 1.0)
-        );
+void ball(in BALL self, in vec2 frag_xy)
+{
+//    fragColor = self.rgb * smoothstep(self.r, self.r/1.9, length(self.xy - frag_xy));
+    fragColor = self.rgb * step(length(self.xy - frag_xy), self.r);
+}
 
 void main()
 {
-    vec2 fragPosNorm = 2.0 * gl_FragCoord.xy / uPointSize - 1.0;
-    vec4 color = colors[int(mod(gl_FragCoord.xy.x / uPointSize * 6.0, 6.0))];
-    fragColor = mix(vec4(0.0, 0.0, 0.0, 1.0), color, smoothstep(0.1, 0.0, length(uMousePos - fragPosNorm)));
-    colors[0] = colors[5];
+    vec2 frag_xy = 2.0 * gl_FragCoord.xy / u_resolution.x - 1.0;
+    ball(u_ball, frag_xy);
 
+//    vec4 color = mix(vec4(1.0, 0.0, 0.0, 1.0),
+//            vec4(1.0, 1.0, 1.0, 1.0),
+//            vec4(gl_FragCoord.xy / u_resolution, gl_FragCoord.yx / u_resolution));
+//    fragColor = mix(vec4(0.0, 0.0, 0.0, 1.0), color, smoothstep(0.1, 0.0, length(u_mouse_pos - fragPosNorm)));
 
+// bvec2 lessThanEqual(vec2 x, vec2 y);
 //    fragColor = vec4(1.0, 0.0, 0.0, 1.0)
-//        * smoothstep(0.06, 0.0, abs(uMousePos - fragPosNorm).x)
-//        * smoothstep(0.12, 0.0, abs(uMousePos - fragPosNorm).y);
+//        * smoothstep(0.06, 0.0, abs(u_mouse_pos - fragPosNorm).x)
+//        * smoothstep(0.12, 0.0, abs(u_mouse_pos - fragPosNorm).y);
 
-//    fragColor = vec4(abs(uMousePos.x)
-//            , abs(uMousePos.y)
-//            , abs(uMousePos.x + uMousePos.y)
+//    fragColor = vec4(abs(u_mouse_pos.x)
+//            , abs(u_mouse_pos.y)
+//            , abs(u_mouse_pos.x + u_mouse_pos.y)
 //            , 1.0);
 }
 </script>
@@ -83,19 +94,50 @@ if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
 
 gl.useProgram(program);
 
-const uPointSizeLoc = gl.getUniformLocation(program, 'uPointSize');
-gl.uniform1f(uPointSizeLoc, canvas.width);
+const uResolutionLoc = gl.getUniformLocation(program, 'u_resolution');
+gl.uniform2f(uResolutionLoc, canvas.width, canvas.height);
 
-const uTimeLoc = gl.getUniformLocation(program, 'uTime');
+const uTimeLoc = gl.getUniformLocation(program, 'u_time');
 var time = 0;
 
-const uMousePosLoc = gl.getUniformLocation(program, "uMousePos");
+const uMousePosLoc = gl.getUniformLocation(program, "u_mouse_pos");
+
+const uBall_xy_Loc = gl.getUniformLocation(program, 'u_ball.xy');
+const uBall_v_Loc = gl.getUniformLocation(program, 'u_ball.v');
+
+var uBall = {};
+
+uBall.init = function()
+{
+    this.r = 0.1
+    this.xy = [0.0, 0.0];
+    const alpha = 17.11 * Math.random();
+    this.v = [0.03 * Math.sin(alpha), 0.03 * Math.cos(alpha)];
+}
+
+uBall.init();
+
+gl.uniform1f(gl.getUniformLocation(program, 'u_ball.r'), uBall.r);
+gl.uniform2f(uBall_xy_Loc, uBall.xy[0], uBall.xy[1]);
+gl.uniform2f(uBall_v_Loc, uBall.v[0], uBall.v[1]);
+gl.uniform4f(gl.getUniformLocation(program, 'u_ball.rgb'), 1.0, 0.0, 0.0, 1.0);
 
 draw = function()
 {
     gl.uniform1f(uTimeLoc, time);
     gl.uniform2f(uMousePosLoc, normMouseX, normMouseY);
+    gl.uniform2f(uBall_xy_Loc, uBall.xy[0], uBall.xy[1]);
     gl.drawArrays(gl.POINTS, 0, 1);
+    const error = gl.getError();
+    if(error !== gl.NO_ERROR)
+        console.error("WebGL error:", error);
+
+    uBall.xy[0] += uBall.v[0];
+    uBall.xy[1] += uBall.v[1];
+    if(uBall.xy[0] < -1 + uBall.r || uBall.xy[0] > 1 - uBall.r)
+        uBall.v[0] = -uBall.v[0];
+    if(uBall.xy[1] < -1 + uBall.r || uBall.xy[1] > 1 - uBall.r)
+        uBall.v[1] = -uBall.v[1];
     requestAnimationFrame(draw);
     time ++;
 }
