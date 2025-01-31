@@ -1,6 +1,6 @@
 <html>
 <style>
-canvas {border: 1px solid #CCC
+canvas {border: 1px solid #CCC}
 </style>
 <body>
 <canvas width=400 height=400></canvas>
@@ -11,18 +11,20 @@ uniform vec2 u_resolution;
 void main()
 {
     gl_PointSize = u_resolution.x;
-    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+    gl_Position = vec4(0.0, 0.0, 0.0, 0.0);
 }
 </script>
 <script id="fs" type="x-shader/x-fragment">#version 300 es
 precision mediump float;
+
+#define PI 3.141592653589793
 
 struct BALL
 {
     float r;
     vec2 xy;
     vec2 v;
-    vec4 rgb;
+    vec4 rgba;
 };
 
 uniform vec2 u_resolution;
@@ -31,33 +33,32 @@ uniform vec2 u_mouse_pos;
 
 uniform BALL u_ball;
 
-out vec4 fragColor;
+out vec4 frag_color;
 
-void ball(in BALL self, in vec2 frag_xy)
+float rand(float x)
 {
-//    fragColor = self.rgb * smoothstep(self.r, self.r/1.9, length(self.xy - frag_xy));
-    fragColor = self.rgb * step(length(self.xy - frag_xy), self.r);
+    return fract(sin(x * 2.0 * PI) * 43758.5453123);
+}
+
+vec4 background(in vec2 frag_xy)
+{
+    float r = rand(frag_xy.x * frag_xy.y * u_time);
+    float g = rand(r);
+    float b = rand(g);
+    return vec4(r, g, b, 1.0);
+}
+
+vec4 draw_ball(in BALL self, in vec4 prev_clr, in vec2 frag_xy)
+{
+    return mix(prev_clr, self.rgba, step(length(self.xy - frag_xy), self.r));
 }
 
 void main()
 {
     vec2 frag_xy = 2.0 * gl_FragCoord.xy / u_resolution.x - 1.0;
-    ball(u_ball, frag_xy);
-
-//    vec4 color = mix(vec4(1.0, 0.0, 0.0, 1.0),
-//            vec4(1.0, 1.0, 1.0, 1.0),
-//            vec4(gl_FragCoord.xy / u_resolution, gl_FragCoord.yx / u_resolution));
-//    fragColor = mix(vec4(0.0, 0.0, 0.0, 1.0), color, smoothstep(0.1, 0.0, length(u_mouse_pos - fragPosNorm)));
-
-// bvec2 lessThanEqual(vec2 x, vec2 y);
-//    fragColor = vec4(1.0, 0.0, 0.0, 1.0)
-//        * smoothstep(0.06, 0.0, abs(u_mouse_pos - fragPosNorm).x)
-//        * smoothstep(0.12, 0.0, abs(u_mouse_pos - fragPosNorm).y);
-
-//    fragColor = vec4(abs(u_mouse_pos.x)
-//            , abs(u_mouse_pos.y)
-//            , abs(u_mouse_pos.x + u_mouse_pos.y)
-//            , 1.0);
+    vec4 curr_clr = background(frag_xy);
+    curr_clr = draw_ball(u_ball, curr_clr, frag_xy);
+    frag_color = curr_clr;
 }
 </script>
 </body>
@@ -98,7 +99,6 @@ const uResolutionLoc = gl.getUniformLocation(program, 'u_resolution');
 gl.uniform2f(uResolutionLoc, canvas.width, canvas.height);
 
 const uTimeLoc = gl.getUniformLocation(program, 'u_time');
-var time = 0;
 
 const uMousePosLoc = gl.getUniformLocation(program, "u_mouse_pos");
 
@@ -120,11 +120,11 @@ uBall.init();
 gl.uniform1f(gl.getUniformLocation(program, 'u_ball.r'), uBall.r);
 gl.uniform2f(uBall_xy_Loc, uBall.xy[0], uBall.xy[1]);
 gl.uniform2f(uBall_v_Loc, uBall.v[0], uBall.v[1]);
-gl.uniform4f(gl.getUniformLocation(program, 'u_ball.rgb'), 1.0, 0.0, 0.0, 1.0);
+gl.uniform4f(gl.getUniformLocation(program, 'u_ball.rgba'), 1.0, 0.0, 0.0, 1.0);
 
 draw = function()
 {
-    gl.uniform1f(uTimeLoc, time);
+    gl.uniform1f(uTimeLoc, (performance.now() % 10000) * 0.001);
     gl.uniform2f(uMousePosLoc, normMouseX, normMouseY);
     gl.uniform2f(uBall_xy_Loc, uBall.xy[0], uBall.xy[1]);
     gl.drawArrays(gl.POINTS, 0, 1);
@@ -139,7 +139,6 @@ draw = function()
     if(uBall.xy[1] < -1 + uBall.r || uBall.xy[1] > 1 - uBall.r)
         uBall.v[1] = -uBall.v[1];
     requestAnimationFrame(draw);
-    time ++;
 }
 draw();
 
