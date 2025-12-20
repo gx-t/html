@@ -1,0 +1,15 @@
+{
+  "short_name": "WebGL test",
+  "name": "WebGL and Shaders Tests",
+  "description": "Test application",
+  "icons": [
+    {
+      "src": "img/pencil.jpg",
+      "sizes": "192x192"
+    }
+  ],
+  "theme_color": "#ff0000",
+  "background_color": "#ff0000",
+  "start_url": "index.html",
+  "display": "fullscreen"
+}
