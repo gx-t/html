@@ -31,15 +31,20 @@ canvas {
 <body>
 <canvas width=400 height=400></canvas>
 <script id="vs" type="x-shader/x-vertex">#version 300 es
-precision mediump float;
+precision highp float;
 
-uniform vec2 u_resolution;
-void main()
-{
-    gl_PointSize = u_resolution.x;
-    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+const vec2 pos[3] = vec2[](
+    vec2(-1.0, -1.0),
+    vec2( 3.0, -1.0),
+    vec2(-1.0,  3.0)
+);
+
+void main() {
+    gl_Position = vec4(pos[gl_VertexID], 0.0, 1.0);
 }
 </script>
+
+
 <script id="fs" type="x-shader/x-fragment">#version 300 es
 precision mediump float;
 
@@ -87,11 +92,21 @@ vec4 draw_ball(in BALL self, in vec4 prev_clr, in vec2 frag_xy)
     return mix(prev_clr, self.rgba * brightness, mask);
 }
 
+vec4 draw_border(in vec4 prev_clr, vec4 border_clr)
+{
+    vec2 p = gl_FragCoord.xy;
+    return (p.x < 1.0
+            || p.y < 1.0
+            || p.x > u_resolution.x - 1.0
+            || p.y > u_resolution.y - 1.0) ? border_clr : prev_clr;
+}
+
 void main()
 {
     vec2 frag_xy = 2.0 * gl_FragCoord.xy / u_resolution - 1.0;
     vec4 curr_clr = background(frag_xy);
     curr_clr = draw_ball(u_ball, curr_clr, frag_xy);
+    curr_clr = draw_border(curr_clr, vec4(0.0, 1.0, 0.0, 1.0));
     frag_color = curr_clr;
 }
 </script>
@@ -163,7 +178,7 @@ draw = function()
     gl.uniform2f(uBall_xy_Loc, uBall.xy[0], uBall.xy[1]);
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.POINTS, 0, 1);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
     const error = gl.getError();
     if(error !== gl.NO_ERROR)
         console.error("WebGL error:", error);
