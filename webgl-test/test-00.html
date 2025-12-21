@@ -66,17 +66,19 @@ uniform BALL u_ball;
 
 out vec4 frag_color;
 
-float rand(float x)
+float hash12(vec2 p)
 {
-    return fract(sin(x * 2.0 * PI) * 43758.5453123);
+    vec3 p3  = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
 }
 
-vec4 background(in vec2 frag_xy)
+vec4 draw_background()
 {
-    float r = rand(frag_xy.x * frag_xy.y * u_time);
-    float g = rand(r);
-    float b = rand(g);
-    return vec4(r, g, b, 1.0);
+    vec2 p = gl_FragCoord.xy;
+
+    float n = hash12(p + floor(u_time * 10.0));
+    return vec4(vec3(n), 1.0);
 }
 
 vec4 draw_ball(in BALL self, in vec4 prev_clr, in vec2 frag_xy)
@@ -104,7 +106,7 @@ vec4 draw_border(in vec4 prev_clr, vec4 border_clr)
 void main()
 {
     vec2 frag_xy = 2.0 * gl_FragCoord.xy / u_resolution - 1.0;
-    vec4 curr_clr = background(frag_xy);
+    vec4 curr_clr = draw_background();
     curr_clr = draw_ball(u_ball, curr_clr, frag_xy);
     curr_clr = draw_border(curr_clr, vec4(0.0, 1.0, 0.0, 1.0));
     frag_color = curr_clr;
@@ -173,7 +175,7 @@ gl.uniform4f(gl.getUniformLocation(program, 'u_ball.rgba'), 1.0, 0.0, 0.0, 1.0);
 
 draw = function()
 {
-    gl.uniform1f(uTimeLoc, (performance.now() % 10000) * 0.001);
+    gl.uniform1f(uTimeLoc, performance.now() * 0.001);
     gl.uniform2f(uMousePosLoc, normMouseX, normMouseY);
     gl.uniform2f(uBall_xy_Loc, uBall.xy[0], uBall.xy[1]);
     gl.clearColor(0, 0, 0, 1);
