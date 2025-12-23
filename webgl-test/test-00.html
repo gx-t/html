@@ -77,8 +77,23 @@ vec4 draw_background()
 {
     vec2 p = gl_FragCoord.xy;
 
-    float n = hash12(p + floor(u_time * 10.0));
-    return vec4(vec3(n), 1.0);
+    // grid size
+    vec2 cellSize = vec2(80.0, 80.0);
+
+    // animate grid movement
+    vec2 uv = (p + vec2(u_mouse_pos.x * 80.0, u_time * 40.0)) / cellSize;
+
+    vec2 f = fract(uv);
+
+    // distance to grid vertex (corner)
+    float d = length(f);
+
+    // dot radius
+    float r = 0.15;
+
+    float dot = 1.0 - smoothstep(r, r + 0.02, d);
+
+    return vec4(vec3(dot / 8.0), 1.0);
 }
 
 vec4 draw_ball(in BALL self, in vec4 prev_clr, in vec2 frag_xy)
@@ -97,10 +112,10 @@ vec4 draw_ball(in BALL self, in vec4 prev_clr, in vec2 frag_xy)
 vec4 draw_border(in vec4 prev_clr, vec4 border_clr)
 {
     vec2 p = gl_FragCoord.xy;
-    return (p.x < 1.0
-            || p.y < 1.0
-            || p.x > u_resolution.x - 1.0
-            || p.y > u_resolution.y - 1.0) ? border_clr : prev_clr;
+    return (p.x < 3.0
+            || p.y < 3.0
+            || p.x > u_resolution.x - 3.0
+            || p.y > u_resolution.y - 3.0) ? border_clr : prev_clr;
 }
 
 void main()
@@ -115,8 +130,8 @@ void main()
 </body>
 <script>
 const canvas = document.querySelector('canvas');
-var normMouseX = 0.0;
-var normMouseY = 0.0;
+var normMouseX = 0.5;
+var normMouseY = 0.5;
 canvas.addEventListener("mousemove", (event) => {
         const rect = canvas.getBoundingClientRect();
 
