@@ -132,12 +132,15 @@ void main()
 const canvas = document.querySelector('canvas');
 var normMouseX = 0.5;
 var normMouseY = 0.5;
-canvas.addEventListener("mousemove", (event) => {
-        const rect = canvas.getBoundingClientRect();
 
-        normMouseX = 2.0 * (event.clientX - rect.left) / canvas.width - 1.0;
-        normMouseY = 2.0 * (rect.top - event.clientY) / canvas.height + 1.0;
-        });
+canvas.addEventListener("pointerdown", updatePointer);
+canvas.addEventListener("pointermove", updatePointer);
+
+function updatePointer(e) {
+    const rect = canvas.getBoundingClientRect();
+    normMouseX = 2.0 * (e.clientX - rect.left) / canvas.width - 1.0;
+    normMouseY = 2.0 * (rect.top - e.clientY) / canvas.height + 1.0;
+}
 
 const gl = canvas.getContext('webgl2');
 const program = gl.createProgram();
