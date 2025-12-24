@@ -162,8 +162,11 @@ const canvas = document.querySelector('canvas');
 var normMouseX = 0.0;
 var normMouseY = 0.0;
 
+canvas.style.touchAction = 'none';
 canvas.addEventListener("pointerdown", updatePointer);
 canvas.addEventListener("pointermove", updatePointer);
+canvas.addEventListener('pointerup', updatePointer);
+canvas.addEventListener('pointercancel', updatePointer);
 
 function updatePointer(e) {
     const rect = canvas.getBoundingClientRect();
