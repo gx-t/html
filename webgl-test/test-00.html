@@ -58,20 +58,21 @@ struct BALL
     vec4 rgba;
 };
 
+struct PAD
+{
+    float width;
+    float height;
+    vec4 rgba;
+};
+
 uniform vec2 u_resolution;
 uniform float u_time;
 uniform vec2 u_mouse_pos;
 
 uniform BALL u_ball;
+uniform PAD u_pad;
 
 out vec4 frag_color;
-
-float hash12(vec2 p)
-{
-    vec3 p3  = fract(vec3(p.xyx) * 0.1031);
-    p3 += dot(p3, p3.yzx + 33.33);
-    return fract((p3.x + p3.y) * p3.z);
-}
 
 vec4 draw_background()
 {
@@ -104,9 +105,36 @@ vec4 draw_ball(in BALL self, in vec4 prev_clr, in vec2 frag_xy)
 
     float brightness = (frag_xy.x - self.xy.x) / self.r;
     brightness = brightness * 0.5 + 0.5;
-    brightness = clamp(brightness, 0.0, 1.0);
 
     return mix(prev_clr, self.rgba * brightness, mask);
+}
+
+vec4 draw_pad(vec2 frag_pos, vec4 color)
+{
+    vec2 pad_center = vec2(u_mouse_pos.x, -1.0 + u_pad.height * 0.5);
+
+    vec2 d = abs(frag_pos - pad_center);
+    vec2 h = vec2(u_pad.width, u_pad.height) * 0.5;
+
+    float outer = step(d.x, h.x) * step(d.y, h.y);
+
+    float border_w = 0.01;
+    vec2 hi = h - border_w;
+
+    float inner = step(d.x, hi.x) * step(d.y, hi.y);
+
+    float body = inner;
+    float border = outer - inner;
+
+    float gx = (frag_pos.x - pad_center.x) / h.x;
+    float light = gx * 0.5 + 0.5;
+
+    vec4 body_col   = u_pad.rgba * light;
+    vec4 border_col = u_pad.rgba * 0.25;
+
+    vec4 pad_col = body_col * body + border_col * border;
+
+    return mix(color, pad_col, outer);
 }
 
 vec4 draw_border(in vec4 prev_clr, vec4 border_clr)
@@ -123,6 +151,7 @@ void main()
     vec2 frag_xy = 2.0 * gl_FragCoord.xy / u_resolution - 1.0;
     vec4 curr_clr = draw_background();
     curr_clr = draw_ball(u_ball, curr_clr, frag_xy);
+    curr_clr = draw_pad(frag_xy, curr_clr);
     curr_clr = draw_border(curr_clr, vec4(0.0, 1.0, 0.0, 1.0));
     frag_color = curr_clr;
 }
@@ -130,16 +159,18 @@ void main()
 </body>
 <script>
 const canvas = document.querySelector('canvas');
-var normMouseX = 0.5;
-var normMouseY = 0.5;
+var normMouseX = 0.0;
+var normMouseY = 0.0;
 
 canvas.addEventListener("pointerdown", updatePointer);
 canvas.addEventListener("pointermove", updatePointer);
 
 function updatePointer(e) {
     const rect = canvas.getBoundingClientRect();
-    normMouseX = 2.0 * (e.clientX - rect.left) / canvas.width - 1.0;
-    normMouseY = 2.0 * (rect.top - e.clientY) / canvas.height + 1.0;
+    normMouseX = (e.clientX - rect.left) / canvas.width * 4.0 - 1.0;
+    normMouseY = (rect.top - e.clientY) / canvas.height * 4.0 + 1.0;
+    console.log("===>>> " + e.clientX + " " + e.clientY);
+    console.log("===>>> " + normMouseX + " " + normMouseY);
 }
 
 const gl = canvas.getContext('webgl2');
@@ -174,11 +205,16 @@ const uMousePosLoc = gl.getUniformLocation(program, "u_mouse_pos");
 const uBall_xy_Loc = gl.getUniformLocation(program, 'u_ball.xy');
 const uBall_v_Loc = gl.getUniformLocation(program, 'u_ball.v');
 
+const uPad_width_Loc = gl.getUniformLocation(program, 'u_pad.width');
+const uPad_height_Loc = gl.getUniformLocation(program, 'u_pad.height');
+const uPad_rgb_Loc = gl.getUniformLocation(program, 'u_ball.rgba');
+
 var uBall = {};
+var uPad = {width: 0.5, height: 0.1};
 
 uBall.init = function()
 {
-    this.r = 0.1
+    this.r = 0.1;
     this.xy = [0.0, 0.0];
     const alpha = 17.11 * Math.random();
     this.v = [0.03 * Math.sin(alpha), 0.03 * Math.cos(alpha)];
@@ -190,6 +226,10 @@ gl.uniform1f(gl.getUniformLocation(program, 'u_ball.r'), uBall.r);
 gl.uniform2f(uBall_xy_Loc, uBall.xy[0], uBall.xy[1]);
 gl.uniform2f(uBall_v_Loc, uBall.v[0], uBall.v[1]);
 gl.uniform4f(gl.getUniformLocation(program, 'u_ball.rgba'), 1.0, 0.0, 0.0, 1.0);
+
+gl.uniform1f(gl.getUniformLocation(program, 'u_pad.width'), uPad.width);
+gl.uniform1f(gl.getUniformLocation(program, 'u_pad.height'), uPad.height);
+gl.uniform4f(gl.getUniformLocation(program, 'u_pad.rgba'), 1.0, 1.0, 0.0, 1.0);
 
 draw = function()
 {
