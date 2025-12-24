@@ -208,7 +208,7 @@ const uPad_height_Loc = gl.getUniformLocation(program, 'u_pad.height');
 const uPad_rgb_Loc = gl.getUniformLocation(program, 'u_ball.rgba');
 
 var uBall = {};
-var uPad = {width: 0.5, height: 0.1};
+var uPad = {width: 0.5, height: 0.05};
 
 uBall.init = function()
 {
@@ -241,12 +241,24 @@ draw = function()
     if(error !== gl.NO_ERROR)
         console.error("WebGL error:", error);
 
-    uBall.xy[0] += uBall.v[0];
-    uBall.xy[1] += uBall.v[1];
-    if(uBall.xy[0] < -1 + uBall.r || uBall.xy[0] > 1 - uBall.r)
+    const next_x = uBall.xy[0] + uBall.v[0];
+    const next_y = uBall.xy[1] + uBall.v[1];
+    if(next_x < -1 + uBall.r || next_x > 1 - uBall.r)
         uBall.v[0] = -uBall.v[0];
-    if(uBall.xy[1] < -1 + uBall.r || uBall.xy[1] > 1 - uBall.r)
+    if(next_y < -1 + uBall.r || next_y > 1 - uBall.r)
         uBall.v[1] = -uBall.v[1];
+
+    const pad_left = normMouseX - uPad.width / 2.0;
+    const pad_right = normMouseX + uPad.width / 2.0;
+    const pad_top = -1.0 + uPad.height;
+    if(next_x + uBall.r > pad_left
+        && next_x - uBall.r < pad_right
+        && next_y - uBall.r < pad_top)
+    {
+        uBall.v[1] = -uBall.v[1];
+    }
+    uBall.xy[0] = next_x;
+    uBall.xy[1] = next_y;
     requestAnimationFrame(draw);
 }
 draw();
