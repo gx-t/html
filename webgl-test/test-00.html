@@ -92,21 +92,21 @@ vec4 draw_background()
     // dot radius
     float r = 0.15;
 
-    float dot = 1.0 - smoothstep(r, r + 0.02, d);
+    float dot = 1.0 - step(r, d);
 
     return vec4(vec3(dot / 8.0), 1.0);
 }
 
-vec4 draw_ball(in BALL self, in vec4 prev_clr, in vec2 frag_xy)
+vec4 draw_ball(in vec2 frag_xy, in vec4 prev_clr)
 {
-    float d = length(self.xy - frag_xy);
+    float d = length(frag_xy - u_ball.xy);
 
-    float mask = 1.0 - smoothstep(self.r - 0.01, self.r, d);
+    float mask = 1.0 - step(u_ball.r, d);
 
-    float brightness = (frag_xy.x - self.xy.x) / self.r;
+    float brightness = (frag_xy.x - u_ball.xy.x) / u_ball.r;
     brightness = brightness * 0.5 + 0.5;
 
-    return mix(prev_clr, self.rgba * brightness, mask);
+    return mix(prev_clr, u_ball.rgba * brightness, mask);
 }
 
 vec4 draw_pad(vec2 frag_pos, vec4 color)
@@ -150,7 +150,7 @@ void main()
 {
     vec2 frag_xy = 2.0 * gl_FragCoord.xy / u_resolution - 1.0;
     vec4 curr_clr = draw_background();
-    curr_clr = draw_ball(u_ball, curr_clr, frag_xy);
+    curr_clr = draw_ball(frag_xy, curr_clr);
     curr_clr = draw_pad(frag_xy, curr_clr);
     curr_clr = draw_border(curr_clr, vec4(0.0, 1.0, 0.0, 1.0));
     frag_color = curr_clr;
