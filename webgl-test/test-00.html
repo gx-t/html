@@ -254,14 +254,28 @@ draw = function()
     const pad_left = normMouseX - uPad.width / 2.0;
     const pad_right = normMouseX + uPad.width / 2.0;
     const pad_top = -1.0 + uPad.height;
-    if(next_x + uBall.r > pad_left
-        && next_x - uBall.r < pad_right
-        && next_y - uBall.r < pad_top)
+    if(
+            next_x + uBall.r > pad_left &&
+            next_x - uBall.r < pad_right &&
+            next_y - uBall.r < pad_top &&
+            uBall.v[1] < 0.0
+      )
     {
-        uBall.v[1] = -uBall.v[1];
+        const pad_center = normMouseX;
+        const hit = (next_x - pad_center) / (uPad.width * 0.5);
+        const hit_clamped = Math.max(-1, Math.min(1, hit));
+
+        const MAX_ANGLE = Math.PI * 0.35;
+        const angle = hit_clamped * MAX_ANGLE;
+
+        const speed = Math.hypot(uBall.v[0], uBall.v[1]);
+
+        uBall.v[0] = speed * Math.sin(angle);
+        uBall.v[1] = speed * Math.cos(angle); // always upward
+        uBall.xy[1] = pad_top + uBall.r + 0.0001;
     }
-    uBall.xy[0] = next_x;
-    uBall.xy[1] = next_y;
+    uBall.xy[0] += uBall.v[0];
+    uBall.xy[1] += uBall.v[1];
     requestAnimationFrame(draw);
 }
 draw();
